@@ -94,6 +94,19 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 		})
 	}
 
+	for _, event := range entity.Events {
+		var props []*proto.Property
+		for _, prop := range event.Data {
+			props = append(props, prop.toProto())
+		}
+
+		applyMutation.Events = append(applyMutation.Events, &proto.Event{
+			Type: toKey(event.Type),
+			Time: timestamppb.New(event.Time),
+			Data: props,
+		})
+	}
+
 	mutate := &proto.MutateRequest{
 		WorkspaceId: entity.WorkspaceID,
 		Schema:      toKey(entity.Schema),

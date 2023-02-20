@@ -2,6 +2,8 @@ package keystone
 
 import (
 	"github.com/kubex/definitions-go/app"
+	"github.com/kubex/keystone-go/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
@@ -16,6 +18,20 @@ type Property struct {
 	Float          float64
 	Time           *time.Time
 	updated        bool
+}
+
+func (p *Property) toProto() *proto.Property {
+	return &proto.Property{
+		Key:            toKey(p.Name),
+		Type:           p.Type.toProto(),
+		Classification: p.Classification.toProto(),
+		Text:           p.Text,
+		Int:            p.Int,
+		Bool:           p.Bool,
+		Float:          float32(p.Float),
+		Time:           timestamppb.New(*p.Time),
+		SecureText:     p.Secret,
+	}
 }
 
 func Encrypted(name, decrypted, preview string) Property {
