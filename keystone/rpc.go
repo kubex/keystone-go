@@ -50,11 +50,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 		prop.updated = true
 
 		protoProp := &proto.Property{
-			Key: &proto.Key{
-				VendorId: prop.Name.VendorID,
-				AppId:    prop.Name.AppID,
-				Key:      prop.Name.Key,
-			},
+			Key: toKey(prop.Name),
 		}
 
 		switch prop.Type {
@@ -82,11 +78,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	}
 
 	for _, prop := range entity.DeleteProperties {
-		applyMutation.PropertyDeletes = append(applyMutation.PropertyDeletes, &proto.Key{
-			VendorId: prop.Name.VendorID,
-			AppId:    prop.Name.AppID,
-			Key:      prop.Name.Key,
-		})
+		applyMutation.PropertyDeletes = append(applyMutation.PropertyDeletes, toKey(prop.Name))
 	}
 
 	for _, logEntry := range entity.LogEntries {
@@ -104,6 +96,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 
 	mutate := &proto.MutateRequest{
 		WorkspaceId: entity.WorkspaceID,
+		Schema:      toKey(entity.Schema),
 		Mutations:   []*proto.Mutation{applyMutation},
 	}
 

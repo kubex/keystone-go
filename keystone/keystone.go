@@ -1,12 +1,14 @@
 package keystone
 
 import (
+	"github.com/kubex/definitions-go/app"
 	"github.com/kubex/definitions-go/k4"
 )
 
 type Entity struct {
 	WorkspaceID      string
 	ID               k4.ID
+	Schema           app.ScopedKey
 	Properties       map[string]Property
 	DeleteProperties map[string]Property
 	LogEntries       []LogEntry

@@ -1,6 +1,9 @@
 package keystone
 
-import "github.com/kubex/keystone-go/proto"
+import (
+	"github.com/kubex/definitions-go/app"
+	"github.com/kubex/keystone-go/proto"
+)
 
 type Classification string
 
@@ -146,4 +149,17 @@ func getLogLevel(logLevel proto.LogLevel) LogLevel {
 		return LogLevelFatal
 	}
 	return LogLevelInfo
+}
+
+func getScopedKey(key *proto.Key) app.ScopedKey {
+	gaid := app.NewID(key.GetVendorId(), key.GetAppId())
+	return app.NewScopedKey(key.GetKey(), &gaid)
+}
+
+func toKey(scopedKey app.ScopedKey) *proto.Key {
+	return &proto.Key{
+		VendorId: scopedKey.VendorID,
+		AppId:    scopedKey.AppID,
+		Key:      scopedKey.Key,
+	}
 }
