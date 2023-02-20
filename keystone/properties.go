@@ -42,22 +42,36 @@ func Float(name string, input float64) Property {
 	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Float: input, Type: PropertyTypeFloat}
 }
 
-func (v *Property) Updated() {
-	v.updated = true
+func (p *Property) Updated() {
+	p.updated = true
 }
 
-func (v *Property) Value() interface{} {
-	switch v.Type {
+func (p *Property) Value() interface{} {
+	switch p.Type {
 	case PropertyTypeText:
-		return v.Text
+		return p.Text
 	case PropertyTypeInt:
-		return v.Int
+		return p.Int
 	case PropertyTypeBool:
-		return v.Bool
+		return p.Bool
 	case PropertyTypeFloat:
-		return v.Float
+		return p.Float
 	case PropertyTypeTime:
-		return v.Time
+		return p.Time
 	}
 	return nil
 }
+
+func (p *Property) AsPersonal()  { p.Classification = ClassificationPersonal }
+func (p *Property) AsUserInput() { p.Classification = ClassificationUserInput }
+func (p *Property) AsSecure()    { p.Classification = ClassificationSecure }
+func (p *Property) AsIndexed()   { p.Classification = ClassificationIndexed }
+func (p *Property) AsID()        { p.Classification = ClassificationID }
+func (p *Property) AsAnonymous() { p.Classification = ClassificationAnonymous }
+
+func PersonalData(p Property) Property  { p.AsPersonal(); return p }
+func UserInput(p Property) Property     { p.AsUserInput(); return p }
+func SecureData(p Property) Property    { p.AsSecure(); return p }
+func IndexedData(p Property) Property   { p.AsIndexed(); return p }
+func Identifier(p Property) Property    { p.AsID(); return p }
+func AnonymousData(p Property) Property { p.AsAnonymous(); return p }
