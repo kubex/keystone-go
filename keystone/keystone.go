@@ -15,18 +15,24 @@ type Entity struct {
 	Events           []Event
 }
 
-func NewEntity(workspaceID, schema string) *Entity {
+func newEntity(workspaceID string) *Entity {
 	return &Entity{
-		WorkspaceID: workspaceID,
-		Schema:      app.NewScopedKey(schema, defaultSetGlobalAppID),
+		WorkspaceID:      workspaceID,
+		Properties:       make(map[string]Property),
+		DeleteProperties: make(map[string]Property),
 	}
 }
 
+func NewEntity(workspaceID, schema string) *Entity {
+	e := newEntity(workspaceID)
+	e.Schema = app.NewScopedKey(schema, defaultSetGlobalAppID)
+	return e
+}
+
 func ExistingEntity(workspaceID, entityID string) *Entity {
-	return &Entity{
-		WorkspaceID: workspaceID,
-		ID:          k4.IDFromString(entityID),
-	}
+	e := newEntity(workspaceID)
+	e.ID = k4.IDFromString(entityID)
+	return e
 }
 
 func (e *Entity) Mutate(prop ...Property) {
