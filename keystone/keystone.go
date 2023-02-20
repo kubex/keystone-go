@@ -15,9 +15,10 @@ type Entity struct {
 	Events           []Event
 }
 
-func NewEntity(workspaceID string) *Entity {
+func NewEntity(workspaceID, schema string) *Entity {
 	return &Entity{
 		WorkspaceID: workspaceID,
+		Schema:      app.NewScopedKey(schema, defaultSetGlobalAppID),
 	}
 }
 
