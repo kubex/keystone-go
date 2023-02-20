@@ -34,7 +34,7 @@ func (c Classification) toProto() proto.DataClassification {
 	return proto.DataClassification_CLASSIFICATION_ANONYMOUS
 }
 
-func toClassification(classification proto.DataClassification) Classification {
+func GetClassification(classification proto.DataClassification) Classification {
 	switch classification {
 	case proto.DataClassification_CLASSIFICATION_ANONYMOUS:
 		return ClassificationAnonymous
@@ -78,7 +78,7 @@ func (p PropertyType) toProto() proto.ValueType {
 	return proto.ValueType_VALUE_TEXT
 }
 
-func toPropertyType(valueType proto.ValueType) PropertyType {
+func GetPropertyType(valueType proto.ValueType) PropertyType {
 	switch valueType {
 	case proto.ValueType_VALUE_TEXT:
 		return PropertyTypeText
@@ -129,7 +129,7 @@ func (l LogLevel) toProto() proto.LogLevel {
 	return proto.LogLevel_LevelInfo
 }
 
-func getLogLevel(logLevel proto.LogLevel) LogLevel {
+func GetLogLevel(logLevel proto.LogLevel) LogLevel {
 	switch logLevel {
 	case proto.LogLevel_LevelDebug:
 		return LogLevelDebug
@@ -151,7 +151,7 @@ func getLogLevel(logLevel proto.LogLevel) LogLevel {
 	return LogLevelInfo
 }
 
-func getScopedKey(key *proto.Key) app.ScopedKey {
+func GetScopedKey(key *proto.Key) app.ScopedKey {
 	gaid := app.NewID(key.GetVendorId(), key.GetAppId())
 	return app.NewScopedKey(key.GetKey(), &gaid)
 }
