@@ -21,6 +21,10 @@ type Property struct {
 }
 
 func (p *Property) toProto() *proto.Property {
+	var useTime *timestamppb.Timestamp
+	if p.Time != nil {
+		useTime = timestamppb.New(*p.Time)
+	}
 	return &proto.Property{
 		Key:            toKey(p.Name),
 		Type:           p.Type.toProto(),
@@ -29,7 +33,7 @@ func (p *Property) toProto() *proto.Property {
 		Int:            p.Int,
 		Bool:           p.Bool,
 		Float:          float32(p.Float),
-		Time:           timestamppb.New(*p.Time),
+		Time:           useTime,
 		SecureText:     p.Secret,
 	}
 }
