@@ -133,6 +133,9 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	}
 
 	mutateResp, err := c.client.Mutate(ctx, mutate)
+	if err != nil {
+		return nil, err
+	}
 
 	if mutateResp.Success {
 		entity.ID = k4.IDFromString(mutateResp.EntityId)
