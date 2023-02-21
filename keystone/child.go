@@ -1,6 +1,7 @@
 package keystone
 
 import (
+	"encoding/json"
 	"github.com/kubex/definitions-go/app"
 )
 
@@ -17,4 +18,13 @@ func (e *Entity) AddChild(childType string, data []byte) {
 		Type:    app.NewScopedKey(childType, defaultSetGlobalAppID),
 		Data:    data,
 	})
+}
+
+func (e *Entity) AddChildJson(childType string, data interface{}) error {
+	if dataBytes, err := json.Marshal(data); err == nil {
+		e.AddChild(childType, dataBytes)
+		return nil
+	} else {
+		return err
+	}
 }
