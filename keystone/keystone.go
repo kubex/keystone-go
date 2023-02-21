@@ -13,6 +13,7 @@ type Entity struct {
 	DeleteProperties map[string]Property
 	LogEntries       []LogEntry
 	Events           []Event
+	Children         []Child
 }
 
 func newEntity(workspaceID string) *Entity {

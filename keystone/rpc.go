@@ -85,6 +85,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 		if logEntry.Actor == nil {
 			logEntry.Actor = &c.actor
 		}
+
 		applyMutation.Logs = append(applyMutation.Logs, &proto.Log{
 			Level:     logEntry.Level.toProto(),
 			Message:   logEntry.Message,
@@ -92,6 +93,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 			TraceId:   logEntry.TraceID,
 			Time:      timestamppb.New(logEntry.Time),
 		})
+		logEntry.written = true
 	}
 
 	for _, event := range entity.Events {
@@ -105,6 +107,19 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 			Time: timestamppb.New(event.Time),
 			Data: props,
 		})
+		event.written = true
+	}
+
+	for _, child := range entity.Children {
+		protoChild := &proto.Child{
+			Type: toKey(child.Type),
+			Data: child.Data,
+		}
+		if child.ID != "" {
+			protoChild.Id = child.ID
+		}
+		applyMutation.Children = append(applyMutation.Children, protoChild)
+		child.written = true
 	}
 
 	mutate := &proto.MutateRequest{
