@@ -34,6 +34,13 @@ func (c Classification) toProto() proto.DataClassification {
 	return proto.DataClassification_CLASSIFICATION_ANONYMOUS
 }
 
+func (c Classification) StoresEncrypted() bool {
+	return c == ClassificationPersonal || c == ClassificationSecure
+}
+func (c Classification) StoresIndexed() bool {
+	return c == ClassificationPersonal || c == ClassificationSecure
+}
+
 func GetClassification(classification proto.DataClassification) Classification {
 	switch classification {
 	case proto.DataClassification_CLASSIFICATION_ANONYMOUS:
