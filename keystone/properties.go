@@ -38,8 +38,16 @@ func (p *Property) toProto() *proto.Property {
 	}
 }
 
-func Encrypted(name, decrypted, preview string) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Secret: decrypted, Text: preview, Classification: ClassificationSecure, Type: PropertyTypeText}
+func Secret(name, secureData, preview string) Property {
+	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Secret: secureData, Text: preview, Classification: ClassificationSecure, Type: PropertyTypeText}
+}
+
+func Personal(name, sensitiveData, preview string) Property {
+	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Secret: sensitiveData, Text: preview, Classification: ClassificationPersonal, Type: PropertyTypeText}
+}
+
+func ID(name, uniqueID string) Property {
+	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Text: uniqueID, Type: PropertyTypeText, Classification: ClassificationID}
 }
 
 func Text(name, input string) Property {
@@ -92,6 +100,6 @@ func (p *Property) AsAnonymous() { p.Classification = ClassificationAnonymous }
 func PersonalData(p Property) Property  { p.AsPersonal(); return p }
 func UserInput(p Property) Property     { p.AsUserInput(); return p }
 func SecureData(p Property) Property    { p.AsSecure(); return p }
-func IndexedData(p Property) Property   { p.AsIndexed(); return p }
+func Indexed(p Property) Property       { p.AsIndexed(); return p }
 func Identifier(p Property) Property    { p.AsID(); return p }
 func AnonymousData(p Property) Property { p.AsAnonymous(); return p }
