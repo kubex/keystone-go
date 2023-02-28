@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type KeystoneClient interface {
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*EntityResponse, error)
+	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
+	Lookup(ctx context.Context, in *LookupRequest, opts ...grpc.CallOption) (*FindResponse, error)
 }
 
 type keystoneClient struct {
@@ -52,12 +54,32 @@ func (c *keystoneClient) Retrieve(ctx context.Context, in *RetrieveRequest, opts
 	return out, nil
 }
 
+func (c *keystoneClient) Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error) {
+	out := new(FindResponse)
+	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Find", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) Lookup(ctx context.Context, in *LookupRequest, opts ...grpc.CallOption) (*FindResponse, error) {
+	out := new(FindResponse)
+	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Lookup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KeystoneServer is the server API for Keystone service.
 // All implementations must embed UnimplementedKeystoneServer
 // for forward compatibility
 type KeystoneServer interface {
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
 	Retrieve(context.Context, *RetrieveRequest) (*EntityResponse, error)
+	Find(context.Context, *FindRequest) (*FindResponse, error)
+	Lookup(context.Context, *LookupRequest) (*FindResponse, error)
 	mustEmbedUnimplementedKeystoneServer()
 }
 
@@ -70,6 +92,12 @@ func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*Mut
 }
 func (UnimplementedKeystoneServer) Retrieve(context.Context, *RetrieveRequest) (*EntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retrieve not implemented")
+}
+func (UnimplementedKeystoneServer) Find(context.Context, *FindRequest) (*FindResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Find not implemented")
+}
+func (UnimplementedKeystoneServer) Lookup(context.Context, *LookupRequest) (*FindResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Lookup not implemented")
 }
 func (UnimplementedKeystoneServer) mustEmbedUnimplementedKeystoneServer() {}
 
@@ -120,6 +148,42 @@ func _Keystone_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keystone_Find_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).Find(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubex.keystone.Keystone/Find",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).Find(ctx, req.(*FindRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keystone_Lookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LookupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).Lookup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubex.keystone.Keystone/Lookup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).Lookup(ctx, req.(*LookupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Keystone_ServiceDesc is the grpc.ServiceDesc for Keystone service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +198,14 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Retrieve",
 			Handler:    _Keystone_Retrieve_Handler,
+		},
+		{
+			MethodName: "Find",
+			Handler:    _Keystone_Find_Handler,
+		},
+		{
+			MethodName: "Lookup",
+			Handler:    _Keystone_Lookup_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
