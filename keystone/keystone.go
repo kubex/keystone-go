@@ -14,6 +14,7 @@ type Entity struct {
 	LogEntries       []LogEntry
 	Events           []Event
 	Children         []Child
+	Relationships    []Relationship
 }
 
 func newEntity(workspaceID string) *Entity {
