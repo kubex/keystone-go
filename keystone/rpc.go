@@ -124,6 +124,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 
 	mutate := &proto.MutateRequest{
 		WorkspaceId: entity.WorkspaceID,
+		EntityId:    entity.ID.Full(),
 		Schema:      toKey(entity.Schema),
 		Mutations:   []*proto.Mutation{applyMutation},
 	}
