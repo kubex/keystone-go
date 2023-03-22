@@ -2,14 +2,26 @@ package keystone
 
 import (
 	"context"
+	"github.com/kubex/definitions-go/app"
 	"github.com/kubex/definitions-go/k4"
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"log"
 )
 
 type Connection struct {
 	client proto.KeystoneClient
 	actor  Actor
+	appID  app.GlobalAppID
+	token  string
+}
+
+func (c *Connection) authorization() *proto.Authorization {
+	return &proto.Authorization{
+		VendorId: c.appID.VendorID,
+		AppId:    c.appID.AppID,
+		Token:    c.token,
+	}
 }
 
 type Actor struct {
@@ -28,8 +40,8 @@ func NewActor(remoteIP, userID, userAgent string) Actor {
 	}
 }
 
-func NewConnection(client proto.KeystoneClient, actor Actor) *Connection {
-	return &Connection{client: client, actor: actor}
+func NewConnection(client proto.KeystoneClient, appID app.GlobalAppID, accessToken string, actor Actor) *Connection {
+	return &Connection{client: client, actor: actor, appID: appID, token: accessToken}
 }
 
 func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateResponse, error) {
@@ -50,7 +62,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 		prop.updated = true
 
 		protoProp := &proto.Property{
-			Key: toKey(prop.Name),
+			Name: prop.Name,
 		}
 
 		switch prop.Type {
@@ -78,7 +90,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	}
 
 	for _, prop := range entity.DeleteProperties {
-		applyMutation.PropertyDeletes = append(applyMutation.PropertyDeletes, toKey(prop.Name))
+		applyMutation.PropertyDeletes = append(applyMutation.PropertyDeletes, prop.Name)
 	}
 
 	for _, logEntry := range entity.LogEntries {
@@ -97,22 +109,17 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	}
 
 	for _, event := range entity.Events {
-		var props []*proto.Property
-		for _, prop := range event.Data {
-			props = append(props, prop.toProto())
-		}
-
 		applyMutation.Events = append(applyMutation.Events, &proto.Event{
-			Type: toKey(event.Type),
+			Type: event.Type,
 			Time: timestamppb.New(event.Time),
-			Data: props,
+			Data: event.Data,
 		})
 		event.written = true
 	}
 
 	for _, child := range entity.Children {
 		protoChild := &proto.Child{
-			Type: toKey(child.Type),
+			Type: child.Type,
 			Data: child.Data,
 		}
 		if child.ID != "" {
@@ -123,15 +130,28 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	}
 
 	for _, rel := range entity.Relationships {
-		rel.written = true
-		applyMutation.Relationships = append(applyMutation.Relationships)
+		if !rel.written {
+			protoRel := &proto.Relationship{
+				Relationship:  rel.Relationship,
+				DestinationId: rel.DestinationID,
+				Since:         timestamppb.New(rel.Since),
+				Data:          rel.Data,
+				BiDirectional: false,
+			}
+			applyMutation.Relationships = append(applyMutation.Relationships, protoRel)
+			rel.written = true
+			log.Println("writing relationship")
+		} else {
+			log.Println("skipping relationship write")
+		}
 	}
 
 	mutate := &proto.MutateRequest{
-		WorkspaceId: entity.WorkspaceID,
-		EntityId:    entity.ID.Full(),
-		Schema:      toKey(entity.Schema),
-		Mutations:   []*proto.Mutation{applyMutation},
+		Authorization: c.authorization(),
+		WorkspaceId:   entity.WorkspaceID,
+		EntityId:      entity.ID.Full(),
+		Schema:        toKey(entity.Schema),
+		Mutations:     []*proto.Mutation{applyMutation},
 	}
 
 	if entity.ID.Full() == "" {

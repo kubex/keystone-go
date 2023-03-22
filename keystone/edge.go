@@ -1,15 +1,14 @@
 package keystone
 
 import (
-	"github.com/kubex/definitions-go/app"
 	"time"
 )
 
 type Relationship struct {
-	Relationship  app.ScopedKey
+	Relationship  string
 	DestinationID string
 	Since         time.Time
-	Data          []Property
+	Data          map[string]string
 	written       bool
 }
 

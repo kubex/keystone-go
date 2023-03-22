@@ -1,14 +1,13 @@
 package keystone
 
 import (
-	"github.com/kubex/definitions-go/app"
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
 type Property struct {
-	Name           app.ScopedKey
+	Name           string
 	Type           PropertyType
 	Classification Classification
 	Text           string
@@ -26,7 +25,7 @@ func (p *Property) toProto() *proto.Property {
 		useTime = timestamppb.New(*p.Time)
 	}
 	return &proto.Property{
-		Key:            toKey(p.Name),
+		Name:           p.Name,
 		Type:           p.Type.toProto(),
 		Classification: p.Classification.toProto(),
 		Text:           p.Text,
@@ -39,35 +38,35 @@ func (p *Property) toProto() *proto.Property {
 }
 
 func Secret(name, secureData, preview string) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Secret: secureData, Text: preview, Classification: ClassificationSecure, Type: PropertyTypeText}
+	return Property{updated: true, Name: name, Secret: secureData, Text: preview, Classification: ClassificationSecure, Type: PropertyTypeText}
 }
 
 func Personal(name, sensitiveData, preview string) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Secret: sensitiveData, Text: preview, Classification: ClassificationPersonal, Type: PropertyTypeText}
+	return Property{updated: true, Name: name, Secret: sensitiveData, Text: preview, Classification: ClassificationPersonal, Type: PropertyTypeText}
 }
 
 func ID(name, uniqueID string) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Text: uniqueID, Type: PropertyTypeText, Classification: ClassificationID}
+	return Property{updated: true, Name: name, Text: uniqueID, Type: PropertyTypeText, Classification: ClassificationID}
 }
 
 func Text(name, input string) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Text: input, Type: PropertyTypeText}
+	return Property{updated: true, Name: name, Text: input, Type: PropertyTypeText}
 }
 
 func Time(name string, input time.Time) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Time: &input, Type: PropertyTypeTime}
+	return Property{updated: true, Name: name, Time: &input, Type: PropertyTypeTime}
 }
 
 func Int(name string, input int64) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Int: input, Type: PropertyTypeInt}
+	return Property{updated: true, Name: name, Int: input, Type: PropertyTypeInt}
 }
 
 func Bool(name string, input bool) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Bool: input, Type: PropertyTypeBool}
+	return Property{updated: true, Name: name, Bool: input, Type: PropertyTypeBool}
 }
 
 func Float(name string, input float64) Property {
-	return Property{updated: true, Name: app.NewScopedKey(name, defaultSetGlobalAppID), Float: input, Type: PropertyTypeFloat}
+	return Property{updated: true, Name: name, Float: input, Type: PropertyTypeFloat}
 }
 
 func (p *Property) Updated() {

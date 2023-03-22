@@ -39,11 +39,11 @@ func ExistingEntity(workspaceID, entityID string) *Entity {
 
 func (e *Entity) Mutate(prop ...Property) {
 	for _, p := range prop {
-		e.Properties[p.Name.String()] = p
+		e.Properties[p.Name] = p
 	}
 }
 
 func (e *Entity) Delete(prop Property) {
-	e.DeleteProperties[prop.Name.String()] = prop
-	delete(e.Properties, prop.Name.String())
+	e.DeleteProperties[prop.Name] = prop
+	delete(e.Properties, prop.Name)
 }

@@ -1,23 +1,22 @@
 package keystone
 
 import (
-	"github.com/kubex/definitions-go/app"
 	"time"
 )
 
 type Event struct {
 	written bool
-	ID      string        `json:"-"`
-	Type    app.ScopedKey `json:"e"`
-	Time    time.Time     `json:"-"`
-	Data    []Property    `json:"d"`
-	Actor   *Actor        `json:"a"`
+	ID      string            `json:"-"`
+	Type    string            `json:"e"`
+	Time    time.Time         `json:"-"`
+	Data    map[string]string `json:"d"`
+	Actor   *Actor            `json:"a"`
 }
 
-func (e *Entity) AddEvent(eventType string, properties ...Property) {
+func (e *Entity) AddEvent(eventType string, properties map[string]string) {
 	e.Events = append(e.Events, Event{
 		written: false,
-		Type:    app.NewScopedKey(eventType, defaultSetGlobalAppID),
+		Type:    eventType,
 		Time:    time.Now(),
 		Data:    properties,
 	})

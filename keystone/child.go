@@ -2,11 +2,10 @@ package keystone
 
 import (
 	"encoding/json"
-	"github.com/kubex/definitions-go/app"
 )
 
 type Child struct {
-	Type    app.ScopedKey
+	Type    string
 	ID      string
 	Data    []byte
 	written bool
@@ -15,7 +14,7 @@ type Child struct {
 func (e *Entity) AddChild(childType string, data []byte) {
 	e.Children = append(e.Children, Child{
 		written: false,
-		Type:    app.NewScopedKey(childType, defaultSetGlobalAppID),
+		Type:    childType,
 		Data:    data,
 	})
 }
