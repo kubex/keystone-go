@@ -122,6 +122,11 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 		child.written = true
 	}
 
+	for _, rel := range entity.Relationships {
+		rel.written = true
+		applyMutation.Relationships = append(applyMutation.Relationships)
+	}
+
 	mutate := &proto.MutateRequest{
 		WorkspaceId: entity.WorkspaceID,
 		EntityId:    entity.ID.Full(),

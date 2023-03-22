@@ -10,4 +10,9 @@ type Relationship struct {
 	DestinationID string
 	Since         time.Time
 	Data          []Property
+	written       bool
+}
+
+func (e *Entity) Edge(rel Relationship) {
+	e.Relationships = append(e.Relationships, rel)
 }
