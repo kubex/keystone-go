@@ -38,7 +38,7 @@ func (c Classification) StoresEncrypted() bool {
 	return c == ClassificationPersonal || c == ClassificationSecure
 }
 func (c Classification) StoresIndexed() bool {
-	return c == ClassificationPersonal || c == ClassificationSecure
+	return c == ClassificationPersonal || c == ClassificationID
 }
 
 func GetClassification(classification proto.DataClassification) Classification {
