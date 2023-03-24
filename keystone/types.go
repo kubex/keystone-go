@@ -12,8 +12,9 @@ const (
 	ClassificationPersonal  Classification = "p"
 	ClassificationUserInput Classification = "u" // Unknown free-type input by a user
 	ClassificationIndexed   Classification = "q" //Data that should be indexed for queries
-	ClassificationID        Classification = "i" // Index in 1-X relationship
+	ClassificationID        Classification = "i" // Unique Index
 	ClassificationSecure    Classification = "s" // Not to be indexed, should be encrypted
+	ClassificationLookup    Classification = "l" // Exact match lookup supported
 )
 
 func (c Classification) toProto() proto.DataClassification {
@@ -30,15 +31,10 @@ func (c Classification) toProto() proto.DataClassification {
 		return proto.DataClassification_CLASSIFICATION_ID
 	case ClassificationSecure:
 		return proto.DataClassification_CLASSIFICATION_SECURE
+	case ClassificationLookup:
+		return proto.DataClassification_CLASSIFICATION_LOOKUP
 	}
 	return proto.DataClassification_CLASSIFICATION_ANONYMOUS
-}
-
-func (c Classification) StoresEncrypted() bool {
-	return c == ClassificationPersonal || c == ClassificationSecure
-}
-func (c Classification) StoresIndexed() bool {
-	return c == ClassificationPersonal || c == ClassificationID
 }
 
 func GetClassification(classification proto.DataClassification) Classification {
@@ -55,6 +51,8 @@ func GetClassification(classification proto.DataClassification) Classification {
 		return ClassificationID
 	case proto.DataClassification_CLASSIFICATION_SECURE:
 		return ClassificationSecure
+	case proto.DataClassification_CLASSIFICATION_LOOKUP:
+		return ClassificationLookup
 	}
 	return ClassificationAnonymous
 }
