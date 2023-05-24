@@ -17,24 +17,12 @@ type Entity struct {
 	Relationships    []Relationship
 }
 
-func newEntity(workspaceID string) *Entity {
+func (w Workspace) newEntity() *Entity {
 	return &Entity{
-		WorkspaceID:      workspaceID,
+		WorkspaceID:      w.workspaceID,
 		Properties:       make(map[string]Property),
 		DeleteProperties: make(map[string]Property),
 	}
-}
-
-func NewEntity(workspaceID, schema string) *Entity {
-	e := newEntity(workspaceID)
-	e.Schema = app.NewScopedKey(schema, defaultSetGlobalAppID)
-	return e
-}
-
-func ExistingEntity(workspaceID, entityID string) *Entity {
-	e := newEntity(workspaceID)
-	e.ID = k4.IDFromString(entityID)
-	return e
 }
 
 func (e *Entity) Mutate(prop ...Property) {
@@ -46,4 +34,26 @@ func (e *Entity) Mutate(prop ...Property) {
 func (e *Entity) Delete(prop Property) {
 	e.DeleteProperties[prop.Name] = prop
 	delete(e.Properties, prop.Name)
+}
+
+type Workspace struct {
+	workspaceID string
+}
+
+func NewWorkspace(workspaceID string) Workspace {
+	return Workspace{workspaceID: workspaceID}
+}
+
+func (w Workspace) ID() string { return w.workspaceID }
+
+func (w Workspace) NewEntity(schema string) *Entity {
+	e := w.newEntity()
+	e.Schema = app.NewScopedKey(schema, defaultSetGlobalAppID)
+	return e
+}
+
+func (w Workspace) ExistingEntity(entityID string) *Entity {
+	e := w.newEntity()
+	e.ID = k4.IDFromString(entityID)
+	return e
 }
