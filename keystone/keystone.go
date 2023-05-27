@@ -36,6 +36,13 @@ func (e *Entity) Delete(prop Property) {
 	delete(e.Properties, prop.Name)
 }
 
+func (e *Entity) GetProperty(name string) *Property {
+	if p, ok := e.Properties[name]; ok {
+		return &p
+	}
+	return nil
+}
+
 type Workspace struct {
 	workspaceID string
 }
