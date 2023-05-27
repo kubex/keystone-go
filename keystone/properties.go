@@ -96,6 +96,41 @@ func (p *Property) AsIndexed()   { p.Classification = ClassificationIndexed }
 func (p *Property) AsID()        { p.Classification = ClassificationID }
 func (p *Property) AsAnonymous() { p.Classification = ClassificationAnonymous }
 
+func (p *Property) GetText() string {
+	if p != nil {
+		return p.Text
+	}
+	return ""
+}
+
+func (p *Property) GetInt() int64 {
+	if p != nil {
+		return p.Int
+	}
+	return 0
+}
+
+func (p *Property) GetBool() bool {
+	if p != nil {
+		return p.Bool
+	}
+	return false
+}
+
+func (p *Property) GetFloat() float64 {
+	if p != nil {
+		return p.Float
+	}
+	return 0.0
+}
+
+func (p *Property) GetTime() *time.Time {
+	if p != nil {
+		return p.Time
+	}
+	return nil
+}
+
 func PersonalData(p Property) Property  { p.AsPersonal(); return p }
 func UserInput(p Property) Property     { p.AsUserInput(); return p }
 func SecureData(p Property) Property    { p.AsSecure(); return p }
