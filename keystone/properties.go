@@ -103,6 +103,13 @@ func (p *Property) GetText() string {
 	return ""
 }
 
+func (p *Property) GetSecureText() string {
+	if p != nil {
+		return p.Secret
+	}
+	return ""
+}
+
 func (p *Property) GetInt() int64 {
 	if p != nil {
 		return p.Int
