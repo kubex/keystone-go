@@ -44,6 +44,8 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 	// Iterate all the fields in the struct
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
+		log.Println(field.Name, field.Anonymous, field.IsExported())
+		log.Println(field.Type.String(), field.Type.Kind().String())
 		fName := getFieldName(field)
 
 		switch fName {

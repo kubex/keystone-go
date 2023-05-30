@@ -13,7 +13,25 @@ type Event struct {
 	Actor   *Actor            `json:"a"`
 }
 
-func (e *Entity) AddEvent(eventType string, properties map[string]string) {
+type EntityEventProvider interface {
+	ClearEvents() error
+	GetEvents() ([]Event, error)
+}
+
+type EntityEvents struct {
+	Events []Event
+}
+
+func (e *EntityEvents) ClearEvents() error {
+	e.Events = []Event{}
+	return nil
+}
+
+func (e *EntityEvents) GetEvents() ([]Event, error) {
+	return e.Events, nil
+}
+
+func (e *EntityEvents) AddEvent(eventType string, properties map[string]string) {
 	e.Events = append(e.Events, Event{
 		written: false,
 		Type:    eventType,

@@ -14,39 +14,60 @@ type LogEntry struct {
 	Actor     *Actor
 }
 
-func (e *Entity) LogDebug(message, reference, traceID string) {
+type EntityLogProvider interface {
+	ClearLogs() error
+	GetLogs() ([]LogEntry, error)
+}
+
+type EntityLogger struct {
+	LogEntries []LogEntry
+}
+
+func (e *EntityLogger) ClearLogs() error {
+	e.LogEntries = []LogEntry{}
+	return nil
+}
+
+func (e *EntityLogger) GetLogs() ([]LogEntry, error) {
+	return e.LogEntries, nil
+}
+
+func (e *EntityLogger) LogDebug(message, reference, traceID string) {
 	e.Log(LogLevelDebug, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogInfo(message, reference, traceID string) {
+func (e *EntityLogger) LogInfo(message, reference, traceID string) {
 	e.Log(LogLevelInfo, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogNotice(message, reference, traceID string) {
+func (e *EntityLogger) LogNotice(message, reference, traceID string) {
 	e.Log(LogLevelNotice, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogWarn(message, reference, traceID string) {
+func (e *EntityLogger) LogWarn(message, reference, traceID string) {
 	e.Log(LogLevelWarn, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogError(message, reference, traceID string) {
+func (e *EntityLogger) LogError(message, reference, traceID string) {
 	e.Log(LogLevelError, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogCritical(message, reference, traceID string) {
+func (e *EntityLogger) LogCritical(message, reference, traceID string) {
 	e.Log(LogLevelCritical, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogAlert(message, reference, traceID string) {
+func (e *EntityLogger) LogAlert(message, reference, traceID string) {
 	e.Log(LogLevelAlert, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) LogFatal(message, reference, traceID string) {
+func (e *EntityLogger) LogFatal(message, reference, traceID string) {
 	e.Log(LogLevelFatal, message, reference, traceID, time.Now())
 }
 
-func (e *Entity) Log(level LogLevel, message, reference, traceID string, time time.Time) {
+func (e *EntityLogger) Log(level LogLevel, message, reference, traceID string, time time.Time) {
+	if e.LogEntries == nil {
+		e.LogEntries = make([]LogEntry, 0)
+	}
 	e.LogEntries = append(e.LogEntries, LogEntry{
 		written:   false,
 		Time:      time,

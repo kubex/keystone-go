@@ -6,13 +6,13 @@ import (
 )
 
 type Entity struct {
+	EntityLogger
+	EntityEvents
 	WorkspaceID      string
 	ID               k4.ID
 	Schema           app.ScopedKey
 	Properties       map[string]Property
 	DeleteProperties map[string]Property
-	LogEntries       []LogEntry
-	Events           []Event
 	Children         []Child
 	Relationships    []Relationship
 }

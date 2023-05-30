@@ -22,13 +22,13 @@ func TestUnmarshal(t *testing.T) {
 
 type unmarshalTest struct {
 	baseStruct
-	ID                 string `keystone:"_entity_id"`
 	AddressCountryCode string `keystone:""`
 	EmailAddress       SecretString
+	second             secondStruct
 }
 
 type baseStruct struct {
-	ID string
+	ID string `keystone:"_entity_id"`
 }
 
 type secondStruct struct {

@@ -11,3 +11,10 @@ func (e SecretString) String() string {
 	}
 	return e.Masked
 }
+
+func NewSecretString(original, masked string) SecretString {
+	return SecretString{
+		Masked:   masked,
+		Original: original,
+	}
+}
