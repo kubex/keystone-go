@@ -42,7 +42,6 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 
 	propNameMap := make(map[string]*proto.Property, 0)
 	for _, p := range response.Properties {
-		log.Println(p.GetName(), " - ", strings.TrimPrefix(p.GetName(), appRoot))
 		propNameMap[strings.TrimPrefix(p.GetName(), appRoot)] = p
 	}
 
