@@ -4,6 +4,7 @@ import (
 	"github.com/kubex/keystone-go/proto"
 	"log"
 	"testing"
+	"time"
 )
 
 // Test the function Unmarshal
@@ -20,6 +21,16 @@ func TestUnmarshal(t *testing.T) {
 }
 
 type unmarshalTest struct {
+	baseStruct
 	ID                 string `keystone:"_entity_id"`
 	AddressCountryCode string `keystone:""`
+	EmailAddress       SecretString
+}
+
+type baseStruct struct {
+	ID string
+}
+
+type secondStruct struct {
+	DateCreated time.Time `keystone:"_created"`
 }
