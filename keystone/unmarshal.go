@@ -11,6 +11,7 @@ import (
 var (
 	typeOfTime         = reflect.TypeOf(time.Time{})
 	typeOfSecretString = reflect.TypeOf(SecretString{})
+	typeOfAmount       = reflect.TypeOf(Amount{})
 )
 
 const MarshalFieldId = "_entity_id"
@@ -36,16 +37,18 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 	v := reflect.ValueOf(dst)
 	t := v.Type().Elem()
 
+	appRoot := response.GetSchema().GetVendorId() + "/" + response.GetSchema().GetAppId() + "/"
+	log.Println(appRoot)
+
 	propNameMap := make(map[string]*proto.Property, 0)
 	for _, p := range response.Properties {
-		propNameMap[p.GetName()] = p
+		log.Println(p.GetName(), " - ", strings.TrimPrefix(p.GetName(), appRoot))
+		propNameMap[strings.TrimPrefix(p.GetName(), appRoot)] = p
 	}
 
 	// Iterate all the fields in the struct
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		log.Println(field.Name, field.Anonymous, field.IsExported())
-		log.Println(field.Type.String(), field.Type.Kind().String())
 		fName := getFieldName(field)
 
 		switch fName {
@@ -112,6 +115,12 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 			v.Elem().Field(i).Set(reflect.ValueOf(SecretString{
 				Masked:   prop.GetText(),
 				Original: prop.GetSecureText(),
+			}))
+			continue
+		case typeOfAmount:
+			v.Elem().Field(i).Set(reflect.ValueOf(Amount{
+				Currency: prop.GetText(),
+				Units:    prop.GetInt(),
 			}))
 			continue
 		case typeOfTime:

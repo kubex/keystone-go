@@ -73,6 +73,11 @@ func Marshal(src interface{}, dst *Entity) error {
 				dst.Properties[fName] = Secret(fName, val.Original, val.Masked)
 			}
 			continue
+		case typeOfAmount:
+			if val, ok := v.Field(i).Interface().(Amount); ok {
+				dst.Properties[fName] = Money(fName, val.Currency, val.Units)
+			}
+			continue
 		case typeOfTime:
 			if val, ok := v.Field(i).Interface().(time.Time); ok {
 				dst.Properties[fName] = Time(fName, val)

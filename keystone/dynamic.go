@@ -18,3 +18,15 @@ func NewSecretString(original, masked string) SecretString {
 		Original: original,
 	}
 }
+
+type Amount struct {
+	Currency string `json:"currency"`
+	Units    int64  `json:"units"`
+}
+
+func NewAmount(currency string, units int64) Amount {
+	return Amount{
+		Currency: currency,
+		Units:    units,
+	}
+}

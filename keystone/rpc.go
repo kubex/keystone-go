@@ -76,6 +76,9 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 			protoProp.Float = float32(prop.Float)
 		case PropertyTypeTime:
 			protoProp.Time = timestamppb.New(*prop.Time)
+		case PropertyTypeAmount:
+			protoProp.Text = prop.Text
+			protoProp.Int = prop.Int
 		}
 
 		protoProp.Type = prop.Type.toProto()

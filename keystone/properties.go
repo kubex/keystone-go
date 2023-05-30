@@ -1,6 +1,7 @@
 package keystone
 
 import (
+	"fmt"
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
@@ -39,6 +40,10 @@ func (p *Property) toProto() *proto.Property {
 
 func Secret(name, secureData, preview string) Property {
 	return Property{updated: true, Name: name, Secret: secureData, Text: preview, Classification: ClassificationSecure, Type: PropertyTypeText}
+}
+
+func Money(name, currency string, units int64) Property {
+	return Property{updated: true, Name: name, Text: currency, Int: units, Classification: ClassificationAnonymous, Type: PropertyTypeAmount}
 }
 
 func Personal(name, sensitiveData, preview string) Property {
@@ -85,6 +90,8 @@ func (p *Property) Value() interface{} {
 		return p.Float
 	case PropertyTypeTime:
 		return p.Time
+	case PropertyTypeAmount:
+		return p.Text + ":" + fmt.Sprintf("%.2f", float64(p.Int)/100.0)
 	}
 	return nil
 }

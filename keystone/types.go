@@ -60,11 +60,12 @@ func GetClassification(classification proto.DataClassification) Classification {
 type PropertyType string
 
 const (
-	PropertyTypeText  = "s"
-	PropertyTypeInt   = "i"
-	PropertyTypeBool  = "b"
-	PropertyTypeFloat = "f"
-	PropertyTypeTime  = "t"
+	PropertyTypeText   = "s"
+	PropertyTypeInt    = "i"
+	PropertyTypeBool   = "b"
+	PropertyTypeFloat  = "f"
+	PropertyTypeTime   = "t"
+	PropertyTypeAmount = "a"
 )
 
 func (p PropertyType) toProto() proto.ValueType {
@@ -79,6 +80,8 @@ func (p PropertyType) toProto() proto.ValueType {
 		return proto.ValueType_VALUE_FLOAT
 	case PropertyTypeTime:
 		return proto.ValueType_VALUE_TIME
+	case PropertyTypeAmount:
+		return proto.ValueType_VALUE_AMOUNT
 	}
 	return proto.ValueType_VALUE_TEXT
 }
@@ -95,6 +98,8 @@ func GetPropertyType(valueType proto.ValueType) PropertyType {
 		return PropertyTypeFloat
 	case proto.ValueType_VALUE_TIME:
 		return PropertyTypeTime
+	case proto.ValueType_VALUE_AMOUNT:
+		return PropertyTypeAmount
 	}
 	return PropertyTypeText
 }
