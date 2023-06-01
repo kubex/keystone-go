@@ -22,9 +22,9 @@ func TestUnmarshal(t *testing.T) {
 
 type unmarshalTest struct {
 	baseStruct
-	AddressCountryCode string `keystone:""`
-	EmailAddress       SecretString
-	second             secondStruct
+	AddressCountryCode string       `keystone:""`
+	EmailAddress       SecretString `keystone:",indexed"`
+	second             secondStruct `keystone:",indexed,lookup,omitempty"`
 }
 
 type baseStruct struct {

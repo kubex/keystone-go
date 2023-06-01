@@ -19,6 +19,7 @@ type Property struct {
 	Time           *time.Time
 	indexed        bool
 	lookup         bool
+	omitempty      bool
 	updated        bool
 }
 
@@ -98,6 +99,24 @@ func (p *Property) Value() interface{} {
 		return p.Text + ":" + fmt.Sprintf("%.2f", float64(p.Int)/100.0)
 	}
 	return nil
+}
+
+func (p *Property) IsEmpty() bool {
+	switch p.Type {
+	case PropertyTypeText:
+		return p.Text == ""
+	case PropertyTypeInt:
+		return p.Int == 0
+	case PropertyTypeBool:
+		return !p.Bool
+	case PropertyTypeFloat:
+		return p.Float == 0.0
+	case PropertyTypeTime:
+		return p.Time == nil || p.Time.IsZero()
+	case PropertyTypeAmount:
+		return p.Text == "" || p.Int == 0
+	}
+	return true
 }
 
 func (p *Property) AsPersonal()  { p.Classification = ClassificationPersonal }

@@ -47,40 +47,41 @@ func Marshal(src interface{}, dst *Entity) error {
 		if !field.IsExported() {
 			continue
 		}
-		fName := getFieldName(field)
-		if fName == "" {
+		fOpt := getFieldOptions(field)
+		if fOpt.name == "" {
 			continue
 		}
+		fName := fOpt.name
 
 		switch field.Type.Kind() {
 		case reflect.String:
-			dst.Properties[fName] = Text(fName, v.Field(i).String())
+			dst.addProperty(fName, prepareProperty(Text(fName, v.Field(i).String()), fOpt))
 			continue
 		case reflect.Bool:
-			dst.Properties[fName] = Bool(fName, v.Field(i).Bool())
+			dst.addProperty(fName, prepareProperty(Bool(fName, v.Field(i).Bool()), fOpt))
 			continue
 		case reflect.Int32, reflect.Int64:
-			dst.Properties[fName] = Int(fName, v.Field(i).Int())
+			dst.addProperty(fName, prepareProperty(Int(fName, v.Field(i).Int()), fOpt))
 			continue
 		case reflect.Float32, reflect.Float64:
-			dst.Properties[fName] = Float(fName, v.Field(i).Float())
+			dst.addProperty(fName, prepareProperty(Float(fName, v.Field(i).Float()), fOpt))
 			continue
 		}
 
 		switch field.Type {
 		case typeOfSecretString:
 			if val, ok := v.Field(i).Interface().(SecretString); ok {
-				dst.Properties[fName] = Secret(fName, val.Original, val.Masked)
+				dst.addProperty(fName, prepareProperty(Secret(fName, val.Original, val.Masked), fOpt))
 			}
 			continue
 		case typeOfAmount:
 			if val, ok := v.Field(i).Interface().(Amount); ok {
-				dst.Properties[fName] = Money(fName, val.Currency, val.Units)
+				dst.addProperty(fName, prepareProperty(Money(fName, val.Currency, val.Units), fOpt))
 			}
 			continue
 		case typeOfTime:
 			if val, ok := v.Field(i).Interface().(time.Time); ok {
-				dst.Properties[fName] = Time(fName, val)
+				dst.addProperty(fName, prepareProperty(Time(fName, val), fOpt))
 			}
 			continue
 		}
@@ -88,4 +89,24 @@ func Marshal(src interface{}, dst *Entity) error {
 	}
 
 	return nil
+}
+
+func (e *Entity) addProperty(name string, prop Property) {
+	if prop.omitempty && prop.IsEmpty() {
+		return
+	}
+	e.Properties[name] = prop
+}
+
+func prepareProperty(property Property, options fieldOptions) Property {
+	if options.indexed {
+		property.AsIndexed()
+	}
+	if options.lookup {
+		property.AsLookup()
+	}
+	if options.omitempty {
+		property.omitempty = true
+	}
+	return property
 }

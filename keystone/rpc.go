@@ -60,36 +60,7 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 			continue
 		}
 		prop.updated = true
-
-		protoProp := &proto.Property{
-			Name: prop.Name,
-		}
-
-		switch prop.Type {
-		case PropertyTypeText:
-			protoProp.Text = prop.Text
-		case PropertyTypeInt:
-			protoProp.Int = prop.Int
-		case PropertyTypeBool:
-			protoProp.Bool = prop.Bool
-		case PropertyTypeFloat:
-			protoProp.Float = float32(prop.Float)
-		case PropertyTypeTime:
-			protoProp.Time = timestamppb.New(*prop.Time)
-		case PropertyTypeAmount:
-			protoProp.Text = prop.Text
-			protoProp.Int = prop.Int
-		}
-
-		protoProp.Type = prop.Type.toProto()
-
-		protoProp.Classification = prop.Classification.toProto()
-
-		if prop.Secret != "" {
-			protoProp.SecureText = prop.Secret
-		}
-
-		applyMutation.Properties = append(applyMutation.Properties, protoProp)
+		applyMutation.Properties = append(applyMutation.Properties, prop.toProto())
 	}
 
 	for _, prop := range entity.DeleteProperties {

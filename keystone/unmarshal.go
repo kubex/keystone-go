@@ -14,6 +14,13 @@ var (
 	typeOfAmount       = reflect.TypeOf(Amount{})
 )
 
+type fieldOptions struct {
+	name      string
+	indexed   bool
+	lookup    bool
+	omitempty bool
+}
+
 const MarshalFieldId = "_entity_id"
 const MarshalState = "_state"
 const MarshalStateChange = "_state_change"
@@ -23,14 +30,32 @@ const MarshalSchemaFull = "_schema_full"
 const MarshalSchemaVendor = "_schema_vendor"
 const MarshalSchemaApp = "_schema_app"
 
-func getFieldName(f reflect.StructField) string {
+func getFieldOptions(f reflect.StructField) fieldOptions {
 	tag := f.Tag.Get("keystone")
-	if tag == "" {
-		return snakeCase(f.Name)
-	} else if tag == "-" {
-		return ""
+	opt := fieldOptions{}
+
+	tagParts := strings.Split(tag, ",")
+	for i, part := range tagParts {
+		if i == 0 {
+			if part == "" {
+				opt.name = snakeCase(f.Name)
+			} else if part == "-" {
+				return opt
+			} else {
+				opt.name = strings.ToLower(part)
+			}
+			continue
+		}
+		switch part {
+		case "indexed":
+			opt.indexed = true
+		case "lookup":
+			opt.lookup = true
+		case "omitempty":
+			opt.omitempty = true
+		}
 	}
-	return strings.ToLower(tag)
+	return opt
 }
 
 func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
@@ -38,7 +63,6 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 	t := v.Type().Elem()
 
 	appRoot := response.GetSchema().GetVendorId() + "/" + response.GetSchema().GetAppId() + "/"
-	log.Println(appRoot)
 
 	propNameMap := make(map[string]*proto.Property, 0)
 	for _, p := range response.Properties {
@@ -48,9 +72,9 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 	// Iterate all the fields in the struct
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		fName := getFieldName(field)
+		fOpt := getFieldOptions(field)
 
-		switch fName {
+		switch fOpt.name {
 		case MarshalFieldId:
 			v.Elem().Field(i).SetString(response.GetEntityId())
 			continue
@@ -83,9 +107,11 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 		case MarshalSchemaApp:
 			v.Elem().Field(i).SetString(response.GetSchema().GetAppId())
 			continue
+		case "":
+			continue
 		}
 
-		prop, ok := propNameMap[fName]
+		prop, ok := propNameMap[fOpt.name]
 		if !ok {
 			continue
 		}
