@@ -17,6 +17,8 @@ type Property struct {
 	Bool           bool
 	Float          float64
 	Time           *time.Time
+	indexed        bool
+	lookup         bool
 	updated        bool
 }
 
@@ -35,6 +37,8 @@ func (p *Property) toProto() *proto.Property {
 		Float:          float32(p.Float),
 		Time:           useTime,
 		SecureText:     p.Secret,
+		Indexed:        p.indexed,
+		Lookup:         p.lookup,
 	}
 }
 
@@ -99,7 +103,8 @@ func (p *Property) Value() interface{} {
 func (p *Property) AsPersonal()  { p.Classification = ClassificationPersonal }
 func (p *Property) AsUserInput() { p.Classification = ClassificationUserInput }
 func (p *Property) AsSecure()    { p.Classification = ClassificationSecure }
-func (p *Property) AsIndexed()   { p.Classification = ClassificationIndexed }
+func (p *Property) AsIndexed()   { p.indexed = true }
+func (p *Property) AsLookup()    { p.lookup = true }
 func (p *Property) AsID()        { p.Classification = ClassificationID }
 func (p *Property) AsAnonymous() { p.Classification = ClassificationAnonymous }
 
@@ -148,6 +153,5 @@ func (p *Property) GetTime() *time.Time {
 func PersonalData(p Property) Property  { p.AsPersonal(); return p }
 func UserInput(p Property) Property     { p.AsUserInput(); return p }
 func SecureData(p Property) Property    { p.AsSecure(); return p }
-func Indexed(p Property) Property       { p.AsIndexed(); return p }
 func Identifier(p Property) Property    { p.AsID(); return p }
 func AnonymousData(p Property) Property { p.AsAnonymous(); return p }

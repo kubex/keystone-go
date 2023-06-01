@@ -22,6 +22,8 @@ func EntityFromProto(p *proto.EntityResponse) *Entity {
 			Bool:           prop.GetBool(),
 			Float:          float64(prop.GetFloat()),
 			Time:           &t,
+			indexed:        prop.Indexed,
+			lookup:         prop.Lookup,
 		}
 	}
 	return e

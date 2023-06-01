@@ -1,8 +1,8 @@
 package keystone
 
 type SecretString struct {
-	Masked   string `json:"masked"`
-	Original string `json:"original"`
+	Masked   string `json:"masked,omitempty"`
+	Original string `json:"original,omitempty"`
 }
 
 func (e SecretString) String() string {
