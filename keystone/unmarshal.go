@@ -48,6 +48,7 @@ func getFieldOptions(f reflect.StructField) fieldOptions {
 		}
 		switch part {
 		case "indexed":
+		case "index":
 			opt.indexed = true
 		case "lookup":
 			opt.lookup = true
