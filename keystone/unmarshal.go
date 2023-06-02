@@ -36,6 +36,7 @@ func getFieldOptions(f reflect.StructField) fieldOptions {
 
 	tagParts := strings.Split(tag, ",")
 	for i, part := range tagParts {
+		part = strings.TrimSpace(part)
 		if i == 0 {
 			if part == "" {
 				opt.name = snakeCase(f.Name)
@@ -47,8 +48,7 @@ func getFieldOptions(f reflect.StructField) fieldOptions {
 			continue
 		}
 		switch part {
-		case "indexed":
-		case "index":
+		case "indexed", "index":
 			opt.indexed = true
 		case "lookup":
 			opt.lookup = true
