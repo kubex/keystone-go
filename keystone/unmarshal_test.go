@@ -2,6 +2,7 @@ package keystone
 
 import (
 	"github.com/kubex/keystone-go/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"testing"
 	"time"
@@ -15,22 +16,28 @@ func TestUnmarshal(t *testing.T) {
 		Properties: []*proto.Property{
 			{Name: "id", Value: &proto.Value{Text: "abslfdwuflwkdh"}},
 			{Name: "address_country_code", Value: &proto.Value{Text: "US"}},
+			{Name: "name", Value: &proto.Value{Text: "Putin"}},
+			{Name: "created", Value: &proto.Value{Time: timestamppb.New(time.Now())}},
 		},
 	}, &s))
-	log.Println(s)
+	log.Println(s.ID)
+	log.Println(s.AddressCountryCode)
+	log.Println(s.Second)
 }
 
 type unmarshalTest struct {
-	baseStruct
+	BaseStruct
 	AddressCountryCode string       `keystone:""`
 	EmailAddress       SecretString `keystone:",indexed"`
-	second             secondStruct `keystone:",indexed,lookup,omitempty"`
+	Second             SecondStruct `keystone:",indexed,lookup,omitempty"`
 }
 
-type baseStruct struct {
-	ID string `keystone:"_entity_id"`
+type BaseStruct struct {
+	ID string `keystone:"id"`
 }
 
-type secondStruct struct {
-	DateCreated time.Time `keystone:"_created"`
+type SecondStruct struct {
+	ID          string `keystone:"id"`
+	Name        string
+	DateCreated time.Time `keystone:"created"`
 }

@@ -1,6 +1,8 @@
 package keystone
 
 import (
+	"errors"
+	"fmt"
 	"github.com/kubex/keystone-go/proto"
 	"log"
 	"reflect"
@@ -75,87 +77,132 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 		field := t.Field(i)
 		fOpt := getFieldOptions(field)
 
-		switch fOpt.name {
-		case MarshalFieldId:
-			v.Elem().Field(i).SetString(response.GetEntityId())
+		if !field.IsExported() {
+			fmt.Println("skipping unexported field")
 			continue
-		case MarshalState:
-			v.Elem().Field(i).SetString(response.GetState().String())
-			continue
-		case MarshalStateChange:
-			if v.Elem().Field(i).Type() == typeOfTime {
-				v.Elem().Field(i).Set(reflect.ValueOf(response.StateChange))
-			} else {
-				log.Println("WARNING: Field _state_change is not a time.Time")
-			}
-			continue
-		case MarshalCreated:
-			if v.Elem().Field(i).Type() == typeOfTime {
-				v.Elem().Field(i).Set(reflect.ValueOf(response.Created))
-			} else {
-				log.Println("WARNING: Field _created is not a time.Time")
-			}
-			continue
-		case MarshalSchema:
-			v.Elem().Field(i).SetString(response.GetSchema().GetKey())
-			continue
-		case MarshalSchemaFull:
-			v.Elem().Field(i).SetString(response.GetSchema().String())
-			continue
-		case MarshalSchemaVendor:
-			v.Elem().Field(i).SetString(response.GetSchema().GetVendorId())
-			continue
-		case MarshalSchemaApp:
-			v.Elem().Field(i).SetString(response.GetSchema().GetAppId())
-			continue
-		case "":
+		}
+
+		if err := hydrateByTagName(fOpt.name, v, response, i); err == nil {
 			continue
 		}
 
 		prop, ok := propNameMap[fOpt.name]
 		if !ok {
-			continue
-		}
-
-		switch field.Type.Kind() {
-		case reflect.String:
-			if prop.GetValue().GetSecureText() != "" {
-				v.Elem().Field(i).SetString(prop.GetValue().GetSecureText())
-			} else {
-				v.Elem().Field(i).SetString(prop.GetValue().GetText())
+			if field.Type.Kind() == reflect.Struct {
+				n := handleStruct(field, propNameMap)
+				v.Elem().Field(i).Set(n.Elem())
 			}
 			continue
-		case reflect.Bool:
-			v.Elem().Field(i).SetBool(prop.GetValue().GetBool())
-			continue
-		case reflect.Int32, reflect.Int64:
-			v.Elem().Field(i).SetInt(prop.GetValue().GetInt())
-			continue
-		case reflect.Float32, reflect.Float64:
-			v.Elem().Field(i).SetFloat(float64(prop.GetValue().GetFloat()))
-			continue
 		}
 
-		switch field.Type {
-		case typeOfSecretString:
-			v.Elem().Field(i).Set(reflect.ValueOf(SecretString{
-				Masked:   prop.GetValue().GetText(),
-				Original: prop.GetValue().GetSecureText(),
-			}))
+		if err := hydrateFromProperty(v, field, prop, i); err == nil {
 			continue
-		case typeOfAmount:
-			v.Elem().Field(i).Set(reflect.ValueOf(Amount{
-				Currency: prop.GetValue().GetText(),
-				Units:    prop.GetValue().GetInt(),
-			}))
-			continue
-		case typeOfTime:
-			v.Elem().Field(i).Set(reflect.ValueOf(prop.GetValue().GetTime().AsTime()))
-			continue
+		} else {
+			log.Println(err.Error())
 		}
-
-		log.Println("Failed Prop ", field.Type.String())
 	}
 
 	return nil
+}
+
+func hydrateFromProperty(v reflect.Value, field reflect.StructField, prop *proto.Property, i int) error {
+	switch field.Type.Kind() {
+	case reflect.String:
+		if prop.GetValue().GetSecureText() != "" {
+			v.Elem().Field(i).SetString(prop.GetValue().GetSecureText())
+		} else {
+			v.Elem().Field(i).SetString(prop.GetValue().GetText())
+		}
+		return nil
+	case reflect.Bool:
+		v.Elem().Field(i).SetBool(prop.GetValue().GetBool())
+		return nil
+	case reflect.Int32, reflect.Int64:
+		v.Elem().Field(i).SetInt(prop.GetValue().GetInt())
+		return nil
+	case reflect.Float32, reflect.Float64:
+		v.Elem().Field(i).SetFloat(float64(prop.GetValue().GetFloat()))
+		return nil
+	}
+
+	switch field.Type {
+	case typeOfSecretString:
+		v.Elem().Field(i).Set(reflect.ValueOf(SecretString{
+			Masked:   prop.GetValue().GetText(),
+			Original: prop.GetValue().GetSecureText(),
+		}))
+		return nil
+	case typeOfAmount:
+		v.Elem().Field(i).Set(reflect.ValueOf(Amount{
+			Currency: prop.GetValue().GetText(),
+			Units:    prop.GetValue().GetInt(),
+		}))
+		return nil
+	case typeOfTime:
+		v.Elem().Field(i).Set(reflect.ValueOf(prop.GetValue().GetTime().AsTime()))
+		return nil
+	}
+
+	return fmt.Errorf("failed Prop %s", field.Type.String())
+}
+
+func hydrateByTagName(name string, v reflect.Value, response *proto.EntityResponse, i int) error {
+	switch name {
+	case MarshalFieldId:
+		v.Elem().Field(i).SetString(response.GetEntityId())
+		return nil
+	case MarshalState:
+		v.Elem().Field(i).SetString(response.GetState().String())
+		return nil
+	case MarshalStateChange:
+		if v.Elem().Field(i).Type() == typeOfTime {
+			v.Elem().Field(i).Set(reflect.ValueOf(response.StateChange))
+		} else {
+			log.Println("WARNING: Field _state_change is not a time.Time")
+		}
+		return nil
+	case MarshalCreated:
+		if v.Elem().Field(i).Type() == typeOfTime {
+			v.Elem().Field(i).Set(reflect.ValueOf(response.Created.AsTime()))
+		} else {
+			log.Println("WARNING: Field _created is not a time.Time")
+		}
+		return nil
+	case MarshalSchema:
+		v.Elem().Field(i).SetString(response.GetSchema().GetKey())
+		return nil
+	case MarshalSchemaFull:
+		v.Elem().Field(i).SetString(response.GetSchema().String())
+		return nil
+	case MarshalSchemaVendor:
+		v.Elem().Field(i).SetString(response.GetSchema().GetVendorId())
+		return nil
+	case MarshalSchemaApp:
+		v.Elem().Field(i).SetString(response.GetSchema().GetAppId())
+		return nil
+	case "":
+		return nil
+	}
+	return errors.New("unsupported schema field")
+}
+
+func handleStruct(field reflect.StructField, propNameMap map[string]*proto.Property) reflect.Value {
+	e := field.Type
+	n := reflect.New(e)
+	for x := 0; x < e.NumField(); x++ {
+		nestedField := e.Field(x)
+		nestedFieldOpts := getFieldOptions(nestedField)
+
+		if !nestedField.IsExported() {
+			fmt.Println("skipping unexported nested field")
+			continue
+		}
+
+		prop, ok := propNameMap[nestedFieldOpts.name]
+		if ok {
+			//field = nestedField
+			_ = hydrateFromProperty(n, nestedField, prop, x)
+		}
+	}
+	return n
 }
