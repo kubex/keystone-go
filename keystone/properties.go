@@ -30,16 +30,18 @@ func (p *Property) toProto() *proto.Property {
 	}
 	return &proto.Property{
 		Name:           p.Name,
-		Type:           p.Type.toProto(),
 		Classification: p.Classification.toProto(),
-		Text:           p.Text,
-		Int:            p.Int,
-		Bool:           p.Bool,
-		Float:          float32(p.Float),
-		Time:           useTime,
-		SecureText:     p.Secret,
-		Indexed:        p.indexed,
-		Lookup:         p.lookup,
+		Value: &proto.Value{
+			Type:       p.Type.toProto(),
+			Text:       p.Text,
+			Int:        p.Int,
+			Bool:       p.Bool,
+			Float:      float32(p.Float),
+			Time:       useTime,
+			SecureText: p.Secret,
+		},
+		Indexed: p.indexed,
+		Lookup:  p.lookup,
 	}
 }
 

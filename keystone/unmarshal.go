@@ -119,38 +119,38 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 
 		switch field.Type.Kind() {
 		case reflect.String:
-			if prop.GetSecureText() != "" {
-				v.Elem().Field(i).SetString(prop.GetSecureText())
+			if prop.GetValue().GetSecureText() != "" {
+				v.Elem().Field(i).SetString(prop.GetValue().GetSecureText())
 			} else {
-				v.Elem().Field(i).SetString(prop.GetText())
+				v.Elem().Field(i).SetString(prop.GetValue().GetText())
 			}
 			continue
 		case reflect.Bool:
-			v.Elem().Field(i).SetBool(prop.GetBool())
+			v.Elem().Field(i).SetBool(prop.GetValue().GetBool())
 			continue
 		case reflect.Int32, reflect.Int64:
-			v.Elem().Field(i).SetInt(prop.GetInt())
+			v.Elem().Field(i).SetInt(prop.GetValue().GetInt())
 			continue
 		case reflect.Float32, reflect.Float64:
-			v.Elem().Field(i).SetFloat(float64(prop.GetFloat()))
+			v.Elem().Field(i).SetFloat(float64(prop.GetValue().GetFloat()))
 			continue
 		}
 
 		switch field.Type {
 		case typeOfSecretString:
 			v.Elem().Field(i).Set(reflect.ValueOf(SecretString{
-				Masked:   prop.GetText(),
-				Original: prop.GetSecureText(),
+				Masked:   prop.GetValue().GetText(),
+				Original: prop.GetValue().GetSecureText(),
 			}))
 			continue
 		case typeOfAmount:
 			v.Elem().Field(i).Set(reflect.ValueOf(Amount{
-				Currency: prop.GetText(),
-				Units:    prop.GetInt(),
+				Currency: prop.GetValue().GetText(),
+				Units:    prop.GetValue().GetInt(),
 			}))
 			continue
 		case typeOfTime:
-			v.Elem().Field(i).Set(reflect.ValueOf(prop.GetTime().AsTime()))
+			v.Elem().Field(i).Set(reflect.ValueOf(prop.GetValue().GetTime().AsTime()))
 			continue
 		}
 

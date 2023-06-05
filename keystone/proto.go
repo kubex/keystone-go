@@ -11,16 +11,16 @@ func EntityFromProto(p *proto.EntityResponse) *Entity {
 	e.Schema = GetScopedKey(p.Schema)
 	e.Properties = make(map[string]Property)
 	for _, prop := range p.Properties {
-		t := prop.GetTime().AsTime()
+		t := prop.GetValue().GetTime().AsTime()
 		e.Properties[prop.Name] = Property{
 			Name:           prop.GetName(),
-			Type:           GetPropertyType(prop.GetType()),
+			Type:           GetPropertyType(prop.GetValue().GetType()),
 			Classification: GetClassification(prop.GetClassification()),
-			Text:           prop.GetText(),
-			Secret:         prop.GetSecureText(),
-			Int:            prop.GetInt(),
-			Bool:           prop.GetBool(),
-			Float:          float64(prop.GetFloat()),
+			Text:           prop.GetValue().GetText(),
+			Secret:         prop.GetValue().GetSecureText(),
+			Int:            prop.GetValue().GetInt(),
+			Bool:           prop.GetValue().GetBool(),
+			Float:          float64(prop.GetValue().GetFloat()),
 			Time:           &t,
 			indexed:        prop.Indexed,
 			lookup:         prop.Lookup,

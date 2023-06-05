@@ -13,8 +13,8 @@ func TestUnmarshal(t *testing.T) {
 	log.Println(Unmarshal(&proto.EntityResponse{
 		EntityId: "random-uuid-1234",
 		Properties: []*proto.Property{
-			{Name: "id", Text: "abslfdwuflwkdh"},
-			{Name: "address_country_code", Text: "US"},
+			{Name: "id", Value: &proto.Value{Text: "abslfdwuflwkdh"}},
+			{Name: "address_country_code", Value: &proto.Value{Text: "US"}},
 		},
 	}, &s))
 	log.Println(s)
