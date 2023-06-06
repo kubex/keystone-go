@@ -24,6 +24,14 @@ func (c *Connection) authorization() *proto.Authorization {
 	}
 }
 
+func (c *Connection) MakeKey(name string) *proto.Key {
+	return &proto.Key{
+		VendorId: c.appID.VendorID,
+		AppId:    c.appID.AppID,
+		Key:      name,
+	}
+}
+
 type Actor struct {
 	UserAgent string
 	RemoteIP  string
