@@ -131,13 +131,13 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	mutate := &proto.MutateRequest{
 		Authorization: c.authorization(),
 		WorkspaceId:   entity.WorkspaceID,
-		EntityId:      entity.ID.Full(),
+		EntityId:      entity.ID.String(),
 		Schema:        toKey(entity.Schema),
 		Mutations:     []*proto.Mutation{applyMutation},
 	}
 
-	if entity.ID.Full() == "" {
-		mutate.EntityId = entity.ID.Full()
+	if entity.ID.String() == "" {
+		mutate.EntityId = entity.ID.String()
 	}
 
 	mutateResp, err := c.client.Mutate(ctx, mutate)
