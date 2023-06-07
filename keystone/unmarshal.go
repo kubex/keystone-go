@@ -1,11 +1,14 @@
 package keystone
 
 import (
-	"errors"
 	"fmt"
 	"github.com/kubex/keystone-go/proto"
-	"log"
 	"reflect"
+)
+
+import (
+	"errors"
+	"log"
 	"strings"
 	"time"
 )
@@ -64,7 +67,6 @@ func getFieldOptions(f reflect.StructField) fieldOptions {
 func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 	v := reflect.ValueOf(dst)
 	t := v.Type().Elem()
-
 	appRoot := response.GetSchema().GetVendorId() + "/" + response.GetSchema().GetAppId() + "/"
 
 	propNameMap := make(map[string]*proto.Property, 0)
@@ -78,7 +80,7 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 		fOpt := getFieldOptions(field)
 
 		if !field.IsExported() {
-			fmt.Println("skipping unexported field")
+			fmt.Println("skipping unexported field ", field.Name)
 			continue
 		}
 
@@ -88,10 +90,11 @@ func Unmarshal(response *proto.EntityResponse, dst interface{}) error {
 
 		prop, ok := propNameMap[fOpt.name]
 		if !ok {
-			if field.Type.Kind() == reflect.Struct {
+			//TODO: This code breaks known structs, e.g. time.Time
+			/*if field.Type.Kind() == reflect.Struct {
 				n := handleStruct(field, propNameMap)
 				v.Elem().Field(i).Set(n.Elem())
-			}
+			}*/
 			continue
 		}
 
@@ -194,7 +197,7 @@ func handleStruct(field reflect.StructField, propNameMap map[string]*proto.Prope
 		nestedFieldOpts := getFieldOptions(nestedField)
 
 		if !nestedField.IsExported() {
-			fmt.Println("skipping unexported nested field")
+			fmt.Println("skipping unexported nested field ", field.Name)
 			continue
 		}
 

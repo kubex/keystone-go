@@ -20,7 +20,7 @@ type EntityLogProvider interface {
 }
 
 type EntityLogger struct {
-	LogEntries []LogEntry
+	LogEntries []LogEntry `json:",omitempty"`
 }
 
 func (e *EntityLogger) ClearLogs() error {

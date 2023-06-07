@@ -19,7 +19,7 @@ type EntityEventProvider interface {
 }
 
 type EntityEvents struct {
-	Events []Event
+	Events []Event `json:",omitempty"`
 }
 
 func (e *EntityEvents) ClearEvents() error {
