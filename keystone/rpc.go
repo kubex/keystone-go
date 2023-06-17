@@ -16,6 +16,10 @@ type Connection struct {
 	token  string
 }
 
+func (c *Connection) ProtoClient() proto.KeystoneClient {
+	return c.client
+}
+
 func (c *Connection) authorization() *proto.Authorization {
 	return &proto.Authorization{
 		VendorId: c.appID.VendorID,
