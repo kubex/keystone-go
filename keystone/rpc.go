@@ -182,6 +182,22 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	return mutateResp, err
 }
 
+func (c *Connection) Retrieve(ctx context.Context, workspaceID, entityId string, retrieveProperties []string) (*proto.EntityResponse, error) {
+	retrieveReq := &proto.RetrieveRequest{
+		WorkspaceId: workspaceID,
+		EntityId:    entityId,
+		Properties:  []*proto.PropertyRequest{},
+	}
+
+	for _, prop := range retrieveProperties {
+		retrieveReq.Properties = append(retrieveReq.Properties, &proto.PropertyRequest{
+			Property: c.MakeKey(prop),
+		})
+	}
+
+	return c.client.Retrieve(ctx, retrieveReq)
+}
+
 func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, retrieveProperties []string, options ...Option) ([]*proto.EntityResponse, error) {
 
 	findReq := &proto.FindRequest{
@@ -195,8 +211,6 @@ func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, r
 			findReq.Filters = append(findReq.Filters, filter)
 		}
 	}
-
-	//TODO: Limit & Offset
 
 	for _, prop := range retrieveProperties {
 		findReq.Properties = append(findReq.Properties, &proto.PropertyRequest{
