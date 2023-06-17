@@ -198,6 +198,15 @@ func (c *Connection) Retrieve(ctx context.Context, workspaceID, entityId string,
 	return c.client.Retrieve(ctx, retrieveReq)
 }
 
+func (c *Connection) Lookup(ctx context.Context, workspaceID, idLookup string) ([]*proto.EntityResponse, error) {
+	located, err := c.client.Lookup(ctx, &proto.LookupRequest{
+		WorkspaceId: workspaceID,
+		LookupId:    idLookup,
+	})
+
+	return located.GetEntities(), err
+}
+
 func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, retrieveProperties []string, options ...Option) ([]*proto.EntityResponse, error) {
 
 	findReq := &proto.FindRequest{
