@@ -20,6 +20,11 @@ func (c *Connection) ProtoClient() proto.KeystoneClient {
 	return c.client
 }
 
+// IsAppSchema checks if the schema is for the current app
+func (c *Connection) IsAppSchema(schema *proto.Key) bool {
+	return c.appID.VendorID == schema.GetVendorId() && c.appID.AppID == schema.GetAppId()
+}
+
 func (c *Connection) authorization() *proto.Authorization {
 	return &proto.Authorization{
 		VendorId: c.appID.VendorID,
