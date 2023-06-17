@@ -182,13 +182,18 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	return mutateResp, err
 }
 
-func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, retrieveProperties []string, filters []*proto.FilterProperty, limit, offset int32) ([]*proto.EntityResponse, error) {
+func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, retrieveProperties []string, options ...Option) ([]*proto.EntityResponse, error) {
 
 	findReq := &proto.FindRequest{
 		WorkspaceId: workspaceID,
 		Schema:      c.MakeKey(entityType),
 		Properties:  []*proto.PropertyRequest{},
-		Filters:     filters,
+	}
+
+	for _, option := range options {
+		for _, filter := range option.Filters {
+			findReq.Filters = append(findReq.Filters, filter)
+		}
 	}
 
 	//TODO: Limit & Offset
@@ -201,4 +206,21 @@ func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, r
 
 	located, err := c.client.Find(ctx, findReq)
 	return located.GetEntities(), err
+}
+
+type Option struct {
+	Filters []*proto.FilterProperty
+}
+
+func NewFilterOption(filters ...*proto.FilterProperty) Option {
+	return Option{
+		Filters: filters,
+	}
+}
+
+func TextValue(value string) *proto.Value {
+	return &proto.Value{
+		Type: proto.ValueType_VALUE_TEXT,
+		Text: value,
+	}
 }
