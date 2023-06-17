@@ -41,6 +41,25 @@ func (c *Connection) MakeKey(name string) *proto.Key {
 	}
 }
 
+type FilterOperator string
+
+const FilterEqual FilterOperator = "eq"
+const FilterNotEqual FilterOperator = "neq"
+const FilterGreaterThan FilterOperator = "gt"
+const FilterGreaterThanEqual FilterOperator = "gte"
+const FilterLessThan FilterOperator = "lt"
+const FilterLessThanEqual FilterOperator = "lte"
+const FilterLike FilterOperator = "like"
+const FilterIn FilterOperator = "in"
+
+func (c *Connection) NewFilter(property string, operator FilterOperator, value *proto.Value) *proto.FilterProperty {
+	return &proto.FilterProperty{
+		Property: c.MakeKey(property),
+		Operator: string(operator),
+		Value:    value,
+	}
+}
+
 type Actor struct {
 	UserAgent string
 	RemoteIP  string
@@ -161,4 +180,25 @@ func (c *Connection) Apply(ctx context.Context, entity *Entity) (*proto.MutateRe
 	//TODO: on success, update property updates to true, instead of on read
 
 	return mutateResp, err
+}
+
+func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, retrieveProperties []string, filters []*proto.FilterProperty, limit, offset int32) ([]*proto.EntityResponse, error) {
+
+	findReq := &proto.FindRequest{
+		WorkspaceId: workspaceID,
+		Schema:      c.MakeKey(entityType),
+		Properties:  []*proto.PropertyRequest{},
+		Filters:     filters,
+	}
+
+	//TODO: Limit & Offset
+
+	for _, prop := range retrieveProperties {
+		findReq.Properties = append(findReq.Properties, &proto.PropertyRequest{
+			Property: c.MakeKey(prop),
+		})
+	}
+
+	located, err := c.client.Find(ctx, findReq)
+	return located.GetEntities(), err
 }
