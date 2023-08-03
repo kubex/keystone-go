@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KeystoneClient interface {
-	Define(ctx context.Context, in *Schema, opts ...grpc.CallOption) (*Schema, error)
+	Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*EntityResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
@@ -37,7 +37,7 @@ func NewKeystoneClient(cc grpc.ClientConnInterface) KeystoneClient {
 	return &keystoneClient{cc}
 }
 
-func (c *keystoneClient) Define(ctx context.Context, in *Schema, opts ...grpc.CallOption) (*Schema, error) {
+func (c *keystoneClient) Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Define", in, out, opts...)
 	if err != nil {
@@ -86,7 +86,7 @@ func (c *keystoneClient) Lookup(ctx context.Context, in *LookupRequest, opts ...
 // All implementations must embed UnimplementedKeystoneServer
 // for forward compatibility
 type KeystoneServer interface {
-	Define(context.Context, *Schema) (*Schema, error)
+	Define(context.Context, *SchemaRequest) (*Schema, error)
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
 	Retrieve(context.Context, *RetrieveRequest) (*EntityResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
@@ -98,7 +98,7 @@ type KeystoneServer interface {
 type UnimplementedKeystoneServer struct {
 }
 
-func (UnimplementedKeystoneServer) Define(context.Context, *Schema) (*Schema, error) {
+func (UnimplementedKeystoneServer) Define(context.Context, *SchemaRequest) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Define not implemented")
 }
 func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*MutateResponse, error) {
@@ -127,7 +127,7 @@ func RegisterKeystoneServer(s grpc.ServiceRegistrar, srv KeystoneServer) {
 }
 
 func _Keystone_Define_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Schema)
+	in := new(SchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func _Keystone_Define_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/kubex.keystone.Keystone/Define",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeystoneServer).Define(ctx, req.(*Schema))
+		return srv.(KeystoneServer).Define(ctx, req.(*SchemaRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

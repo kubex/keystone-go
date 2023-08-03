@@ -3,6 +3,7 @@ package keystone
 import (
 	"fmt"
 	"github.com/kubex/keystone-go/proto"
+	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -72,15 +73,18 @@ func getFields(t reflect.Type, prefix string) []*proto.Field {
 		}
 		fOpt.name = prefix + fOpt.name
 
-		protoField := &proto.Field{}
-		var supported bool
-		protoField.DataType, protoField.Classification, supported = getFieldType(field)
-
 		// not supported assumed a nested struct field
-		if !supported {
-			returnFields = append(returnFields, getFields(field.Type, fOpt.name+".")...)
+		if !supportedType(field.Type) {
+			if field.Type.Kind() == reflect.Struct {
+				returnFields = append(returnFields, getFields(field.Type, fOpt.name+".")...)
+			} else {
+				log.Println("skipping unsupported field ", field.Name, field.Type.Kind())
+			}
 			continue
 		}
+
+		protoField := &proto.Field{}
+		protoField.DataType, protoField.Classification = getFieldType(field)
 		fOpt.applyTo(protoField)
 
 		returnFields = append(returnFields, protoField)
@@ -95,29 +99,29 @@ func appendOption(protoField *proto.Field, option proto.Field_Option, when bool)
 	}
 }
 
-func getFieldType(fieldType reflect.StructField) (proto.Field_Type, proto.Field_Classification, bool) {
+func getFieldType(fieldType reflect.StructField) (proto.Field_Type, proto.Field_Classification) {
 	defaultClassification := proto.Field_Anonymous
 	switch fieldType.Type.Kind() {
 	case reflect.String:
-		return proto.Field_Text, defaultClassification, true
+		return proto.Field_Text, defaultClassification
 	case reflect.Int32, reflect.Int64:
-		return proto.Field_Number, defaultClassification, true
+		return proto.Field_Number, defaultClassification
 	case reflect.Bool:
-		return proto.Field_Boolean, defaultClassification, true
+		return proto.Field_Boolean, defaultClassification
 	case reflect.Float32, reflect.Float64:
-		return proto.Field_Float, defaultClassification, true
+		return proto.Field_Float, defaultClassification
 	}
 
 	switch fieldType.Type {
 	case typeOfSecretString:
-		return proto.Field_Text, proto.Field_Secure, true
+		return proto.Field_Text, proto.Field_Secure
 	case typeOfAmount:
-		return proto.Field_Amount, defaultClassification, true
+		return proto.Field_Amount, defaultClassification
 	case typeOfTime:
-		return proto.Field_Time, defaultClassification, true
+		return proto.Field_Time, defaultClassification
 	}
 
-	return proto.Field_Text, defaultClassification, fieldType.Type.Kind() != reflect.Struct
+	return proto.Field_Text, defaultClassification
 }
 
 func getFieldOptions(f reflect.StructField) fieldOptions {

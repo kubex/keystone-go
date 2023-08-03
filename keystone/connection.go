@@ -54,7 +54,7 @@ func (c *Connection) Actor(workspaceID, remoteIP, userID, userAgent string) Acto
 func (c *Connection) RegisterTypes(types ...interface{}) int {
 	registered := 0
 	for _, t := range types {
-		if c.registerType(t) {
+		if _, reg := c.registerType(t); !reg {
 			registered++
 		}
 	}
@@ -62,14 +62,16 @@ func (c *Connection) RegisterTypes(types ...interface{}) int {
 }
 
 // registerType returns true if the type is already registered
-func (c *Connection) registerType(t interface{}) bool {
+func (c *Connection) registerType(t interface{}) (*proto.Schema, bool) {
 	typ := reflect.TypeOf(t)
-	if _, ok := c.typeRegister[typ]; !ok {
-		c.typeRegister[typ] = typeToSchema(t)
+	if schema, ok := c.typeRegister[typ]; !ok {
+		newSchema := typeToSchema(t)
+		c.typeRegister[typ] = newSchema
 		c.registerQueue[typ] = false
-		return false
+		return newSchema, false
+	} else {
+		return schema, true
 	}
-	return true
 }
 
 func (c *Connection) SyncSchema() *sync.WaitGroup {
@@ -80,7 +82,10 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 			if !processing {
 				if toRegister, ok := c.typeRegister[typ]; ok {
 					log.Println("Registering type", typ)
-					resp, err := c.ProtoClient().Define(context.Background(), toRegister)
+					resp, err := c.ProtoClient().Define(context.Background(), &proto.SchemaRequest{
+						Authorization: c.authorization(),
+						Schema:        toRegister,
+					})
 					log.Println(resp, err)
 				}
 				wg.Done()
@@ -98,15 +103,6 @@ type Actor struct {
 
 func (a *Actor) SetClient(client string) {
 	a.mutator.Client = client
-}
-
-func (a *Actor) Marshal(entity interface{}) {
-	log.Println("Processing Marshal request")
-	if !a.connection.registerType(entity) {
-		// wait for the type to be registered with the keystone server
-		a.connection.SyncSchema().Wait()
-	}
-	log.Println("Marshalling entity", entity)
 }
 
 func (c *Connection) Retrieve(ctx context.Context, workspaceID, entityId string, retrieveProperties []string) (*proto.EntityResponse, error) {
