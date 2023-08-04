@@ -3,18 +3,20 @@ package keystone
 import (
 	"context"
 	"encoding/json"
+	"github.com/ggwhite/go-masker"
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"os"
+	"sync"
+	"syreclabs.com/go/faker"
 	"testing"
 	"time"
 )
 
-func TestConnection(t *testing.T) {
-
+func TestRead(t *testing.T) {
 	kHost := os.Getenv("KEYSTONE_SERVICE_HOST")
 	kPort := os.Getenv("KEYSTONE_SERVICE_PORT")
 	if kHost == "" {
@@ -34,12 +36,13 @@ func TestConnection(t *testing.T) {
 	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
-	c.RegisterTypes(testSchemaType{}, Customer{})
+	c.RegisterTypes(Customer{}, &Customer{})
 	c.SyncSchema().Wait()
 
-	log.Println("Marshalling")
-	actor.Marshal(Customer{
-		//ID:            "23of2DIcK7WUli7A",
+	log.Println(c.typeRegister)
+
+	/*actor.Marshal(Customer{
+		//ID:            "enzfUSpdK7z5JMpq",
 		Name:          NewSecretString("John Doe", "J**n D*e"),
 		Email:         NewSecretString("john.doe@gmail.com", "j*******@gma**.com"),
 		Company:       "Chargehive Ltd",
@@ -53,10 +56,65 @@ func TestConnection(t *testing.T) {
 		HasPaid:       true,
 		Country:       "UK",
 		CountryCode:   "GB",
-		AmountPaid:    NewAmount("USD", 12353),
+		AmountPaid:    NewAmount("USD", 123),
 		LeadDate:      time.Now(),
-		UserID:        "user-237",
-	}, "Creating Customer via Marshal")
+		UserID:        "user-233",
+		Address: Address{
+			Line1: "123 Old Street",
+			Line2: "Line 2 is optional",
+			City:  "Southampton",
+		},
+	}, "Creating Customer via Marshal")*/
+
+	//	cst1 := &Customer{}
+	//log.Println(actor.GetByID(context.Background(), "00EWhvCdK7vP0Ipo", cst1), cst1)
+
+	cst2 := &Customer{}
+	log.Println(actor.GetByUnique(context.Background(), "user_id", "user-233", cst2), cst2)
+}
+
+func TestConnection(t *testing.T) {
+
+	wg := sync.WaitGroup{}
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func() {
+			writeCustomers()
+			wg.Done()
+		}()
+		time.Sleep(time.Millisecond * 100)
+	}
+	wg.Wait()
+}
+
+func writeCustomers() {
+	kHost := os.Getenv("KEYSTONE_SERVICE_HOST")
+	kPort := os.Getenv("KEYSTONE_SERVICE_PORT")
+	if kHost == "" {
+		kHost = "127.0.0.1"
+	}
+	if kPort == "" {
+		kPort = "50031"
+	}
+
+	ksGrpcConn, err := grpc.Dial(kHost+":"+kPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	log.Println(kHost + ":" + kPort)
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+
+	ksClient := proto.NewKeystoneClient(ksGrpcConn)
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
+	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
+
+	c.RegisterTypes( /*testSchemaType{},*/ Customer{})
+	c.SyncSchema().Wait()
+
+	log.Println("Marshalling")
+	for i := 0; i < 2500; i++ {
+		actor.Marshal(FakeCustomer(), "Faker Customer x")
+	}
+	return
 }
 
 func xx(t *testing.T) {
@@ -258,6 +316,8 @@ func xx(t *testing.T) {
 }
 
 type Customer struct {
+	EntityLogger
+	EntityEvents
 	ID               string       `keystone:"_entity_id" json:",omitempty"`
 	Name             SecretString `keystone:",indexed,personal,omitempty" json:",omitempty"`
 	Email            SecretString `keystone:",indexed,omitempty" json:",omitempty"`
@@ -275,6 +335,7 @@ type Customer struct {
 	Timezone         string       `keystone:",omitempty" json:",omitempty"`
 	State            string       `keystone:",omitempty" json:",omitempty"`
 	StateAbbr        string       `keystone:",omitempty" json:",omitempty"`
+	James            string       `keystone:",omitempty,indexed" json:",omitempty"`
 	Country          string       `keystone:",omitempty" json:",omitempty"`
 	CountryCode      string       `keystone:",omitempty" json:",omitempty"`
 	Latitude         float64      `keystone:",omitempty" json:",omitempty"`
@@ -282,4 +343,49 @@ type Customer struct {
 	AmountPaid       Amount       `keystone:",omitempty" json:",omitempty"`
 	LeadDate         time.Time    `keystone:",omitempty" json:",omitempty"`
 	UserID           string       `keystone:",unique,omitempty" json:",omitempty"`
+	Address          Address
+	LineItems        []LineItem // TODO: Store as children?
+}
+
+type LineItem struct {
+	Name string
+}
+
+type Address struct {
+	Line1 string
+	Line2 string
+	City  string
+}
+
+func FakeCustomer() Customer {
+
+	name := faker.Name().Name()
+	email := faker.Internet().Email()
+
+	c := Customer{}
+	c.Name = NewSecretString(name, masker.Name(name))
+	c.Email = NewSecretString(email, masker.Email(email))
+	c.Company = faker.Company().Name()
+	c.Phone = faker.PhoneNumber().String()
+	c.AvatarUrl = faker.Avatar().Url("png", 100, 100)
+	c.City = faker.Address().City()
+	c.StreetName = faker.Address().StreetName()
+	c.StreetAddress = faker.Address().StreetAddress()
+	c.SecondaryAddress = faker.Address().SecondaryAddress()
+	c.BuildingNumber = faker.Address().BuildingNumber()
+	c.Postcode = faker.Address().Postcode()
+	c.Zipcode = faker.Address().ZipCode()
+	c.Timezone = faker.Address().TimeZone()
+	c.State = faker.Address().State()
+	c.Country = faker.Address().Country()
+	c.CountryCode = faker.Address().CountryCode()
+	c.Latitude = float64(faker.Address().Latitude())
+	c.Longitude = float64(faker.Address().Longitude())
+	c.AmountPaid = NewAmount("GBP", int64(faker.Commerce().Price()*100))
+	c.LeadDate = faker.Time().Birthday(0, 5)
+	c.UserID = faker.RandomString(10)
+
+	c.LogDebug("Created customer", "REF123", "trace-id", "mr-man", nil)
+
+	return c
 }

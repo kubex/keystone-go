@@ -64,6 +64,11 @@ func (c *Connection) RegisterTypes(types ...interface{}) int {
 // registerType returns true if the type is already registered
 func (c *Connection) registerType(t interface{}) (*proto.Schema, bool) {
 	typ := reflect.TypeOf(t)
+
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+
 	if schema, ok := c.typeRegister[typ]; !ok {
 		newSchema := typeToSchema(t)
 		c.typeRegister[typ] = newSchema
@@ -86,7 +91,9 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 						Authorization: c.authorization(),
 						Schema:        toRegister,
 					})
-					log.Println(resp, err)
+					if err == nil {
+						c.typeRegister[typ] = resp
+					}
 				}
 				wg.Done()
 			}
@@ -99,6 +106,14 @@ type Actor struct {
 	connection  *Connection
 	workspaceID string
 	mutator     *proto.Mutator
+}
+
+func (a *Actor) authorization() *proto.Authorization {
+	return &proto.Authorization{
+		Source:      &a.connection.appID,
+		Token:       a.connection.token,
+		WorkspaceId: a.workspaceID,
+	}
 }
 
 func (a *Actor) SetClient(client string) {

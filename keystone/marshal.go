@@ -2,7 +2,6 @@ package keystone
 
 import (
 	"context"
-	"fmt"
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
@@ -11,13 +10,13 @@ import (
 )
 
 func (a *Actor) Marshal(src interface{}, comment string) {
-	log.Println("Processing Marshal request")
+	//log.Println("Processing Marshal request")
 	schema, registered := a.connection.registerType(src)
 	if !registered {
 		// wait for the type to be registered with the keystone server
 		a.connection.SyncSchema().Wait()
 	}
-	log.Println("Marshalling entity", src)
+	//log.Println("Marshalling entity", src)
 
 	v := reflect.ValueOf(src)
 	for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
@@ -51,11 +50,11 @@ func (a *Actor) Marshal(src interface{}, comment string) {
 		Mutation:      mutation,
 	}
 
-	res, err := a.connection.ProtoClient().Mutate(context.Background(), m)
+	_, err := a.connection.ProtoClient().Mutate(context.Background(), m)
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Println(res)
+		//log.Println(res)
 	}
 
 }
@@ -76,7 +75,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 
 			if !field.IsExported() && at.Kind() != reflect.Struct {
 				// ignore embedded unexported fields
-				fmt.Println("skipping unexported anonymous ", field.Name)
+				//fmt.Println("skipping unexported anonymous ", field.Name)
 				continue
 			}
 
@@ -84,7 +83,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 			continue
 
 		} else if !field.IsExported() {
-			fmt.Println("skipping unexported field ", field.Name)
+			//fmt.Println("skipping unexported field ", field.Name)
 			continue
 		}
 
@@ -98,7 +97,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 			if field.Type.Kind() == reflect.Struct {
 				returnProperties = append(returnProperties, fieldsToProperties(fieldValue, field.Type, fOpt.name+".")...)
 			} else {
-				fmt.Println("skipping unsupported type ", field.Type.Kind())
+				//fmt.Println("skipping unsupported type ", field.Type.Kind())
 			}
 			continue
 		}

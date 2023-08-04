@@ -14,6 +14,10 @@ func typeToSchema(input interface{}) *proto.Schema {
 	v := reflect.ValueOf(input)
 	t := v.Type()
 
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
 	name := strings.ReplaceAll(snakeCase(t.Name()), "_", " ")
 	returnSchema := &proto.Schema{
 		Name: name,
@@ -43,6 +47,10 @@ func typeToSchema(input interface{}) *proto.Schema {
 
 func getFields(t reflect.Type, prefix string) []*proto.Field {
 	var returnFields []*proto.Field
+
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
 
 	// Iterate all the fields in the struct
 	for i := 0; i < t.NumField(); i++ {
