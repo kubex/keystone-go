@@ -14,10 +14,10 @@ const FilterLike FilterOperator = "like"
 const FilterIn FilterOperator = "in"
 
 type Option struct {
-	Filters []*proto.FilterProperty
+	Filters []*proto.PropertyFilter
 }
 
-func NewFilterOption(filters ...*proto.FilterProperty) Option {
+func NewFilterOption(filters ...*proto.PropertyFilter) Option {
 	return Option{
 		Filters: filters,
 	}

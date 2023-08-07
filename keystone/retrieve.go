@@ -9,7 +9,7 @@ import (
 
 func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}) error {
 
-	resp, err := a.connection.ProtoClient().Retrieve(ctx, &proto.RetrieveRequest{
+	resp, err := a.connection.ProtoClient().Retrieve(ctx, &proto.EntityRequest{
 		Authorization: a.authorization(),
 		EntityId:      entityID,
 		Properties: []*proto.PropertyRequest{
@@ -31,7 +31,7 @@ func (a *Actor) GetByUnique(ctx context.Context, key, value string, dst interfac
 		schemaID = schema.Type
 	}
 
-	resp, err := a.connection.ProtoClient().Retrieve(ctx, &proto.RetrieveRequest{
+	resp, err := a.connection.ProtoClient().Retrieve(ctx, &proto.EntityRequest{
 		Authorization: a.authorization(),
 		UniqueId: &proto.IDLookup{
 			Property: key,

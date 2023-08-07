@@ -120,7 +120,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 
 func supportedType(t reflect.Type) bool {
 	switch t.Kind() {
-	case reflect.String, reflect.Int32, reflect.Int64, reflect.Bool, reflect.Float32, reflect.Float64:
+	case reflect.String, reflect.Int32, reflect.Int64, reflect.Int, reflect.Bool, reflect.Float32, reflect.Float64:
 		return true
 	}
 
@@ -139,7 +139,7 @@ func propertyFromField(val reflect.Value, fieldType reflect.StructField) (*proto
 	case reflect.String:
 		prop.Text = val.String()
 		return prop, prop.Text == ""
-	case reflect.Int32, reflect.Int64:
+	case reflect.Int32, reflect.Int64, reflect.Int:
 		prop.Int = val.Int()
 		return prop, prop.Int == 0
 	case reflect.Bool:

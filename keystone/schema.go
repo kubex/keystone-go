@@ -113,7 +113,7 @@ func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Pro
 	switch fieldType.Type.Kind() {
 	case reflect.String:
 		return proto.Property_Text, defaultClassification
-	case reflect.Int32, reflect.Int64:
+	case reflect.Int32, reflect.Int64, reflect.Int:
 		return proto.Property_Number, defaultClassification
 	case reflect.Bool:
 		return proto.Property_Boolean, defaultClassification
