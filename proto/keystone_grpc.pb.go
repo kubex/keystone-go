@@ -24,9 +24,10 @@ const _ = grpc.SupportPackageIsVersion7
 type KeystoneClient interface {
 	Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
-	Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*EntityResponse, error)
+	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
+	Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error)
+	Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
-	Lookup(ctx context.Context, in *LookupRequest, opts ...grpc.CallOption) (*FindResponse, error)
 }
 
 type keystoneClient struct {
@@ -55,9 +56,27 @@ func (c *keystoneClient) Mutate(ctx context.Context, in *MutateRequest, opts ...
 	return out, nil
 }
 
-func (c *keystoneClient) Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*EntityResponse, error) {
+func (c *keystoneClient) Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error) {
 	out := new(EntityResponse)
 	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Retrieve", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error) {
+	out := new(LogsResponse)
+	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Logs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error) {
+	out := new(EventsResponse)
+	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Events", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,24 +92,16 @@ func (c *keystoneClient) Find(ctx context.Context, in *FindRequest, opts ...grpc
 	return out, nil
 }
 
-func (c *keystoneClient) Lookup(ctx context.Context, in *LookupRequest, opts ...grpc.CallOption) (*FindResponse, error) {
-	out := new(FindResponse)
-	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Lookup", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // KeystoneServer is the server API for Keystone service.
 // All implementations must embed UnimplementedKeystoneServer
 // for forward compatibility
 type KeystoneServer interface {
 	Define(context.Context, *SchemaRequest) (*Schema, error)
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
-	Retrieve(context.Context, *RetrieveRequest) (*EntityResponse, error)
+	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
+	Logs(context.Context, *LogRequest) (*LogsResponse, error)
+	Events(context.Context, *EventRequest) (*EventsResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
-	Lookup(context.Context, *LookupRequest) (*FindResponse, error)
 	mustEmbedUnimplementedKeystoneServer()
 }
 
@@ -104,14 +115,17 @@ func (UnimplementedKeystoneServer) Define(context.Context, *SchemaRequest) (*Sch
 func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*MutateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Mutate not implemented")
 }
-func (UnimplementedKeystoneServer) Retrieve(context.Context, *RetrieveRequest) (*EntityResponse, error) {
+func (UnimplementedKeystoneServer) Retrieve(context.Context, *EntityRequest) (*EntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retrieve not implemented")
+}
+func (UnimplementedKeystoneServer) Logs(context.Context, *LogRequest) (*LogsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logs not implemented")
+}
+func (UnimplementedKeystoneServer) Events(context.Context, *EventRequest) (*EventsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Events not implemented")
 }
 func (UnimplementedKeystoneServer) Find(context.Context, *FindRequest) (*FindResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Find not implemented")
-}
-func (UnimplementedKeystoneServer) Lookup(context.Context, *LookupRequest) (*FindResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Lookup not implemented")
 }
 func (UnimplementedKeystoneServer) mustEmbedUnimplementedKeystoneServer() {}
 
@@ -163,7 +177,7 @@ func _Keystone_Mutate_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Keystone_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RetrieveRequest)
+	in := new(EntityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -175,7 +189,43 @@ func _Keystone_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/kubex.keystone.Keystone/Retrieve",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeystoneServer).Retrieve(ctx, req.(*RetrieveRequest))
+		return srv.(KeystoneServer).Retrieve(ctx, req.(*EntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keystone_Logs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).Logs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubex.keystone.Keystone/Logs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).Logs(ctx, req.(*LogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keystone_Events_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).Events(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubex.keystone.Keystone/Events",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).Events(ctx, req.(*EventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -194,24 +244,6 @@ func _Keystone_Find_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KeystoneServer).Find(ctx, req.(*FindRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Keystone_Lookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LookupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeystoneServer).Lookup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kubex.keystone.Keystone/Lookup",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeystoneServer).Lookup(ctx, req.(*LookupRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -236,12 +268,16 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keystone_Retrieve_Handler,
 		},
 		{
-			MethodName: "Find",
-			Handler:    _Keystone_Find_Handler,
+			MethodName: "Logs",
+			Handler:    _Keystone_Logs_Handler,
 		},
 		{
-			MethodName: "Lookup",
-			Handler:    _Keystone_Lookup_Handler,
+			MethodName: "Events",
+			Handler:    _Keystone_Events_Handler,
+		},
+		{
+			MethodName: "Find",
+			Handler:    _Keystone_Find_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
