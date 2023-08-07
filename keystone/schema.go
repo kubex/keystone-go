@@ -84,6 +84,10 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 
 		// not supported assumed a nested struct field
 		if !supportedType(field.Type) {
+			if field.Type.Kind() == reflect.Pointer {
+				field.Type = field.Type.Elem()
+			}
+
 			if field.Type.Kind() == reflect.Struct {
 				returnFields = append(returnFields, getProperties(field.Type, fOpt.name+".")...)
 			} else {

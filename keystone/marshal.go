@@ -96,7 +96,13 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 		fOpt.name = prefix + fOpt.name
 
 		if !supportedType(field.Type) {
-			if field.Type.Kind() == reflect.Struct {
+			if field.Type.Kind() == reflect.Pointer {
+				fieldValue = fieldValue.Elem()
+				if fieldValue.IsValid() {
+					field.Type = fieldValue.Type()
+				}
+			}
+			if field.Type.Kind() == reflect.Struct || field.Type.Kind() == reflect.Pointer {
 				returnProperties = append(returnProperties, fieldsToProperties(fieldValue, field.Type, fOpt.name+".")...)
 			} else {
 				//fmt.Println("skipping unsupported type ", field.Type.Kind())
