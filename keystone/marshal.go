@@ -120,7 +120,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 
 func supportedType(t reflect.Type) bool {
 	switch t.Kind() {
-	case reflect.String, reflect.Int32, reflect.Int64, reflect.Int, reflect.Bool, reflect.Float32, reflect.Float64:
+	case reflect.String, reflect.Int32, reflect.Int64, reflect.Int, reflect.Bool, reflect.Float32, reflect.Float64, reflect.Map, reflect.Slice:
 		return true
 	}
 
@@ -148,6 +148,22 @@ func propertyFromField(val reflect.Value, fieldType reflect.StructField) (*proto
 	case reflect.Float32, reflect.Float64:
 		prop.Float = val.Float()
 		return prop, prop.Float == 0
+	case reflect.Map:
+		prop.Map = map[string][]byte{}
+		iter := val.MapRange()
+		for iter.Next() {
+			k := iter.Key()
+			v := iter.Value()
+			prop.Map[k.String()] = []byte(v.String())
+		}
+		return prop, len(prop.Map) == 0
+	case reflect.Slice:
+		if set, ok := val.Slice(0, val.Len()).Interface().([]string); ok {
+			prop.Set = set
+		} else {
+			fmt.Println("only slice of string is supported")
+		}
+		return prop, len(prop.Set) == 0
 	}
 
 	switch fieldType.Type {

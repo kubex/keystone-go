@@ -119,6 +119,10 @@ func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Pro
 		return proto.Property_Boolean, defaultClassification
 	case reflect.Float32, reflect.Float64:
 		return proto.Property_Float, defaultClassification
+	case reflect.Map:
+		return proto.Property_Map, defaultClassification
+	case reflect.Slice:
+		return proto.Property_Set, defaultClassification
 	}
 
 	switch fieldType.Type {
