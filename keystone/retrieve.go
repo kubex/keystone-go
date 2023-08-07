@@ -2,8 +2,9 @@ package keystone
 
 import (
 	"context"
-	"github.com/kubex/keystone-go/proto"
 	"log"
+
+	"github.com/kubex/keystone-go/proto"
 )
 
 func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}) error {
@@ -12,7 +13,7 @@ func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}) e
 		Authorization: a.authorization(),
 		EntityId:      entityID,
 		Properties: []*proto.PropertyRequest{
-			{Keys: []string{"address~"}},
+			{Properties: []string{"address~"}},
 		},
 	})
 	if err != nil {
@@ -33,13 +34,13 @@ func (a *Actor) GetByUnique(ctx context.Context, key, value string, dst interfac
 	resp, err := a.connection.ProtoClient().Retrieve(ctx, &proto.RetrieveRequest{
 		Authorization: a.authorization(),
 		UniqueId: &proto.IDLookup{
-			Field:    key,
+			Property: key,
 			UniqueId: value,
 			SchemaId: schemaID,
 		},
 		Properties: []*proto.PropertyRequest{
-			{Keys: []string{"address~"}},
-			{Keys: []string{"name", "email"}},
+			{Properties: []string{"address~"}},
+			{Properties: []string{"name", "email"}},
 		},
 	})
 

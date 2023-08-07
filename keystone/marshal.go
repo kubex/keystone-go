@@ -2,11 +2,12 @@ package keystone
 
 import (
 	"context"
-	"github.com/kubex/keystone-go/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"reflect"
 	"time"
+
+	"github.com/kubex/keystone-go/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (a *Actor) Marshal(src interface{}, comment string) {
@@ -34,8 +35,8 @@ func (a *Actor) Marshal(src interface{}, comment string) {
 
 	properties := fieldsToProperties(v, t, "")
 	for _, p := range properties {
-		if p.Key.Key[0] == '_' {
-			if p.Key.Key == "_entity_id" && p.Value.Text != "" {
+		if p.Property.Key[0] == '_' {
+			if p.Property.Key == "_entity_id" && p.Value.Text != "" {
 				eid = p.Value.Text
 			}
 		} else {
@@ -103,7 +104,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 		}
 
 		protoProp := &proto.EntityProperty{}
-		protoProp.Key = &proto.Key{Key: fOpt.name}
+		protoProp.Property = &proto.Key{Key: fOpt.name}
 		var isEmpty bool
 		protoProp.Value, isEmpty = propertyFromField(fieldValue, field)
 

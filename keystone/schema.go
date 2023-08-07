@@ -2,12 +2,13 @@ package keystone
 
 import (
 	"fmt"
-	"github.com/kubex/keystone-go/proto"
 	"log"
 	"reflect"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/kubex/keystone-go/proto"
 )
 
 func typeToSchema(input interface{}) *proto.Schema {
@@ -40,13 +41,13 @@ func typeToSchema(input interface{}) *proto.Schema {
 		returnSchema.Options = append(returnSchema.Options, def.Options...)
 	}
 
-	returnSchema.Fields = getFields(t, "")
+	returnSchema.Properties = getProperties(t, "")
 
 	return returnSchema
 }
 
-func getFields(t reflect.Type, prefix string) []*proto.Field {
-	var returnFields []*proto.Field
+func getProperties(t reflect.Type, prefix string) []*proto.Property {
+	var returnFields []*proto.Property
 
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
@@ -67,7 +68,7 @@ func getFields(t reflect.Type, prefix string) []*proto.Field {
 				continue
 			}
 
-			returnFields = append(returnFields, getFields(t, prefix)...)
+			returnFields = append(returnFields, getProperties(t, prefix)...)
 			continue
 
 		} else if !field.IsExported() {
@@ -84,14 +85,14 @@ func getFields(t reflect.Type, prefix string) []*proto.Field {
 		// not supported assumed a nested struct field
 		if !supportedType(field.Type) {
 			if field.Type.Kind() == reflect.Struct {
-				returnFields = append(returnFields, getFields(field.Type, fOpt.name+".")...)
+				returnFields = append(returnFields, getProperties(field.Type, fOpt.name+".")...)
 			} else {
 				log.Println("skipping unsupported field ", field.Name, field.Type.Kind())
 			}
 			continue
 		}
 
-		protoField := &proto.Field{}
+		protoField := &proto.Property{}
 		protoField.DataType, protoField.Classification = getFieldType(field)
 		fOpt.applyTo(protoField)
 
@@ -101,35 +102,35 @@ func getFields(t reflect.Type, prefix string) []*proto.Field {
 	return returnFields
 }
 
-func appendOption(protoField *proto.Field, option proto.Field_Option, when bool) {
+func appendOption(protoField *proto.Property, option proto.Property_Option, when bool) {
 	if when {
 		protoField.Options = append(protoField.Options, option)
 	}
 }
 
-func getFieldType(fieldType reflect.StructField) (proto.Field_Type, proto.Field_Classification) {
-	defaultClassification := proto.Field_Anonymous
+func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Property_Classification) {
+	defaultClassification := proto.Property_Anonymous
 	switch fieldType.Type.Kind() {
 	case reflect.String:
-		return proto.Field_Text, defaultClassification
+		return proto.Property_Text, defaultClassification
 	case reflect.Int32, reflect.Int64:
-		return proto.Field_Number, defaultClassification
+		return proto.Property_Number, defaultClassification
 	case reflect.Bool:
-		return proto.Field_Boolean, defaultClassification
+		return proto.Property_Boolean, defaultClassification
 	case reflect.Float32, reflect.Float64:
-		return proto.Field_Float, defaultClassification
+		return proto.Property_Float, defaultClassification
 	}
 
 	switch fieldType.Type {
 	case typeOfSecretString:
-		return proto.Field_Text, proto.Field_Secure
+		return proto.Property_Text, proto.Property_Secure
 	case typeOfAmount:
-		return proto.Field_Amount, defaultClassification
+		return proto.Property_Amount, defaultClassification
 	case typeOfTime:
-		return proto.Field_Time, defaultClassification
+		return proto.Property_Time, defaultClassification
 	}
 
-	return proto.Field_Text, defaultClassification
+	return proto.Property_Text, defaultClassification
 }
 
 func getFieldOptions(f reflect.StructField) fieldOptions {
@@ -197,19 +198,19 @@ type fieldOptions struct {
 	userInputData bool
 }
 
-func (fOpt fieldOptions) applyTo(protoField *proto.Field) {
+func (fOpt fieldOptions) applyTo(protoField *proto.Property) {
 	protoField.Name = fOpt.name
 	if fOpt.personalData {
-		protoField.Classification = proto.Field_Personal
+		protoField.Classification = proto.Property_Personal
 	} else if fOpt.userInputData {
-		protoField.Classification = proto.Field_UserInput
+		protoField.Classification = proto.Property_UserInput
 	}
 
-	appendOption(protoField, proto.Field_Unique, fOpt.unique)
-	appendOption(protoField, proto.Field_Indexed, fOpt.indexed)
-	appendOption(protoField, proto.Field_Immutable, fOpt.immutable)
-	appendOption(protoField, proto.Field_Required, fOpt.required)
-	appendOption(protoField, proto.Field_ReverseLookup, fOpt.reverseLookup)
+	appendOption(protoField, proto.Property_Unique, fOpt.unique)
+	appendOption(protoField, proto.Property_Indexed, fOpt.indexed)
+	appendOption(protoField, proto.Property_Immutable, fOpt.immutable)
+	appendOption(protoField, proto.Property_Required, fOpt.required)
+	appendOption(protoField, proto.Property_ReverseLookup, fOpt.reverseLookup)
 }
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")

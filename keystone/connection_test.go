@@ -3,17 +3,18 @@ package keystone
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"os"
+	"sync"
+	"testing"
+	"time"
+
 	"github.com/ggwhite/go-masker"
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"log"
-	"os"
-	"sync"
 	"syreclabs.com/go/faker"
-	"testing"
-	"time"
 )
 
 func TestRead(t *testing.T) {
@@ -41,36 +42,39 @@ func TestRead(t *testing.T) {
 
 	log.Println(c.typeRegister)
 
-	/*actor.Marshal(Customer{
-		//ID:            "enzfUSpdK7z5JMpq",
-		Name:          NewSecretString("John Doe", "J**n D*e"),
-		Email:         NewSecretString("john.doe@gmail.com", "j*******@gma**.com"),
-		Company:       "Chargehive Ltd",
-		Phone:         "0791736u63434",
-		City:          "Portsmouth",
-		StreetName:    "New Street",
-		StreetAddress: "41",
-		Postcode:      "PO1 3AG",
-		Timezone:      "BST",
-		State:         "Hampshire",
-		HasPaid:       true,
-		Country:       "UK",
-		CountryCode:   "GB",
-		AmountPaid:    NewAmount("USD", 123),
-		LeadDate:      time.Now(),
-		UserID:        "user-233",
-		Address: Address{
-			Line1: "123 Old Street",
-			Line2: "Line 2 is optional",
-			City:  "Southampton",
-		},
-	}, "Creating Customer via Marshal")*/
+	//actor.Marshal(Customer{
+	//	//ID:            "enzfUSpdK7z5JMpq",
+	//	Name:          NewSecretString("John Doe", "J**n D*e"),
+	//	Email:         NewSecretString("john.doe@gmail.com", "j*******@gma**.com"),
+	//	Company:       "Chargehive Ltd",
+	//	Phone:         "0791736u63434",
+	//	City:          "Portsmouth",
+	//	StreetName:    "New Street",
+	//	StreetAddress: "41",
+	//	Postcode:      "PO1 3AG",
+	//	Timezone:      "BST",
+	//	State:         "Hampshire",
+	//	HasPaid:       true,
+	//	Country:       "UK",
+	//	CountryCode:   "GB",
+	//	AmountPaid:    NewAmount("USD", 123),
+	//	LeadDate:      time.Now(),
+	//	UserID:        "user-233",
+	//	Address: Address{
+	//		Line1: "123 Old Street",
+	//		Line2: "Line 2 is optional",
+	//		City:  "Southampton",
+	//	},
+	//}, "Creating Customer via Marshal")
 
 	//	cst1 := &Customer{}
 	//log.Println(actor.GetByID(context.Background(), "00EWhvCdK7vP0Ipo", cst1), cst1)
 
 	cst2 := &Customer{}
+	actor.GetByID(context.Background(), "", cst2)
 	log.Println(actor.GetByUnique(context.Background(), "user_id", "user-233", cst2), cst2)
+
+	//actor.Get(context.Background(), cst, PropertyLoader{All: true, Decrypt: true}, LinksLoader{}, ByEntityID(), ByUnique("user_id", "user-233"))
 }
 
 func TestConnection(t *testing.T) {
@@ -176,7 +180,7 @@ func xx(t *testing.T) {
 			Comment: "Customer Creation",
 			Properties: []*proto.EntityProperty{
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "first_name",
 					},
 					Value: &proto.Value{
@@ -185,7 +189,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "last_name",
 					},
 					Value: &proto.Value{
@@ -193,7 +197,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "external_id",
 					},
 					Value: &proto.Value{
@@ -201,7 +205,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "transaction_id",
 					},
 					Value: &proto.Value{
@@ -209,7 +213,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "total_paid",
 					},
 					Value: &proto.Value{
@@ -218,7 +222,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "subscriptions",
 					},
 					Value: &proto.Value{
@@ -226,7 +230,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "first_paid",
 					},
 					Value: &proto.Value{
@@ -234,7 +238,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "fraud_rating",
 					},
 					Value: &proto.Value{
@@ -242,7 +246,7 @@ func xx(t *testing.T) {
 					},
 				},
 				{
-					Key: &proto.Key{
+					Property: &proto.Key{
 						Key: "renewing",
 					},
 					Value: &proto.Value{
