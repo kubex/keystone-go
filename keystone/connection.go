@@ -2,10 +2,11 @@ package keystone
 
 import (
 	"context"
-	"github.com/kubex/keystone-go/proto"
 	"log"
 	"reflect"
 	"sync"
+
+	"github.com/kubex/keystone-go/proto"
 )
 
 type Connection struct {
@@ -92,7 +93,14 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 						Schema:        toRegister,
 					})
 					if err == nil {
-						c.typeRegister[typ] = resp
+						c.typeRegister[typ].Id = resp.GetId()
+						c.typeRegister[typ].Name = resp.GetName()
+						c.typeRegister[typ].Source = resp.GetSource()
+						c.typeRegister[typ].Type = resp.GetType()
+						c.typeRegister[typ].Properties = resp.GetProperties()
+						c.typeRegister[typ].Options = resp.GetOptions()
+						c.typeRegister[typ].Singular = resp.GetSingular()
+						c.typeRegister[typ].Plural = resp.GetPlural()
 					}
 				}
 				wg.Done()
