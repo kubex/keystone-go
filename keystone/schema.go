@@ -53,6 +53,10 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 		t = t.Elem()
 	}
 
+	if t == reflect.TypeOf(GenericResult{}) {
+		return returnFields
+	}
+
 	// Iterate all the fields in the struct
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)

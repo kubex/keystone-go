@@ -9,24 +9,29 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}) error {
+type GenericResult map[string]interface{}
 
+func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}) error {
 	resp, err := a.connection.ProtoClient().Retrieve(ctx, &proto.EntityRequest{
 		Authorization: a.authorization(),
 		EntityId:      entityID,
 		Properties: []*proto.PropertyRequest{
 			{Properties: []string{"address~"}},
+			{Properties: []string{"name", "email", "city", "state", "country", "postcode", "amount_paid"}},
 		},
 	})
 	if err != nil {
 		return err
 	}
 
+	if gr, ok := dst.(GenericResult); ok {
+		return UnmarshalGeneric(resp, gr)
+	}
+
 	return Unmarshal(resp, dst)
 }
 
 func (a *Actor) GetByUnique(ctx context.Context, key, value string, dst interface{}) error {
-
 	schema, registered := a.connection.registerType(dst)
 	if !registered {
 		// wait for the type to be registered with the keystone server
@@ -47,7 +52,7 @@ func (a *Actor) GetByUnique(ctx context.Context, key, value string, dst interfac
 		},
 		Properties: []*proto.PropertyRequest{
 			{Properties: []string{"address~"}},
-			{Properties: []string{"name", "email", "city", "state", "country", "postcode"}},
+			{Properties: []string{"name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date"}},
 		},
 	})
 
@@ -91,6 +96,37 @@ func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, dst
 		}
 	}
 
+	return nil
+}
+
+func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
+	entityPropertyMap := makeEntityPropertyMap(resp)
+	for _, p := range entityPropertyMap {
+		if p.Value.GetText() != "" {
+			dst[p.Property.Key] = p.Value.GetText()
+		}
+		if p.Value.GetInt() != 0 {
+			dst[p.Property.Key] = p.Value.GetInt()
+		}
+		if p.Value.GetBool() {
+			dst[p.Property.Key] = p.Value.GetBool()
+		}
+		if p.Value.GetFloat() != 0 {
+			dst[p.Property.Key] = p.Value.GetFloat()
+		}
+		if p.Value.GetSecureText() != "" {
+			dst[p.Property.Key] = p.Value.GetSecureText()
+		}
+		if len(p.Value.GetSet()) > 0 {
+			dst[p.Property.Key] = p.Value.GetSet()
+		}
+		if len(p.Value.GetMap()) > 0 {
+			dst[p.Property.Key] = p.Value.GetMap()
+		}
+		if p.Value.GetTime() != nil {
+			dst[p.Property.Key] = time.Unix(p.Value.GetTime().Seconds, int64(p.Value.GetTime().Nanos))
+		}
+	}
 	return nil
 }
 
