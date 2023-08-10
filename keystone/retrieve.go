@@ -10,9 +10,10 @@ import (
 type GenericResult map[string]interface{}
 
 type Actor struct {
-	connection  *Connection
-	workspaceID string
-	mutator     *proto.Mutator
+	connection   *Connection
+	workspaceID  string
+	mutator      *proto.Mutator
+	loadedEntity *proto.EntityResponse
 }
 
 func (a *Actor) authorization() *proto.Authorization {
@@ -58,7 +59,7 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 	if err != nil {
 		return err
 	}
-
+	a.loadedEntity = resp
 	if gr, ok := dst.(GenericResult); ok {
 		return UnmarshalGeneric(resp, gr)
 	}

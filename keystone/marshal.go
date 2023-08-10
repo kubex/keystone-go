@@ -33,7 +33,6 @@ func (a *Actor) Marshal(src interface{}, comment string) {
 	}
 
 	eid := "" // try to get from src
-
 	properties := fieldsToProperties(v, t, "")
 	for _, p := range properties {
 		if p.Property.Key[0] == '_' {
@@ -45,6 +44,9 @@ func (a *Actor) Marshal(src interface{}, comment string) {
 		}
 	}
 
+	if a.loadedEntity != nil {
+		mutation.Properties = getChangedProperties(a.loadedEntity, mutation.Properties)
+	}
 	m := &proto.MutateRequest{
 		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
 		EntityId:      eid,
@@ -58,7 +60,31 @@ func (a *Actor) Marshal(src interface{}, comment string) {
 	} else {
 		//log.Println(res)
 	}
+}
 
+func getChangedProperties(existing *proto.EntityResponse, newValues []*proto.EntityProperty) []*proto.EntityProperty {
+	exMap := makeEntityPropertyMap(existing.GetProperties())
+	newMap := makeEntityPropertyMap(newValues)
+
+	var result []*proto.EntityProperty
+	for k, v := range newMap {
+		if _, ok := exMap[k]; !ok {
+			result = append(result, v)
+			continue
+		}
+		if newMap[k].Property.Key == exMap[k].Property.Key &&
+			newMap[k].Value.Text == exMap[k].Value.Text &&
+			newMap[k].Value.SecureText == exMap[k].Value.SecureText &&
+			newMap[k].Value.Int == exMap[k].Value.Int &&
+			newMap[k].Value.Float == exMap[k].Value.Float &&
+			newMap[k].Value.Bool == exMap[k].Value.Bool &&
+			reflect.DeepEqual(newMap[k].Value.Map, exMap[k].Value.Map) &&
+			reflect.DeepEqual(newMap[k].Value.Set, exMap[k].Value.Set) &&
+			reflect.DeepEqual(newMap[k].Value.Time, exMap[k].Value.Time) {
+			continue
+		}
+	}
+	return result
 }
 
 func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*proto.EntityProperty {
@@ -113,7 +139,7 @@ func fieldsToProperties(value reflect.Value, t reflect.Type, prefix string) []*p
 		protoProp := &proto.EntityProperty{}
 		protoProp.Property = &proto.Key{Key: fOpt.name}
 		var isEmpty bool
-		protoProp.Value, isEmpty = propertyFromField(fieldValue, field)
+		protoProp.Value, isEmpty = propertyValueFromField(fieldValue, field)
 
 		if fOpt.omitempty && (protoProp.Value == nil || isEmpty) {
 			continue
@@ -139,7 +165,7 @@ func supportedType(t reflect.Type) bool {
 	return false
 }
 
-func propertyFromField(val reflect.Value, fieldType reflect.StructField) (*proto.Value, bool) {
+func propertyValueFromField(val reflect.Value, fieldType reflect.StructField) (*proto.Value, bool) {
 	prop := &proto.Value{}
 
 	switch fieldType.Type.Kind() {

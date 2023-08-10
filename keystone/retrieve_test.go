@@ -23,6 +23,9 @@ func TestActorRetrieveByUnique(t *testing.T) {
 	); err != nil {
 		t.Error(err)
 	}
+
+	actor.Marshal(cst, "testing actor")
+
 	log.Println(cst)
 }
 
