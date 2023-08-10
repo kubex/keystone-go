@@ -17,7 +17,9 @@ import (
 	"syreclabs.com/go/faker"
 )
 
-func TestRead(t *testing.T) {
+var ksClient proto.KeystoneClient
+
+func init() {
 	kHost := os.Getenv("KEYSTONE_SERVICE_HOST")
 	kPort := os.Getenv("KEYSTONE_SERVICE_PORT")
 	if kHost == "" {
@@ -32,49 +34,37 @@ func TestRead(t *testing.T) {
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	ksClient = proto.NewKeystoneClient(ksGrpcConn)
+}
 
-	ksClient := proto.NewKeystoneClient(ksGrpcConn)
+func TestWrite(t *testing.T) {
 	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
-	c.RegisterTypes(Customer{}, &Customer{})
-	c.SyncSchema().Wait()
-
-	log.Println(c.typeRegister)
-
-	//actor.Marshal(Customer{
-	//	//ID:            "enzfUSpdK7z5JMpq",
-	//	Name:          NewSecretString("John Doe", "J**n D*e"),
-	//	Email:         NewSecretString("john.doe@gmail.com", "j*******@gma**.com"),
-	//	Company:       "Chargehive Ltd",
-	//	Phone:         "0791736u63434",
-	//	City:          "Portsmouth",
-	//	StreetName:    "New Street",
-	//	StreetAddress: "41",
-	//	Postcode:      "PO1 3AG",
-	//	Timezone:      "BST",
-	//	State:         "Hampshire",
-	//	HasPaid:       true,
-	//	Country:       "UK",
-	//	CountryCode:   "GB",
-	//	AmountPaid:    NewAmount("USD", 123),
-	//	LeadDate:      time.Now(),
-	//	UserID:        "user-233",
-	//	Address: Address{
-	//		Line1: "123 Old Street",
-	//		Line2: "Line 2 is optional",
-	//		City:  "Southampton",
-	//	},
-	//}, "Creating Customer via Marshal")
-
-	//	cst1 := &Customer{}
-	//log.Println(actor.GetByID(context.Background(), "00EWhvCdK7vP0Ipo", cst1), cst1)
-
-	cst2 := &Customer{}
-	actor.GetByID(context.Background(), "", cst2)
-	log.Println(actor.GetByUnique(context.Background(), "user_id", "user-233", cst2), cst2)
-
-	//actor.Get(context.Background(), cst, PropertyLoader{All: true, Decrypt: true}, LinksLoader{}, ByEntityID(), ByUnique("user_id", "user-233"))
+	actor.Marshal(Customer{
+		//ID:            "enzfUSpdK7z5JMpq",
+		Name:          NewSecretString("John Doe", "J**n D*e"),
+		Email:         NewSecretString("john.doe@gmail.com", "j*******@gma**.com"),
+		Company:       "Chargehive Ltd",
+		Phone:         "0791736u63434",
+		City:          "Portsmouth",
+		StreetName:    "New Street",
+		StreetAddress: "41",
+		Postcode:      "PO1 3AG",
+		Timezone:      "BST",
+		State:         "Hampshire",
+		HasPaid:       true,
+		Country:       "UK",
+		CountryCode:   "GB",
+		AmountPaid:    NewAmount("USD", 123),
+		LeadDate:      time.Now(),
+		UserID:        "user-233",
+		Address: Address{
+			Line1: "123 Old Street",
+			Line2: "Line 2 is optional",
+			City:  "Southampton",
+		},
+	}, "Creating Customer via Marshal")
 }
 
 func TestConnection(t *testing.T) {

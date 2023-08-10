@@ -110,24 +110,6 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 	return wg
 }
 
-type Actor struct {
-	connection  *Connection
-	workspaceID string
-	mutator     *proto.Mutator
-}
-
-func (a *Actor) authorization() *proto.Authorization {
-	return &proto.Authorization{
-		Source:      &a.connection.appID,
-		Token:       a.connection.token,
-		WorkspaceId: a.workspaceID,
-	}
-}
-
-func (a *Actor) SetClient(client string) {
-	a.mutator.Client = client
-}
-
 func (c *Connection) Retrieve(ctx context.Context, workspaceID, entityId string, retrieveProperties []string) (*proto.EntityResponse, error) {
 	return nil, nil
 }
