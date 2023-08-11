@@ -32,6 +32,18 @@ func (a *Actor) Marshal(src interface{}, comment string) {
 		Properties: []*proto.EntityProperty{},
 	}
 
+	if entityWithLabels, ok := src.(EntityLabelProvider); ok {
+		mutation.Labels = entityWithLabels.GetKeystoneLabels()
+	}
+
+	if entityWithLinks, ok := src.(EntityLinkProvider); ok {
+		mutation.Links = entityWithLinks.GetKeystoneLinks()
+	}
+
+	if entityWithRelationships, ok := src.(EntityRelationshipProvider); ok {
+		mutation.Relationships = entityWithRelationships.GetKeystoneRelationships()
+	}
+
 	eid := "" // try to get from src
 	properties := fieldsToProperties(v, t, "")
 	for _, p := range properties {

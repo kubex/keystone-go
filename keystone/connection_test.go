@@ -312,6 +312,8 @@ func xx(t *testing.T) {
 type Customer struct {
 	EntityLogger
 	EntityEvents
+	EntityLabels
+	EntityLinks
 	ID               string       `keystone:"_entity_id" json:",omitempty"`
 	Name             SecretString `keystone:",indexed,personal,omitempty" json:",omitempty"`
 	Email            SecretString `keystone:",indexed,omitempty" json:",omitempty"`
