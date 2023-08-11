@@ -10,11 +10,19 @@ import (
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp.GetProperties())
+	entityPropertyMap[EntityIDKey] = &proto.EntityProperty{
+		Property: &proto.Key{Key: EntityIDKey},
+		Value:    &proto.Value{Text: resp.Entity.EntityId},
+	}
 	return entityResponseToDst(entityPropertyMap, dst, "")
 }
 
 func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 	entityPropertyMap := makeEntityPropertyMap(resp.GetProperties())
+	entityPropertyMap[EntityIDKey] = &proto.EntityProperty{
+		Property: &proto.Key{Key: EntityIDKey},
+		Value:    &proto.Value{Text: resp.Entity.EntityId},
+	}
 	for _, p := range entityPropertyMap {
 		if p.Value.GetText() != "" {
 			dst[p.Property.Key] = p.Value.GetText()

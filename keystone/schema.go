@@ -190,6 +190,7 @@ var (
 	typeOfTime         = reflect.TypeOf(time.Time{})
 	typeOfSecretString = reflect.TypeOf(SecretString{})
 	typeOfAmount       = reflect.TypeOf(Amount{})
+	typeOfStringSlice  = reflect.TypeOf([]string{})
 )
 
 type fieldOptions struct {

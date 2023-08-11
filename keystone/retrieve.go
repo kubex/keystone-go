@@ -54,6 +54,9 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 		}
 		entityRequest.UniqueId.SchemaId = schemaID
 	}
+	entityRequest.ChildrenByType = []*proto.Key{
+		{Key: "line_items", Source: a.authorization().Source},
+	}
 
 	resp, err := a.connection.ProtoClient().Retrieve(ctx, entityRequest)
 	if err != nil {

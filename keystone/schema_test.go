@@ -2,10 +2,11 @@ package keystone
 
 import (
 	"encoding/json"
-	"github.com/kubex/keystone-go/proto"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/kubex/keystone-go/proto"
 )
 
 func TestTypeToSchema(t *testing.T) {
