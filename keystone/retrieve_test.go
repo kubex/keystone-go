@@ -7,19 +7,22 @@ import (
 )
 
 func TestActorRetrieveByUnique(t *testing.T) {
-	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
+	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
 	cst := &Customer{}
+
 	if err := actor.Get(
 		context.Background(),
 		RetrieveByUnique{UniqueID: "user-233", Property: "user_id"},
 		cst,
 		WithProperties("address~"),
-		WithDecryptedProperties("name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date"),
+		WithDecryptedProperties("name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date", "user_id"),
 		WithLabels(),
 		WithSummary(),
 		WithDatum(),
+		WithChildrenKeys("line_items"),
+		//WithChildrenIDs("id1"),
 	); err != nil {
 		t.Error(err)
 	}
