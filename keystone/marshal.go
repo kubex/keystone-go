@@ -2,6 +2,7 @@ package keystone
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -9,6 +10,10 @@ import (
 )
 
 func (a *Actor) Marshal(src interface{}, comment string) error {
+	if reflect.TypeOf(src).Kind() != reflect.Pointer {
+		return errors.New("marshal requires a pointer to a struct")
+	}
+
 	//log.Println("Processing Marshal request")
 	schema, registered := a.connection.registerType(src)
 	if !registered {
