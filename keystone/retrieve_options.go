@@ -65,6 +65,14 @@ func WithLabels() RetrieveOption {
 	return labelLoader{labels: true}
 }
 
+func WithChildrenKeys(keys ...string) RetrieveOption {
+	return childrenLoader{children: keys}
+}
+
+func WithChildrenIDs(ids ...string) RetrieveOption {
+	return childrenLoader{ids: ids}
+}
+
 type propertyLoader struct {
 	properties []string
 	decrypt    bool
@@ -97,3 +105,20 @@ func (l datumLoader) Apply(config *proto.EntityRequest) { config.Datum = l.datum
 type labelLoader struct{ labels bool }
 
 func (l labelLoader) Apply(config *proto.EntityRequest) { config.Labels = l.labels }
+
+type childrenLoader struct{ children, ids []string }
+
+func (l childrenLoader) Apply(config *proto.EntityRequest) {
+	if len(l.ids) > 0 {
+		config.ChildrenByCid = l.ids
+		config.ChildrenByType = nil
+	}
+	if len(l.children) > 0 {
+		if config.ChildrenByType == nil {
+			config.ChildrenByType = make([]*proto.Key, 0)
+		}
+		for _, child := range l.children {
+			config.ChildrenByType = append(config.ChildrenByType, &proto.Key{Key: child})
+		}
+	}
+}
