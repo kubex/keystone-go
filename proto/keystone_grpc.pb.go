@@ -25,6 +25,7 @@ type KeystoneClient interface {
 	Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
+	RetrieveView(ctx context.Context, in *EntityViewRequest, opts ...grpc.CallOption) (*EntitiesResponse, error)
 	Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error)
 	Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
@@ -65,6 +66,15 @@ func (c *keystoneClient) Retrieve(ctx context.Context, in *EntityRequest, opts .
 	return out, nil
 }
 
+func (c *keystoneClient) RetrieveView(ctx context.Context, in *EntityViewRequest, opts ...grpc.CallOption) (*EntitiesResponse, error) {
+	out := new(EntitiesResponse)
+	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/RetrieveView", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *keystoneClient) Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error) {
 	out := new(LogsResponse)
 	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Logs", in, out, opts...)
@@ -99,6 +109,7 @@ type KeystoneServer interface {
 	Define(context.Context, *SchemaRequest) (*Schema, error)
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
 	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
+	RetrieveView(context.Context, *EntityViewRequest) (*EntitiesResponse, error)
 	Logs(context.Context, *LogRequest) (*LogsResponse, error)
 	Events(context.Context, *EventRequest) (*EventsResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
@@ -117,6 +128,9 @@ func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*Mut
 }
 func (UnimplementedKeystoneServer) Retrieve(context.Context, *EntityRequest) (*EntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retrieve not implemented")
+}
+func (UnimplementedKeystoneServer) RetrieveView(context.Context, *EntityViewRequest) (*EntitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RetrieveView not implemented")
 }
 func (UnimplementedKeystoneServer) Logs(context.Context, *LogRequest) (*LogsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logs not implemented")
@@ -194,6 +208,24 @@ func _Keystone_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keystone_RetrieveView_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EntityViewRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).RetrieveView(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubex.keystone.Keystone/RetrieveView",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).RetrieveView(ctx, req.(*EntityViewRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Keystone_Logs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogRequest)
 	if err := dec(in); err != nil {
@@ -266,6 +298,10 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Retrieve",
 			Handler:    _Keystone_Retrieve_Handler,
+		},
+		{
+			MethodName: "RetrieveView",
+			Handler:    _Keystone_RetrieveView_Handler,
 		},
 		{
 			MethodName: "Logs",
