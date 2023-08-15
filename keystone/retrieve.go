@@ -77,3 +77,24 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 
 	return Unmarshal(resp, dst)
 }
+
+func (a *Actor) Lookup(ctx context.Context, idLookup string) ([]*proto.EntityResponse, error) {
+	return nil, nil
+}
+
+func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) (*proto.FindResponse, error) {
+	findRequest := &proto.FindRequest{
+		Authorization: a.authorization(),
+		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
+		Properties: []*proto.PropertyRequest{
+			{
+				Properties: retrieveProperties,
+			},
+		},
+	}
+	for _, opt := range options {
+		opt.Apply(findRequest)
+	}
+
+	return a.connection.ProtoClient().Find(context.Background(), findRequest)
+}

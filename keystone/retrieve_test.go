@@ -50,3 +50,17 @@ func TestActorRetrieveByEntityID(t *testing.T) {
 	}
 	log.Println(gr)
 }
+
+func TestActorFind(t *testing.T) {
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
+	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
+
+	resp, err := actor.Find(
+		context.Background(),
+		"Customer",
+		[]string{},
+		WhereKeyEquals("name", "John Doe"),
+	)
+
+	log.Println(resp, err)
+}

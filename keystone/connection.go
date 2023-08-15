@@ -109,15 +109,3 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 	}()
 	return wg
 }
-
-func (c *Connection) Retrieve(ctx context.Context, workspaceID, entityId string, retrieveProperties []string) (*proto.EntityResponse, error) {
-	return nil, nil
-}
-
-func (c *Connection) Lookup(ctx context.Context, workspaceID, idLookup string) ([]*proto.EntityResponse, error) {
-	return nil, nil
-}
-
-func (c *Connection) Find(ctx context.Context, workspaceID, entityType string, retrieveProperties []string, options ...Option) ([]*proto.EntityResponse, error) {
-	return nil, nil
-}

@@ -38,10 +38,10 @@ func init() {
 }
 
 func TestWrite(t *testing.T) {
-	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
+	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
-	actor.Marshal(Customer{
+	cust := &Customer{
 		//ID:            "enzfUSpdK7z5JMpq",
 		Name:          NewSecretString("John Doe", "J**n D*e"),
 		Email:         NewSecretString("john.doe@gmail.com", "j*******@gma**.com"),
@@ -56,15 +56,25 @@ func TestWrite(t *testing.T) {
 		HasPaid:       true,
 		Country:       "UK",
 		CountryCode:   "GB",
+		James:         "Eagle",
 		AmountPaid:    NewAmount("USD", 123),
 		LeadDate:      time.Now(),
-		UserID:        "user-233",
+		UserID:        "user-235",
 		Address: Address{
 			Line1: "123 Old Street",
 			Line2: "Line 2 is optional",
 			City:  "Southampton",
 		},
-	}, "Creating Customer via Marshal")
+		References: []string{"ref-1", "ref-2"},
+		LineItems: []*LineItem{
+			{Name: "foo"},
+			{Name: "bar"},
+		},
+	}
+	cust.AddKeystoneLabel("foo", "bar")
+	if err := actor.Marshal(cust, "Creating Customer via Marshal"); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestConnection(t *testing.T) {
@@ -82,55 +92,21 @@ func TestConnection(t *testing.T) {
 }
 
 func writeCustomers() {
-	kHost := os.Getenv("KEYSTONE_SERVICE_HOST")
-	kPort := os.Getenv("KEYSTONE_SERVICE_PORT")
-	if kHost == "" {
-		kHost = "127.0.0.1"
-	}
-	if kPort == "" {
-		kPort = "50031"
-	}
-
-	ksGrpcConn, err := grpc.Dial(kHost+":"+kPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	log.Println(kHost + ":" + kPort)
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-
-	ksClient := proto.NewKeystoneClient(ksGrpcConn)
-	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
+	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
 	c.RegisterTypes( /*testSchemaType{},*/ Customer{})
 	c.SyncSchema().Wait()
 
 	log.Println("Marshalling")
-	for i := 0; i < 2500; i++ {
+	for i := 0; i < 10; i++ {
 		actor.Marshal(FakeCustomer(), "Faker Customer x")
 	}
 	return
 }
 
 func xx(t *testing.T) {
-
-	kHost := os.Getenv("KEYSTONE_SERVICE_HOST")
-	kPort := os.Getenv("KEYSTONE_SERVICE_PORT")
-	if kHost == "" {
-		kHost = "127.0.0.1"
-	}
-	if kPort == "" {
-		kPort = "50031"
-	}
-
-	ksGrpcConn, err := grpc.Dial(kHost+":"+kPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	log.Println(kHost + ":" + kPort)
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-
-	ksClient := proto.NewKeystoneClient(ksGrpcConn)
-
-	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
+	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
 
 	c.RegisterTypes(testSchemaType{}, Customer{})
 	c.SyncSchema().Wait()
@@ -314,37 +290,44 @@ type Customer struct {
 	EntityEvents
 	EntityLabels
 	EntityLinks
-	ID               string       `keystone:"_entity_id" json:",omitempty"`
-	Name             SecretString `keystone:",indexed,personal,omitempty" json:",omitempty"`
-	Email            SecretString `keystone:",indexed,omitempty" json:",omitempty"`
-	Company          string       `keystone:",omitempty" json:",omitempty"`
-	Phone            string       `keystone:",indexed,omitempty" json:",omitempty"`
-	HasPaid          bool         `keystone:",omitempty" json:",omitempty"`
-	AvatarUrl        string       `keystone:",omitempty" json:",omitempty"`
-	City             string       `keystone:",indexed,omitempty" json:",omitempty"`
-	StreetName       string       `keystone:",omitempty" json:",omitempty"`
-	StreetAddress    string       `keystone:",omitempty" json:",omitempty"`
-	SecondaryAddress string       `keystone:",omitempty" json:",omitempty"`
-	BuildingNumber   string       `keystone:",omitempty" json:",omitempty"`
-	Postcode         string       `keystone:",lookup,omitempty" json:",omitempty"`
-	Zipcode          string       `keystone:",omitempty" json:",omitempty"`
-	Timezone         string       `keystone:",omitempty" json:",omitempty"`
-	State            string       `keystone:",omitempty" json:",omitempty"`
-	StateAbbr        string       `keystone:",omitempty" json:",omitempty"`
-	James            string       `keystone:",omitempty,indexed" json:",omitempty"`
-	Country          string       `keystone:",omitempty" json:",omitempty"`
-	CountryCode      string       `keystone:",omitempty" json:",omitempty"`
-	Latitude         float64      `keystone:",omitempty" json:",omitempty"`
-	Longitude        float64      `keystone:",omitempty" json:",omitempty"`
-	AmountPaid       Amount       `keystone:",omitempty" json:",omitempty"`
-	LeadDate         time.Time    `keystone:",omitempty" json:",omitempty"`
-	UserID           string       `keystone:",unique,omitempty" json:",omitempty"`
-	Address          Address
-	LineItems        []LineItem // TODO: Store as children?
+	ID                  string       `keystone:"_entity_id" json:",omitempty"`
+	Name                SecretString `keystone:",indexed,personal,omitempty" json:",omitempty"`
+	Email               SecretString `keystone:",indexed,omitempty" json:",omitempty"`
+	Company             string       `keystone:",omitempty" json:",omitempty"`
+	Phone               string       `keystone:",omitempty" json:",omitempty"`
+	HasPaid             bool         `keystone:",omitempty" json:",omitempty"`
+	AvatarUrl           string       `keystone:",omitempty" json:",omitempty"`
+	City                string       `keystone:",omitempty" json:",omitempty"`
+	StreetName          string       `keystone:",omitempty" json:",omitempty"`
+	StreetAddress       string       `keystone:",omitempty" json:",omitempty"`
+	SecondaryAddress    string       `keystone:",omitempty" json:",omitempty"`
+	BuildingNumber      string       `keystone:",omitempty" json:",omitempty"`
+	Postcode            string       `keystone:",lookup,omitempty" json:",omitempty"`
+	Zipcode             string       `keystone:",omitempty" json:",omitempty"`
+	Timezone            string       `keystone:",omitempty" json:",omitempty"`
+	State               string       `keystone:",omitempty" json:",omitempty"`
+	StateAbbr           string       `keystone:",omitempty" json:",omitempty"`
+	James               string       `keystone:",omitempty,indexed" json:",omitempty"`
+	Country             string       `keystone:",omitempty" json:",omitempty"`
+	CountryCode         string       `keystone:",omitempty" json:",omitempty"`
+	Latitude            float64      `keystone:",omitempty" json:",omitempty"`
+	Longitude           float64      `keystone:",omitempty" json:",omitempty"`
+	AmountPaid          Amount       `keystone:",indexed,omitempty" json:",omitempty"`
+	LeadDate            time.Time    `keystone:",omitempty" json:",omitempty"`
+	UserID              string       `keystone:",unique,omitempty" json:",omitempty"`
+	Address             Address
+	References          []string
+	LineItems           []*LineItem // TODO: Store as children?
+	DiscountedLineItems []LineItem  // TODO: Store as children?
 }
 
 type LineItem struct {
+	ID   string
 	Name string
+}
+
+func (l LineItem) ChildID() string {
+	return l.ID
 }
 
 type Address struct {
@@ -384,4 +367,67 @@ func FakeCustomer() Customer {
 	c.LogDebug("Created customer", "REF123", "trace-id", "mr-man", nil)
 
 	return c
+}
+
+func TestFind(t *testing.T) {
+	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
+	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
+
+	cst := Customer{}
+	c.RegisterTypes(cst)
+	c.SyncSchema().Wait()
+	schema, _ := actor.connection.registerType(cst)
+
+	res, err := c.ProtoClient().Find(context.Background(), &proto.FindRequest{
+		Authorization: actor.authorization(),
+		Schema:        &proto.Key{Key: schema.Type, Source: schema.Source},
+		Properties: []*proto.PropertyRequest{
+			{
+				Properties: []string{"name"},
+			},
+		},
+		Filters: []*proto.PropertyFilter{
+			{
+				Property: &proto.Key{Key: "name"},
+				Operator: proto.Operator_Contains,
+				Values: []*proto.Value{
+					{Text: "j"},
+				},
+			},
+			//{
+			//	Property: &proto.Key{Key: "james"},
+			//	Operator: proto.Operator_Between,
+			//	Values: []*proto.Value{
+			//		{Text: "A"},
+			//		{Text: "F"},
+			//	},
+			//},
+			//{
+			//	Property: &proto.Key{Key: "user_id"},
+			//	Operator: proto.Operator_In,
+			//	Values: []*proto.Value{
+			//		{Text: "user-2331"},
+			//		{Text: "user-233"},
+			//		{Text: "user-212"},
+			//		{Text: "user-233120230810175925"},
+			//	},
+			//},
+			//{
+			//	Property: &proto.Key{Key: "postcode"},
+			//	Operator: proto.Operator_In,
+			//	Values: []*proto.Value{
+			//		//{Text: "PO1 3AG"},
+			//		{Text: "PO2 1AG"},
+			//	},
+			//},
+		},
+		//Labels: []*proto.EntityLabel{
+		//	{
+		//		Name: "active",
+		//	},
+		//},
+
+	})
+	log.Println(res, err)
+
 }
