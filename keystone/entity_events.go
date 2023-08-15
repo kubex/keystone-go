@@ -1,14 +1,15 @@
 package keystone
 
 import (
+	"time"
+
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 )
 
 type EntityEventProvider interface {
 	ClearKeystoneEvents() error
-	GetKeystoneEvents() ([]*proto.EntityEvent, error)
+	GetKeystoneEvents() []*proto.EntityEvent
 }
 
 type EntityEvents struct {
@@ -20,8 +21,8 @@ func (e *EntityEvents) ClearKeystoneEvents() error {
 	return nil
 }
 
-func (e *EntityEvents) GetKeystoneEvents() ([]*proto.EntityEvent, error) {
-	return e.ksEntityEvents, nil
+func (e *EntityEvents) GetKeystoneEvents() []*proto.EntityEvent {
+	return e.ksEntityEvents
 }
 
 func (e *EntityEvents) AddKeystoneEvent(eventType string, properties map[string]string) {

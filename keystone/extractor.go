@@ -122,55 +122,53 @@ func (p *PropertyExtractor) fieldsToProperties(value reflect.Value, t reflect.Ty
 	}
 }
 
-func (p *PropertyExtractor) propertyValueFromField(val reflect.Value, fieldType reflect.StructField) (*proto.Value, bool) {
+func (p *PropertyExtractor) propertyValueFromField(fieldValue reflect.Value, fieldType reflect.StructField) (*proto.Value, bool) {
 	prop := &proto.Value{}
 
 	switch fieldType.Type.Kind() {
 	case reflect.String:
-		prop.Text = val.String()
+		prop.Text = fieldValue.String()
 		return prop, prop.Text == ""
 	case reflect.Int32, reflect.Int64, reflect.Int:
-		prop.Int = val.Int()
+		prop.Int = fieldValue.Int()
 		return prop, prop.Int == 0
 	case reflect.Bool:
-		prop.Bool = val.Bool()
+		prop.Bool = fieldValue.Bool()
 		return prop, !prop.Bool
 	case reflect.Float32, reflect.Float64:
-		prop.Float = val.Float()
+		prop.Float = fieldValue.Float()
 		return prop, prop.Float == 0
 	case reflect.Map:
 		prop.Map = map[string][]byte{}
-		iter := val.MapRange()
+		iter := fieldValue.MapRange()
 		for iter.Next() {
-			k := iter.Key()
-			v := iter.Value()
-			prop.Map[k.String()] = []byte(v.String())
+			prop.Map[iter.Key().String()] = []byte(iter.Value().String())
 		}
 		return prop, len(prop.Map) == 0
 	case reflect.Slice:
-		if set, ok := val.Interface().([]string); ok {
+		if set, ok := fieldValue.Interface().([]string); ok {
 			prop.Set = set
 		} else {
-			fmt.Println("only []string and []ChildEntity is supported")
+			fmt.Println("only []string is supported")
 		}
 		return prop, len(prop.Set) == 0
 	}
 
 	switch fieldType.Type {
 	case typeOfSecretString:
-		if iVal, ok := val.Interface().(SecretString); ok {
+		if iVal, ok := fieldValue.Interface().(SecretString); ok {
 			prop.Text = iVal.Masked
 			prop.SecureText = iVal.Original
 			return prop, prop.Text == "" && prop.SecureText == ""
 		}
 	case typeOfAmount:
-		if iVal, ok := val.Interface().(Amount); ok {
+		if iVal, ok := fieldValue.Interface().(Amount); ok {
 			prop.Text = iVal.Currency
 			prop.Int = iVal.Units
 			return prop, prop.Text == "" && prop.Int == 0
 		}
 	case typeOfTime:
-		if iVal, ok := val.Interface().(time.Time); ok {
+		if iVal, ok := fieldValue.Interface().(time.Time); ok {
 			prop.Time = timestamppb.New(iVal)
 			return prop, prop.Time == nil
 		}

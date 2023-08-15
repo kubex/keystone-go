@@ -1,14 +1,15 @@
 package keystone
 
 import (
+	"time"
+
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 )
 
 type EntityLogProvider interface {
 	ClearKeystoneLogs() error
-	GetKeystoneLogs() ([]*proto.EntityLog, error)
+	GetKeystoneLogs() []*proto.EntityLog
 }
 
 type EntityLogger struct {
@@ -20,8 +21,8 @@ func (e *EntityLogger) ClearKeystoneLogs() error {
 	return nil
 }
 
-func (e *EntityLogger) GetKeystoneLogs() ([]*proto.EntityLog, error) {
-	return e.ksEntityLogs, nil
+func (e *EntityLogger) GetKeystoneLogs() []*proto.EntityLog {
+	return e.ksEntityLogs
 }
 
 func (e *EntityLogger) LogDebug(message, reference, actor, traceID string, data map[string]string) {
