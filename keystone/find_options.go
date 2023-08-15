@@ -8,61 +8,61 @@ type FindOption interface {
 	Apply(config *proto.FindRequest)
 }
 
-func WhereKeyEquals(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_Equal}
+func WhereEquals(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_Equal}
 }
 
-func WhereKeyNotEquals(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_NotEqual}
+func WhereNotEquals(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_NotEqual}
 }
 
-func WhereKeyGreaterThan(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_GreaterThan}
+func WhereGreaterThan(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_GreaterThan}
 }
 
-func WhereKeyGreaterThanOrEquals(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_GreaterThanOrEqual}
+func WhereGreaterThanOrEquals(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_GreaterThanOrEqual}
 }
 
-func WhereKeyLessThan(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_LessThan}
+func WhereLessThan(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_LessThan}
 }
 
-func WhereKeyLessThanOrEquals(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_LessThanOrEqual}
+func WhereLessThanOrEquals(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_LessThanOrEqual}
 }
 
-func WhereKeyContains(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_Contains}
+func WhereContains(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_Contains}
 }
 
-func WhereKeyNotContains(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_NotContains}
+func WhereNotContains(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_NotContains}
 }
 
-func WhereKeyStartsWith(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_StartsWith}
+func WhereStartsWith(key string, value any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_StartsWith}
 }
 
-func WhereKeyEndsWith(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_EndsWith}
+func WhereEndsWith(key string, value string) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_EndsWith}
 }
 
-func WhereKeyIn(key string, value ...string) FindOption {
-	return propertyFilter{key: key, values: value, operator: proto.Operator_In}
+func WhereIn(key string, value ...string) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_In}
 }
 
-func WhereKeyNotIn(key, value string) FindOption {
-	return propertyFilter{key: key, values: []string{value}, operator: proto.Operator_Equal}
+func WhereNotIn(key string, value string) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_Equal}
 }
 
-func WhereKeyBetween(key, value1, value2 string) FindOption {
-	return propertyFilter{key: key, values: []string{value1, value2}, operator: proto.Operator_Equal}
+func WhereBetween(key string, value1, value2 any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value1, value2), operator: proto.Operator_Equal}
 }
 
 type propertyFilter struct {
 	key      string
-	values   []string
+	values   []*proto.Value
 	operator proto.Operator
 }
 
@@ -71,14 +71,31 @@ func (f propertyFilter) Apply(config *proto.FindRequest) {
 		config.Filters = make([]*proto.PropertyFilter, 0)
 	}
 
-	var vals []*proto.Value
-	for _, v := range f.values {
-		vals = append(vals, &proto.Value{Text: v})
-	}
-
 	config.Filters = append(config.Filters, &proto.PropertyFilter{
 		Property: &proto.Key{Key: f.key},
 		Operator: f.operator,
-		Values:   vals,
+		Values:   f.values,
 	})
+}
+
+func valueFromAny(value any) *proto.Value {
+	switch v := value.(type) {
+	case string:
+		return &proto.Value{Text: v}
+	case int, int32, int64:
+		return &proto.Value{Int: int64(v.(int))}
+	case bool:
+		return &proto.Value{Bool: v}
+	case float64:
+		return &proto.Value{Float: v}
+	}
+	return &proto.Value{}
+}
+
+func valuesFromAny(values ...any) []*proto.Value {
+	var result []*proto.Value
+	for _, v := range values {
+		result = append(result, valueFromAny(v))
+	}
+	return result
 }

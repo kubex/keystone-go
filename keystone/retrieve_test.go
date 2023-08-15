@@ -59,7 +59,7 @@ func TestActorFind(t *testing.T) {
 		context.Background(),
 		"Customer",
 		[]string{},
-		WhereKeyEquals("name", "John Doe"),
+		WhereEquals("name", "John Doe"),
 	)
 
 	log.Println(resp, err)
