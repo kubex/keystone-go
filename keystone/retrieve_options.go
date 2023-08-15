@@ -65,12 +65,8 @@ func WithLabels() RetrieveOption {
 	return labelLoader{labels: true}
 }
 
-func WithChildrenKeys(keys ...string) RetrieveOption {
-	return childrenLoader{children: keys}
-}
-
-func WithChildrenIDs(ids ...string) RetrieveOption {
-	return childrenLoader{ids: ids}
+func WithChildren(childType string, ids ...string) RetrieveOption {
+	return childrenLoader{childType: childType, ids: ids}
 }
 
 type propertyLoader struct {
@@ -106,19 +102,18 @@ type labelLoader struct{ labels bool }
 
 func (l labelLoader) Apply(config *proto.EntityRequest) { config.Labels = l.labels }
 
-type childrenLoader struct{ children, ids []string }
+type childrenLoader struct {
+	childType string
+	ids       []string
+}
 
 func (l childrenLoader) Apply(config *proto.EntityRequest) {
-	if len(l.ids) > 0 {
-		config.ChildrenByCid = l.ids
-		config.ChildrenByType = nil
+	if config.Children == nil {
+		config.Children = make([]*proto.ChildRequest, 0)
 	}
-	if len(l.children) > 0 {
-		if config.ChildrenByType == nil {
-			config.ChildrenByType = make([]*proto.Key, 0)
-		}
-		for _, child := range l.children {
-			config.ChildrenByType = append(config.ChildrenByType, &proto.Key{Key: child})
-		}
-	}
+
+	config.Children = append(config.Children, &proto.ChildRequest{
+		Type: &proto.Key{Key: l.childType},
+		Cid:  l.ids,
+	})
 }

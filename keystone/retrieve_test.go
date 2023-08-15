@@ -21,14 +21,13 @@ func TestActorRetrieveByUnique(t *testing.T) {
 		WithLabels(),
 		WithSummary(),
 		WithDatum(),
-		WithChildrenKeys("line_items"),
-		//WithChildrenIDs("id1"),
+		WithChildren("line_items"),
 	); err != nil {
 		t.Error(err)
 	}
 
-	actor.Marshal(cst, "testing actor")
-
+	//actor.Marshal(cst, "testing actor")
+	//
 	log.Println(cst)
 }
 

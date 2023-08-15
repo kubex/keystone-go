@@ -1,6 +1,7 @@
 package keystone
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -14,7 +15,7 @@ func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 		Property: &proto.Key{Key: EntityIDKey},
 		Value:    &proto.Value{Text: resp.Entity.EntityId},
 	}
-	return entityResponseToDst(entityPropertyMap, dst, "")
+	return entityResponseToDst(entityPropertyMap, resp.Children, dst, "")
 }
 
 func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
@@ -61,7 +62,7 @@ func makeEntityPropertyMap(properties []*proto.EntityProperty) map[string]*proto
 	return entityPropertyMap
 }
 
-func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, dst interface{}, prefix string) error {
+func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, children []*proto.EntityChild, dst interface{}, prefix string) error {
 	dstVal := reflect.ValueOf(dst)
 	fmt.Println("entityResponseToDst", dstVal, dstVal.Type(), prefix)
 	for dstVal.Kind() == reflect.Pointer || dstVal.Kind() == reflect.Interface {
@@ -74,11 +75,33 @@ func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, dst
 		fieldOpt.name = prefix + fieldOpt.name
 		if supportedType(field.Type) {
 			setFieldValue(field, fieldValue, fieldOpt, entityPropertyMap)
-		} else if field.Type.Kind() == reflect.Struct {
-			if err := entityResponseToDst(entityPropertyMap, fieldValue.Addr().Interface(), fieldOpt.name+"."); err != nil {
-				return err
+		} else {
+			if field.Type.Kind() == reflect.Slice && len(children) > 0 {
+				var sliceElem reflect.Value
+				for _, child := range children {
+					if child.Type.Key == fieldOpt.name {
+						if !sliceElem.IsValid() {
+							sliceElem = reflect.MakeSlice(field.Type, 0, len(children))
+						}
+						el := reflect.New(field.Type.Elem())
+						if err := json.Unmarshal(child.Data, el.Interface()); err != nil {
+							continue
+						}
+						sliceElem = reflect.Append(sliceElem, el.Elem())
+					}
+				}
+				if sliceElem.IsValid() {
+					fieldValue.Set(sliceElem)
+				}
+				continue
 			}
-			continue
+
+			if field.Type.Kind() == reflect.Struct {
+				if err := entityResponseToDst(entityPropertyMap, children, fieldValue.Addr().Interface(), fieldOpt.name+"."); err != nil {
+					return err
+				}
+				continue
+			}
 		}
 	}
 

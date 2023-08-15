@@ -45,9 +45,6 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 	for _, p := range entityRequest.Properties {
 		p.Source = a.authorization().GetSource()
 	}
-	for _, c := range entityRequest.ChildrenByType {
-		c.Source = a.authorization().GetSource()
-	}
 	for _, l := range entityRequest.LinkByType {
 		l.Source = a.authorization().GetSource()
 	}
