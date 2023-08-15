@@ -7,7 +7,7 @@ import (
 )
 
 func TestActorRetrieveByUnique(t *testing.T) {
-	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
 	cst := &Customer{}
