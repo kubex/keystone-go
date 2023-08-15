@@ -76,22 +76,16 @@ func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, chi
 		if supportedType(field.Type) {
 			setFieldValue(field, fieldValue, fieldOpt, entityPropertyMap)
 		} else {
+			// hydrate children
 			if field.Type.Kind() == reflect.Slice && len(children) > 0 {
-				var sliceElem reflect.Value
 				for _, child := range children {
 					if child.Type.Key == fieldOpt.name {
-						if !sliceElem.IsValid() {
-							sliceElem = reflect.MakeSlice(field.Type, 0, len(children))
-						}
 						el := reflect.New(field.Type.Elem())
 						if err := json.Unmarshal(child.Data, el.Interface()); err != nil {
 							continue
 						}
-						sliceElem = reflect.Append(sliceElem, el.Elem())
+						fieldValue.Set(reflect.Append(fieldValue, el.Elem()))
 					}
-				}
-				if sliceElem.IsValid() {
-					fieldValue.Set(sliceElem)
 				}
 				continue
 			}
