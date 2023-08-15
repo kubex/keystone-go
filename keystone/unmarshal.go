@@ -10,20 +10,12 @@ import (
 )
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
-	entityPropertyMap := makeEntityPropertyMap(resp.GetProperties())
-	entityPropertyMap[EntityIDKey] = &proto.EntityProperty{
-		Property: &proto.Key{Key: EntityIDKey},
-		Value:    &proto.Value{Text: resp.Entity.EntityId},
-	}
+	entityPropertyMap := makeEntityPropertyMap(resp)
 	return entityResponseToDst(entityPropertyMap, resp.Children, dst, "")
 }
 
 func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
-	entityPropertyMap := makeEntityPropertyMap(resp.GetProperties())
-	entityPropertyMap[EntityIDKey] = &proto.EntityProperty{
-		Property: &proto.Key{Key: EntityIDKey},
-		Value:    &proto.Value{Text: resp.Entity.EntityId},
-	}
+	entityPropertyMap := makeEntityPropertyMap(resp)
 	for _, p := range entityPropertyMap {
 		if p.Value.GetText() != "" {
 			dst[p.Property.Key] = p.Value.GetText()
@@ -53,10 +45,15 @@ func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 	return nil
 }
 
-func makeEntityPropertyMap(properties []*proto.EntityProperty) map[string]*proto.EntityProperty {
+func makeEntityPropertyMap(resp *proto.EntityResponse) map[string]*proto.EntityProperty {
 	//log.Println(resp.GetProperties())
-	entityPropertyMap := map[string]*proto.EntityProperty{}
-	for _, p := range properties {
+	entityPropertyMap := map[string]*proto.EntityProperty{
+		EntityIDKey: {
+			Property: &proto.Key{Key: EntityIDKey},
+			Value:    &proto.Value{Text: resp.Entity.EntityId},
+		},
+	}
+	for _, p := range resp.GetProperties() {
 		entityPropertyMap[p.Property.Key] = p
 	}
 	return entityPropertyMap
@@ -122,13 +119,13 @@ func setFieldValue(field reflect.StructField, fieldValue reflect.Value, fieldOpt
 		for k, v := range storedProperty.Value.Map {
 			fieldValue.SetMapIndex(reflect.ValueOf(k), reflect.ValueOf(v))
 		}
-	case reflect.Slice:
-		for _, v := range storedProperty.Value.Set {
-			fieldValue.Set(reflect.Append(fieldValue, reflect.ValueOf(v)))
-		}
 	}
 
 	switch field.Type {
+	case typeOfStringSlice:
+		for _, v := range storedProperty.Value.Set {
+			fieldValue.Set(reflect.Append(fieldValue, reflect.ValueOf(v)))
+		}
 	case typeOfSecretString:
 		if _, ok := fieldValue.Interface().(SecretString); ok {
 			fieldValue.Set(reflect.ValueOf(SecretString{

@@ -22,13 +22,7 @@ func (a *Actor) Marshal(src interface{}, comment string) error {
 	}
 	//log.Println("Marshalling entity", src)
 
-	mutation := &proto.Mutation{
-		Mutator:    a.mutator,
-		Comment:    comment,
-		Properties: []*proto.EntityProperty{},
-		Children:   []*proto.EntityChild{},
-	}
-
+	mutation := &proto.Mutation{Mutator: a.mutator, Comment: comment}
 	if entityWithLabels, ok := src.(EntityLabelProvider); ok {
 		mutation.Labels = entityWithLabels.GetKeystoneLabels()
 	}
@@ -43,14 +37,13 @@ func (a *Actor) Marshal(src interface{}, comment string) error {
 
 	extractor := &PropertyExtractor{}
 	if err := extractor.Extract(src); err != nil {
-		fmt.Println("Error extracting properties", err)
-		return err
+		return fmt.Errorf("error extracting properties; %w", err)
 	}
 
 	mutation.Properties = extractor.Properties()
 	mutation.Children = extractor.Children()
 	if a.loadedEntity != nil {
-		mutation.Properties = a.getChangedProperties(a.loadedEntity, mutation.Properties)
+		mutation.Properties = a.getChangedProperties(a.loadedEntity, &proto.EntityResponse{Properties: mutation.Properties})
 	}
 	m := &proto.MutateRequest{
 		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
@@ -63,8 +56,8 @@ func (a *Actor) Marshal(src interface{}, comment string) error {
 	return err
 }
 
-func (a *Actor) getChangedProperties(existing *proto.EntityResponse, newValues []*proto.EntityProperty) []*proto.EntityProperty {
-	exMap := makeEntityPropertyMap(existing.GetProperties())
+func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) []*proto.EntityProperty {
+	exMap := makeEntityPropertyMap(existing)
 	newMap := makeEntityPropertyMap(newValues)
 
 	var result []*proto.EntityProperty
