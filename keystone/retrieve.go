@@ -82,7 +82,7 @@ func (a *Actor) Lookup(ctx context.Context, idLookup string) ([]*proto.EntityRes
 	return nil, nil
 }
 
-func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) (*proto.FindResponse, error) {
+func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
 	findRequest := &proto.FindRequest{
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
@@ -96,5 +96,9 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties 
 		opt.Apply(findRequest)
 	}
 
-	return a.connection.ProtoClient().Find(context.Background(), findRequest)
+	resp, err := a.connection.ProtoClient().Find(context.Background(), findRequest)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Entities, nil
 }
