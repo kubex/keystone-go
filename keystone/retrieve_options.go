@@ -45,7 +45,7 @@ func WithDecryptedProperties(properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties, decrypt: true}
 }
 
-func WithLinks(links []*proto.Key) RetrieveOption {
+func WithLinks(links []string) RetrieveOption {
 	return linksLoader{Links: links}
 }
 
@@ -82,9 +82,16 @@ func (l propertyLoader) Apply(config *proto.EntityRequest) {
 	config.Properties = append(config.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
 }
 
-type linksLoader struct{ Links []*proto.Key }
+type linksLoader struct{ Links []string }
 
-func (l linksLoader) Apply(config *proto.EntityRequest) { config.LinkByType = l.Links }
+func (l linksLoader) Apply(config *proto.EntityRequest) {
+	if config.LinkByType == nil {
+		config.LinkByType = make([]*proto.Key, 0)
+	}
+	for _, link := range l.Links {
+		config.LinkByType = append(config.LinkByType, &proto.Key{Key: link})
+	}
+}
 
 type authorizationLoader struct{ auth *proto.Authorization }
 
