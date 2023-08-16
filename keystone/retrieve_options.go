@@ -4,25 +4,30 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+// Retriever is an interface that defines a retriever
 type Retriever interface {
 	BaseRequest() *proto.EntityRequest
 }
 
+// RetrieveByEntityID is a retriever that retrieves an entity by its ID
 type RetrieveByEntityID struct {
 	EntityID string
 }
 
+// BaseRequest returns the base RetrieveByEntityID request
 func (l RetrieveByEntityID) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
 		EntityId: l.EntityID,
 	}
 }
 
+// RetrieveByUnique is a retriever that retrieves an entity by its unique ID
 type RetrieveByUnique struct {
 	UniqueID string
 	Property string
 }
 
+// BaseRequest returns the base RetrieveByUnique request
 func (l RetrieveByUnique) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
 		UniqueId: &proto.IDLookup{
@@ -33,38 +38,47 @@ func (l RetrieveByUnique) BaseRequest() *proto.EntityRequest {
 	}
 }
 
+// RetrieveOption is an interface for options to be applied to an entity request
 type RetrieveOption interface {
 	Apply(config *proto.EntityRequest)
 }
 
+// WithProperties is a retrieve option that loads properties
 func WithProperties(properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties}
 }
 
+// WithDecryptedProperties is a retrieve option that loads decrypted properties
 func WithDecryptedProperties(properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties, decrypt: true}
 }
 
+// WithLinks is a retrieve option that loads links
 func WithLinks(links ...string) RetrieveOption {
 	return linksLoader{Links: links}
 }
 
+// WithRelationships is a retrieve option that loads relationships
 func WithRelationships(keys ...string) RetrieveOption {
 	return relationshipsLoader{keys: keys}
 }
 
+// WithSummary is a retrieve option that loads summaries
 func WithSummary() RetrieveOption {
 	return summaryLoader{summary: true}
 }
 
+// WithDatum is a retrieve option that loads datum
 func WithDatum() RetrieveOption {
 	return datumLoader{datum: true}
 }
 
+// WithLabels is a retrieve option that loads labels
 func WithLabels() RetrieveOption {
 	return labelLoader{labels: true}
 }
 
+// WithChildren is a retrieve option that loads children
 func WithChildren(childType string, ids ...string) RetrieveOption {
 	return childrenLoader{childType: childType, ids: ids}
 }

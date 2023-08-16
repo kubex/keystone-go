@@ -66,5 +66,5 @@ func TestActorFind(t *testing.T) {
 		WhereEquals("name", "John Doe"),
 	)
 
-	log.Println(resp, err)
+	t.Log(resp, err)
 }

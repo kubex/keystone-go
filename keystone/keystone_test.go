@@ -35,17 +35,17 @@ var testAddressResponseWithPostCode = &proto.EntityResponse{
 var ksClient proto.KeystoneClient
 
 func init() {
-	kHost := os.Getenv("KEYSTONE_SERVICE_HOST")
-	kPort := os.Getenv("KEYSTONE_SERVICE_PORT")
-	if kHost == "" {
-		kHost = "127.0.0.1"
+	host := os.Getenv("KEYSTONE_SERVICE_HOST")
+	port := os.Getenv("KEYSTONE_SERVICE_PORT")
+	if host == "" {
+		host = "127.0.0.1"
 	}
-	if kPort == "" {
-		kPort = "50031"
+	if port == "" {
+		port = "50031"
 	}
 
-	ksGrpcConn, err := grpc.Dial(kHost+":"+kPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	log.Println(kHost + ":" + kPort)
+	ksGrpcConn, err := grpc.Dial(host+":"+port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	log.Println(host + ":" + port)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -64,7 +64,7 @@ type Customer struct {
 	Company             string       `keystone:",omitempty" json:",omitempty"`
 	Phone               string       `keystone:",omitempty" json:",omitempty"`
 	HasPaid             bool         `keystone:",omitempty" json:",omitempty"`
-	AvatarUrl           string       `keystone:",omitempty" json:",omitempty"`
+	AvatarURL           string       `keystone:",omitempty" json:",omitempty"`
 	City                string       `keystone:",omitempty" json:",omitempty"`
 	StreetName          string       `keystone:",omitempty" json:",omitempty"`
 	StreetAddress       string       `keystone:",omitempty" json:",omitempty"`
@@ -109,10 +109,12 @@ type MockConnector struct {
 }
 
 func (m *MockConnector) Define(ctx context.Context, in *proto.SchemaRequest, opts ...grpc.CallOption) (*proto.Schema, error) {
+	log.Println(ctx, in, opts)
 	return &proto.Schema{}, nil
 }
 
 func (m *MockConnector) Mutate(ctx context.Context, in *proto.MutateRequest, opts ...grpc.CallOption) (*proto.MutateResponse, error) {
+	log.Println(ctx, in, opts)
 	r := &proto.MutateResponse{
 		Success: true,
 	}
@@ -125,18 +127,23 @@ func (m *MockConnector) Mutate(ctx context.Context, in *proto.MutateRequest, opt
 	return r, nil
 }
 func (m *MockConnector) Retrieve(ctx context.Context, in *proto.EntityRequest, opts ...grpc.CallOption) (*proto.EntityResponse, error) {
+	log.Println(ctx, in, opts)
 	return &proto.EntityResponse{}, nil
 }
 func (m *MockConnector) RetrieveView(ctx context.Context, in *proto.EntityViewRequest, opts ...grpc.CallOption) (*proto.EntitiesResponse, error) {
+	log.Println(ctx, in, opts)
 	return &proto.EntitiesResponse{}, nil
 }
 func (m *MockConnector) Logs(ctx context.Context, in *proto.LogRequest, opts ...grpc.CallOption) (*proto.LogsResponse, error) {
+	log.Println(ctx, in, opts)
 	return &proto.LogsResponse{}, nil
 }
 func (m *MockConnector) Events(ctx context.Context, in *proto.EventRequest, opts ...grpc.CallOption) (*proto.EventsResponse, error) {
+	log.Println(ctx, in, opts)
 	return &proto.EventsResponse{}, nil
 }
 func (m *MockConnector) Find(ctx context.Context, in *proto.FindRequest, opts ...grpc.CallOption) (*proto.FindResponse, error) {
+	log.Println(ctx, in, opts)
 	return &proto.FindResponse{}, nil
 }
 
@@ -150,7 +157,7 @@ func FakeCustomer() Customer {
 	c.Email = NewSecretString(email, masker.Email(email))
 	c.Company = faker.Company().Name()
 	c.Phone = faker.PhoneNumber().String()
-	c.AvatarUrl = faker.Avatar().Url("png", 100, 100)
+	c.AvatarURL = faker.Avatar().Url("png", 100, 100)
 	c.City = faker.Address().City()
 	c.StreetName = faker.Address().StreetName()
 	c.StreetAddress = faker.Address().StreetAddress()

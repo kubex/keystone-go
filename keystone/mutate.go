@@ -9,6 +9,7 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+// Mutate is a function that can mutate an entity
 func (a *Actor) Mutate(src interface{}, comment string) error {
 	if reflect.TypeOf(src).Kind() != reflect.Pointer {
 		return errors.New("mutate requires a pointer to a struct")

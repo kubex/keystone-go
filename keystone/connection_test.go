@@ -51,6 +51,7 @@ func TestWrite(t *testing.T) {
 }
 
 func TestConnection(t *testing.T) {
+	t.Log("writing many customers")
 	wg := sync.WaitGroup{}
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
@@ -71,7 +72,8 @@ func writeCustomers() {
 	return
 }
 
-func xx(t *testing.T) {
+func TestMutateEverything(t *testing.T) {
+	t.Skip("Skipping TestMutateEverything")
 	type address struct {
 		Street string `json:"street"`
 		City   string `json:"city"`

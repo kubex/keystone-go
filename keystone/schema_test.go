@@ -13,7 +13,7 @@ func TestTypeToSchema(t *testing.T) {
 	by, e := json.Marshal(testSchemaType{})
 	log.Println(string(by), e)
 	result := typeToSchema(testSchemaType{})
-	log.Println(result)
+	t.Log(result)
 }
 
 // testSchemaType is a test type for testing the schema generation

@@ -10,14 +10,17 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// EntityIDKey is the key for the entity ID property
 const EntityIDKey = "_entity_id"
 
+// PropertyExtractor extracts properties and children from an entity
 type PropertyExtractor struct {
 	EntityID   string
 	properties []*proto.EntityProperty
 	children   []*proto.EntityChild
 }
 
+// Extract extracts properties and children from an entity
 func (p *PropertyExtractor) Extract(entity interface{}) error {
 	entityValue := reflect.ValueOf(entity)
 	for entityValue.Kind() == reflect.Ptr || entityValue.Kind() == reflect.Interface {
@@ -28,6 +31,7 @@ func (p *PropertyExtractor) Extract(entity interface{}) error {
 	return nil
 }
 
+// Properties returns the extracted properties
 func (p *PropertyExtractor) Properties() []*proto.EntityProperty {
 	var properties []*proto.EntityProperty
 	for _, prop := range p.properties {
@@ -43,6 +47,7 @@ func (p *PropertyExtractor) Properties() []*proto.EntityProperty {
 	return properties
 }
 
+// Children returns the extracted children
 func (p *PropertyExtractor) Children() []*proto.EntityChild {
 	return p.children
 }
@@ -87,7 +92,7 @@ func (p *PropertyExtractor) fieldsToProperties(value reflect.Value, t reflect.Ty
 				}
 			}
 			if field.Type.Kind() == reflect.Slice && fieldValue.Len() > 0 {
-				if _, child := fieldValue.Index(0).Interface().(ChildEntity); child {
+				if _, child := fieldValue.Index(0).Interface().(EntityChild); child {
 					for i := 0; i < fieldValue.Len(); i++ {
 						childData, err := json.Marshal(fieldValue.Index(i).Interface())
 						if err != nil {
@@ -104,7 +109,7 @@ func (p *PropertyExtractor) fieldsToProperties(value reflect.Value, t reflect.Ty
 			if field.Type.Kind() == reflect.Struct || field.Type.Kind() == reflect.Pointer {
 				p.fieldsToProperties(fieldValue, field.Type, fOpt.name+".")
 			} else {
-				//fmt.Println("skipping unsupported type ", field.Type.Kind())
+				fmt.Println("skipping unsupported type ", field.Type.Kind())
 			}
 			continue
 		}

@@ -9,6 +9,7 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+// Connection is a connection to a keystone server
 type Connection struct {
 	client        proto.KeystoneClient
 	appID         proto.VendorApp
@@ -17,6 +18,7 @@ type Connection struct {
 	registerQueue map[reflect.Type]bool // true if the type is processing registration
 }
 
+// NewConnection creates a new connection to a keystone server
 func NewConnection(client proto.KeystoneClient, vendorID, appID, accessToken string) *Connection {
 	return &Connection{
 		client:        client,
@@ -27,6 +29,7 @@ func NewConnection(client proto.KeystoneClient, vendorID, appID, accessToken str
 	}
 }
 
+// ProtoClient returns the underlying proto client
 func (c *Connection) ProtoClient() proto.KeystoneClient {
 	return c.client
 }
@@ -38,6 +41,7 @@ func (c *Connection) authorization() *proto.Authorization {
 	}
 }
 
+// Actor returns an actor for the given workspace, remote IP, user ID, and user agent
 func (c *Connection) Actor(workspaceID, remoteIP, userID, userAgent string) Actor {
 	return Actor{
 		connection:  c,
@@ -70,16 +74,17 @@ func (c *Connection) registerType(t interface{}) (*proto.Schema, bool) {
 		typ = typ.Elem()
 	}
 
-	if schema, ok := c.typeRegister[typ]; !ok {
+	schema, ok := c.typeRegister[typ]
+	if !ok {
 		newSchema := typeToSchema(t)
 		c.typeRegister[typ] = newSchema
 		c.registerQueue[typ] = false
 		return newSchema, false
-	} else {
-		return schema, true
 	}
+	return schema, true
 }
 
+// SyncSchema syncs the schema with the server
 func (c *Connection) SyncSchema() *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 	wg.Add(len(c.registerQueue))

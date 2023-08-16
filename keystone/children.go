@@ -1,5 +1,6 @@
 package keystone
 
-type ChildEntity interface {
+// EntityChild is an interface that defines a child entity
+type EntityChild interface {
 	ChildID() string
 }

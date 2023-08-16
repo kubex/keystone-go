@@ -7,8 +7,10 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+// GenericResult is a map that can be used to retrieve a generic result
 type GenericResult map[string]interface{}
 
+// Actor is a struct that represents an actor
 type Actor struct {
 	connection   *Connection
 	workspaceID  string
@@ -24,12 +26,14 @@ func (a *Actor) authorization() *proto.Authorization {
 	}
 }
 
+// SetClient sets the client name for the actor
 func (a *Actor) SetClient(client string) {
 	if a.mutator != nil {
 		a.mutator.Client = client
 	}
 }
 
+// Get retrieves an entity by the given retrieveBy, storing the result in dst
 func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, opts ...RetrieveOption) error {
 	entityRequest := retrieveBy.BaseRequest()
 	entityRequest.Authorization = a.authorization()
@@ -80,6 +84,7 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 	return unmarshal(resp, dst)
 }
 
+// Find returns a list of entities matching the given entityType and retrieveProperties
 func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
 	findRequest := &proto.FindRequest{
 		Authorization: a.authorization(),
