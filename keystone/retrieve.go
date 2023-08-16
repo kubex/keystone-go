@@ -25,7 +25,9 @@ func (a *Actor) authorization() *proto.Authorization {
 }
 
 func (a *Actor) SetClient(client string) {
-	a.mutator.Client = client
+	if a.mutator != nil {
+		a.mutator.Client = client
+	}
 }
 
 func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, opts ...RetrieveOption) error {
@@ -72,14 +74,10 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 	}
 	a.loadedEntity = resp
 	if gr, ok := dst.(GenericResult); ok {
-		return UnmarshalGeneric(resp, gr)
+		return unmarshalGeneric(resp, gr)
 	}
 
-	return Unmarshal(resp, dst)
-}
-
-func (a *Actor) Lookup(ctx context.Context, idLookup string) ([]*proto.EntityResponse, error) {
-	return nil, nil
+	return unmarshal(resp, dst)
 }
 
 func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
@@ -96,7 +94,7 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties 
 		opt.Apply(findRequest)
 	}
 
-	resp, err := a.connection.ProtoClient().Find(context.Background(), findRequest)
+	resp, err := a.connection.ProtoClient().Find(ctx, findRequest)
 	if err != nil {
 		return nil, err
 	}

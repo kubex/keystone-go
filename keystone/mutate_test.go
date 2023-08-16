@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-func TestMarshal(t *testing.T) {
+func TestMutate(t *testing.T) {
 	addr := &Address{
 		Line1: "123 Fake St.",
 		Line2: "Apt. 2",
 		City:  "Springfield",
 	}
 
-	if err := getTestActor(&MockConnector{}).Marshal(addr, "test marshal"); err != nil {
+	if err := getTestActor(&MockConnector{}).Mutate(addr, "test marshal"); err != nil {
 		t.Error(err)
 	}
 }

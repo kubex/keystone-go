@@ -28,7 +28,7 @@ func TestActorRetrieveByUnique(t *testing.T) {
 		t.Error(err)
 	}
 
-	//actor.Marshal(cst, "testing actor")
+	//actor.Mutate(cst, "testing actor")
 	//
 	log.Println(cst)
 	log.Println(cst.GetKeystoneLinks())

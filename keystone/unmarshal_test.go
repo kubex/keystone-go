@@ -9,7 +9,7 @@ import (
 
 func TestUnmarshal(t *testing.T) {
 	addr := &Address{}
-	if err := Unmarshal(testAddressResponse, addr); err != nil {
+	if err := unmarshal(testAddressResponse, addr); err != nil {
 		t.Error(err)
 	}
 	checkAddress(t, addr)
@@ -17,7 +17,7 @@ func TestUnmarshal(t *testing.T) {
 
 func TestUnmarshalGeneric(t *testing.T) {
 	gr := GenericResult{}
-	if err := UnmarshalGeneric(testAddressResponse, gr); err != nil {
+	if err := unmarshalGeneric(testAddressResponse, gr); err != nil {
 		t.Error(err)
 	}
 	if gr["_entity_id"] != "xxx-xxxx" {

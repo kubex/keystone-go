@@ -85,8 +85,8 @@ type Customer struct {
 	UserID              string       `keystone:",unique,omitempty" json:",omitempty"`
 	Address             Address
 	References          []string
-	LineItems           []*LineItem // TODO: Store as children?
-	DiscountedLineItems []LineItem  // TODO: Store as children?
+	LineItems           []*LineItem
+	DiscountedLineItems []LineItem
 }
 
 type LineItem struct {

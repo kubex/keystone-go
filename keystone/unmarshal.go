@@ -9,7 +9,7 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
+func unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
 	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
 		entityWithLinks.SetKeystoneLinks(resp.GetLinks())
@@ -20,7 +20,7 @@ func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	return entityResponseToDst(entityPropertyMap, resp.Children, dst, "")
 }
 
-func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
+func unmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
 	for _, p := range entityPropertyMap {
 		if p.Value.GetText() != "" {

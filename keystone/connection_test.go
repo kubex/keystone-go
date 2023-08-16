@@ -45,7 +45,7 @@ func TestWrite(t *testing.T) {
 	cust.AddKeystoneLabel("foo", "bar")
 	cust.AddKeystoneLink("gcs", "logo", "https://storage.googleapis.com/keystone-assets/keystone-logo.png")
 	cust.AddKeystoneRelationship("user", "customer", map[string]string{"foo": "bar"}, time.Now())
-	if err := getTestActor(nil).Marshal(cust, "Creating Customer via Marshal"); err != nil {
+	if err := getTestActor(nil).Mutate(cust, "Creating Customer via Mutate"); err != nil {
 		t.Error(err)
 	}
 }
@@ -66,7 +66,7 @@ func TestConnection(t *testing.T) {
 func writeCustomers() {
 	log.Println("Marshalling")
 	for i := 0; i < 10; i++ {
-		getTestActor(nil).Marshal(FakeCustomer(), "Faker Customer x")
+		getTestActor(nil).Mutate(FakeCustomer(), "Faker Customer x")
 	}
 	return
 }
@@ -244,5 +244,5 @@ func xx(t *testing.T) {
 		},
 	}
 
-	getTestActor(nil).Marshal(m, "Faker Customer x")
+	getTestActor(nil).Mutate(m, "Faker Customer x")
 }

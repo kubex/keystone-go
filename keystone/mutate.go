@@ -9,12 +9,12 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-func (a *Actor) Marshal(src interface{}, comment string) error {
+func (a *Actor) Mutate(src interface{}, comment string) error {
 	if reflect.TypeOf(src).Kind() != reflect.Pointer {
-		return errors.New("marshal requires a pointer to a struct")
+		return errors.New("mutate requires a pointer to a struct")
 	}
 
-	//log.Println("Processing Marshal request")
+	//log.Println("Processing Mutate request")
 	schema, registered := a.connection.registerType(src)
 	if !registered {
 		// wait for the type to be registered with the keystone server
