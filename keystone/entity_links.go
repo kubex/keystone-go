@@ -7,6 +7,7 @@ import (
 type EntityLinkProvider interface {
 	ClearKeystoneLinks() error
 	GetKeystoneLinks() []*proto.EntityLink
+	SetKeystoneLinks(links []*proto.EntityLink)
 }
 
 type EntityLinks struct {
@@ -20,6 +21,10 @@ func (e *EntityLinks) ClearKeystoneLinks() error {
 
 func (e *EntityLinks) GetKeystoneLinks() []*proto.EntityLink {
 	return e.ksEntityLinks
+}
+
+func (e *EntityLinks) SetKeystoneLinks(links []*proto.EntityLink) {
+	e.ksEntityLinks = links
 }
 
 func (e *EntityLinks) AddKeystoneLink(key, name, location string) {

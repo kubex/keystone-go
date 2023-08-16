@@ -22,6 +22,8 @@ func TestActorRetrieveByUnique(t *testing.T) {
 		WithSummary(),
 		WithDatum(),
 		WithChildren("line_items"),
+		WithLinks("gcs"),
+		WithRelationships("user"),
 	); err != nil {
 		t.Error(err)
 	}
@@ -29,6 +31,8 @@ func TestActorRetrieveByUnique(t *testing.T) {
 	//actor.Marshal(cst, "testing actor")
 	//
 	log.Println(cst)
+	log.Println(cst.GetKeystoneLinks())
+	log.Println(cst.GetKeystoneRelationships())
 }
 
 func TestActorRetrieveByEntityID(t *testing.T) {

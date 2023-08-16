@@ -45,12 +45,12 @@ func WithDecryptedProperties(properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties, decrypt: true}
 }
 
-func WithLinks(links []string) RetrieveOption {
+func WithLinks(links ...string) RetrieveOption {
 	return linksLoader{Links: links}
 }
 
-func WithAuthorization(auth *proto.Authorization) RetrieveOption {
-	return authorizationLoader{auth: auth}
+func WithRelationships(keys ...string) RetrieveOption {
+	return relationshipsLoader{keys: keys}
 }
 
 func WithSummary() RetrieveOption {
@@ -93,9 +93,16 @@ func (l linksLoader) Apply(config *proto.EntityRequest) {
 	}
 }
 
-type authorizationLoader struct{ auth *proto.Authorization }
+type relationshipsLoader struct{ keys []string }
 
-func (l authorizationLoader) Apply(config *proto.EntityRequest) { config.Authorization = l.auth }
+func (l relationshipsLoader) Apply(config *proto.EntityRequest) {
+	if config.RelationshipByType == nil {
+		config.RelationshipByType = make([]*proto.Key, 0)
+	}
+	for _, key := range l.keys {
+		config.RelationshipByType = append(config.RelationshipByType, &proto.Key{Key: key})
+	}
+}
 
 type summaryLoader struct{ summary bool }
 

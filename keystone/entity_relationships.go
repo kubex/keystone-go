@@ -10,6 +10,7 @@ import (
 type EntityRelationshipProvider interface {
 	ClearKeystoneRelationships() error
 	GetKeystoneRelationships() []*proto.EntityRelationship
+	SetKeystoneRelationships(links []*proto.EntityRelationship)
 }
 
 type EntityRelationships struct {
@@ -23,6 +24,10 @@ func (e *EntityRelationships) ClearKeystoneRelationships() error {
 
 func (e *EntityRelationships) GetKeystoneRelationships() []*proto.EntityRelationship {
 	return e.ksEntityRelationships
+}
+
+func (e *EntityRelationships) SetKeystoneRelationships(links []*proto.EntityRelationship) {
+	e.ksEntityRelationships = links
 }
 
 func (e *EntityRelationships) AddKeystoneRelationship(source, target string, meta map[string]string, since time.Time) {

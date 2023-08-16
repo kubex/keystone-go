@@ -11,6 +11,12 @@ import (
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
+	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
+		entityWithLinks.SetKeystoneLinks(resp.GetLinks())
+	}
+	if entityWithRelationships, ok := dst.(EntityRelationshipProvider); ok {
+		entityWithRelationships.SetKeystoneRelationships(resp.GetRelationships())
+	}
 	return entityResponseToDst(entityPropertyMap, resp.Children, dst, "")
 }
 

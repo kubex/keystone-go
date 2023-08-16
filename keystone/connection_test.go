@@ -38,7 +38,7 @@ func init() {
 }
 
 func TestWrite(t *testing.T) {
-	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
 	cust := &Customer{
@@ -59,7 +59,7 @@ func TestWrite(t *testing.T) {
 		James:         "Eagle",
 		AmountPaid:    NewAmount("USD", 123),
 		LeadDate:      time.Now(),
-		UserID:        "user-235",
+		UserID:        "user-237",
 		Address: Address{
 			Line1: "123 Old Street",
 			Line2: "Line 2 is optional",
@@ -72,6 +72,8 @@ func TestWrite(t *testing.T) {
 		},
 	}
 	cust.AddKeystoneLabel("foo", "bar")
+	cust.AddKeystoneLink("gcs", "logo", "https://storage.googleapis.com/keystone-assets/keystone-logo.png")
+	cust.AddKeystoneRelationship("user", "customer", map[string]string{"foo": "bar"}, time.Now())
 	if err := actor.Marshal(cust, "Creating Customer via Marshal"); err != nil {
 		t.Error(err)
 	}
@@ -92,7 +94,7 @@ func TestConnection(t *testing.T) {
 }
 
 func writeCustomers() {
-	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
 	c.RegisterTypes( /*testSchemaType{},*/ Customer{})
@@ -106,7 +108,7 @@ func writeCustomers() {
 }
 
 func xx(t *testing.T) {
-	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 
 	c.RegisterTypes(testSchemaType{}, Customer{})
 	c.SyncSchema().Wait()
@@ -290,6 +292,7 @@ type Customer struct {
 	EntityEvents
 	EntityLabels
 	EntityLinks
+	EntityRelationships
 	ID                  string       `keystone:"_entity_id" json:",omitempty"`
 	Name                SecretString `keystone:",indexed,personal,omitempty" json:",omitempty"`
 	Email               SecretString `keystone:",indexed,omitempty" json:",omitempty"`
@@ -370,7 +373,7 @@ func FakeCustomer() Customer {
 }
 
 func TestFind(t *testing.T) {
-	c := NewConnection(ksClient, "vendor", "okeapp", "accessToken")
+	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
 	cst := Customer{}
