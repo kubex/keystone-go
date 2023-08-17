@@ -30,7 +30,7 @@ func TestWrite(t *testing.T) {
 		James:         "Eagle",
 		AmountPaid:    NewAmount("USD", 123),
 		LeadDate:      time.Now(),
-		UserID:        "user-237",
+		UserID:        "user-233",
 		Address: Address{
 			Line1: "123 Old Street",
 			Line2: "Line 2 is optional",
