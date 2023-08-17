@@ -147,12 +147,12 @@ func (m *MockConnector) Find(ctx context.Context, in *proto.FindRequest, opts ..
 	return &proto.FindResponse{}, nil
 }
 
-func FakeCustomer() Customer {
+func FakeCustomer() *Customer {
 
 	name := faker.Name().Name()
 	email := faker.Internet().Email()
 
-	c := Customer{}
+	c := &Customer{}
 	c.Name = NewSecretString(name, masker.Name(name))
 	c.Email = NewSecretString(email, masker.Email(email))
 	c.Company = faker.Company().Name()
