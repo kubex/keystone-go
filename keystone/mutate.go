@@ -3,7 +3,6 @@ package keystone
 import (
 	"context"
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/kubex/keystone-go/proto"
@@ -23,7 +22,10 @@ func (a *Actor) Mutate(src interface{}, comment string) error {
 	}
 	//log.Println("Marshalling entity", src)
 
-	mutation := &proto.Mutation{Mutator: a.mutator, Comment: comment}
+	encoder := &PropertyEncoder{}
+	mutation := encoder.Marshal(src)
+	mutation.Mutator = a.mutator
+	mutation.Comment = comment
 	if entityWithLabels, ok := src.(EntityLabelProvider); ok {
 		mutation.Labels = entityWithLabels.GetKeystoneLabels()
 	}
@@ -36,19 +38,12 @@ func (a *Actor) Mutate(src interface{}, comment string) error {
 		mutation.Relationships = entityWithRelationships.GetKeystoneRelationships()
 	}
 
-	extractor := &PropertyExtractor{}
-	if err := extractor.Extract(src); err != nil {
-		return fmt.Errorf("error extracting properties; %w", err)
-	}
-
-	mutation.Properties = extractor.Properties()
-	mutation.Children = extractor.Children()
 	if a.loadedEntity != nil {
 		mutation.Properties = a.getChangedProperties(a.loadedEntity, &proto.EntityResponse{Properties: mutation.Properties})
 	}
 	m := &proto.MutateRequest{
 		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
-		EntityId:      extractor.EntityID,
+		EntityId:      encoder.EntityID,
 		Schema:        &proto.Key{Key: schema.Type, Source: schema.Source}, // TODO: Should probably provide the schema ID if we have it - and verify against the type / source
 		Mutation:      mutation,
 	}
@@ -80,18 +75,4 @@ func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) 
 		}
 	}
 	return result
-}
-
-func supportedType(t reflect.Type) bool {
-	switch t.Kind() {
-	case reflect.String, reflect.Int32, reflect.Int64, reflect.Int, reflect.Bool, reflect.Float32, reflect.Float64, reflect.Map:
-		return true
-	}
-
-	switch t {
-	case typeOfSecretString, typeOfAmount, typeOfTime, typeOfStringSlice:
-		return true
-	}
-
-	return false
 }

@@ -7,9 +7,6 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-// GenericResult is a map that can be used to retrieve a generic result
-type GenericResult map[string]interface{}
-
 // Actor is a struct that represents an actor
 type Actor struct {
 	connection   *Connection

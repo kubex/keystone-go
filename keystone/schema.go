@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/kubex/keystone-go/proto"
 )
@@ -80,11 +79,10 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 			continue
 		}
 
-		fOpt := getFieldOptions(field)
+		fOpt := getFieldOptions(field, prefix)
 		if fOpt.name == "" {
 			continue
 		}
-		fOpt.name = prefix + fOpt.name
 
 		// not supported assumed a nested struct field
 		if !supportedType(field.Type) {
@@ -108,6 +106,20 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 	}
 
 	return returnFields
+}
+
+func supportedType(t reflect.Type) bool {
+	switch t.Kind() {
+	case reflect.String, reflect.Int32, reflect.Int64, reflect.Int, reflect.Bool, reflect.Float32, reflect.Float64, reflect.Map:
+		return true
+	}
+
+	switch t {
+	case typeOfSecretString, typeOfAmount, typeOfTime, typeOfStringSlice:
+		return true
+	}
+
+	return false
 }
 
 func appendOption(protoField *proto.Property, option proto.Property_Option, when bool) {
@@ -145,7 +157,7 @@ func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Pro
 	return proto.Property_Text, defaultClassification
 }
 
-func getFieldOptions(f reflect.StructField) fieldOptions {
+func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {
 	tag := f.Tag.Get("keystone")
 	opt := fieldOptions{}
 
@@ -154,11 +166,11 @@ func getFieldOptions(f reflect.StructField) fieldOptions {
 		part = strings.TrimSpace(part)
 		if i == 0 {
 			if part == "" {
-				opt.name = snakeCase(f.Name)
+				opt.name = prefix + snakeCase(f.Name)
 			} else if part == "-" {
 				return opt
 			} else {
-				opt.name = strings.ToLower(part)
+				opt.name = prefix + strings.ToLower(part)
 			}
 			continue
 		}
@@ -185,13 +197,6 @@ func getFieldOptions(f reflect.StructField) fieldOptions {
 	}
 	return opt
 }
-
-var (
-	typeOfTime         = reflect.TypeOf(time.Time{})
-	typeOfSecretString = reflect.TypeOf(SecretString{})
-	typeOfAmount       = reflect.TypeOf(Amount{})
-	typeOfStringSlice  = reflect.TypeOf([]string{})
-)
 
 type fieldOptions struct {
 	name string

@@ -75,7 +75,7 @@ func TestSetFieldValue(t *testing.T) {
 	for i := 0; i < addressValue.NumField(); i++ {
 		field := addressValue.Type().Field(i)
 		fieldValue := addressValue.Field(i)
-		fieldOpt := getFieldOptions(field)
+		fieldOpt := getFieldOptions(field, "")
 		setFieldValue(field, fieldValue, fieldOpt, propMap)
 	}
 	checkAddress(t, addr)

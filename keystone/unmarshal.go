@@ -74,7 +74,7 @@ func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, chi
 	for i := 0; i < dstVal.NumField(); i++ {
 		field := dstVal.Type().Field(i)
 		fieldValue := dstVal.Field(i)
-		fieldOpt := getFieldOptions(field)
+		fieldOpt := getFieldOptions(field, prefix)
 		fieldOpt.name = prefix + fieldOpt.name
 		if supportedType(field.Type) {
 			setFieldValue(field, fieldValue, fieldOpt, entityPropertyMap)
