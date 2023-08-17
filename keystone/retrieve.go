@@ -72,7 +72,7 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 		entityRequest.UniqueId.SchemaId = schemaID
 	}
 
-	resp, err := a.connection.ProtoClient().Retrieve(ctx, entityRequest)
+	resp, err := a.connection.Retrieve(ctx, entityRequest)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties 
 		opt.Apply(findRequest)
 	}
 
-	resp, err := a.connection.ProtoClient().Find(ctx, findRequest)
+	resp, err := a.connection.Find(ctx, findRequest)
 	if err != nil {
 		return nil, err
 	}

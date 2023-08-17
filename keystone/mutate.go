@@ -53,7 +53,7 @@ func (a *Actor) Mutate(src interface{}, comment string) error {
 		Mutation:      mutation,
 	}
 
-	_, err := a.connection.ProtoClient().Mutate(context.Background(), m)
+	_, err := a.connection.Mutate(context.Background(), m)
 	return err
 }
 

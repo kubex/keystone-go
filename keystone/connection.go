@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/kubex/keystone-go/proto"
+	"google.golang.org/grpc"
 )
 
 // Connection is a connection to a keystone server
@@ -29,9 +30,27 @@ func NewConnection(client proto.KeystoneClient, vendorID, appID, accessToken str
 	}
 }
 
-// ProtoClient returns the underlying proto client
-func (c *Connection) ProtoClient() proto.KeystoneClient {
-	return c.client
+func (c *Connection) Define(ctx context.Context, in *proto.SchemaRequest, opts ...grpc.CallOption) (*proto.Schema, error) {
+	return c.client.Define(ctx, in, opts...)
+}
+
+func (c *Connection) Mutate(ctx context.Context, in *proto.MutateRequest, opts ...grpc.CallOption) (*proto.MutateResponse, error) {
+	return c.client.Mutate(ctx, in, opts...)
+}
+func (c *Connection) Retrieve(ctx context.Context, in *proto.EntityRequest, opts ...grpc.CallOption) (*proto.EntityResponse, error) {
+	return c.client.Retrieve(ctx, in, opts...)
+}
+func (c *Connection) RetrieveView(ctx context.Context, in *proto.EntityViewRequest, opts ...grpc.CallOption) (*proto.EntitiesResponse, error) {
+	return c.client.RetrieveView(ctx, in, opts...)
+}
+func (c *Connection) Logs(ctx context.Context, in *proto.LogRequest, opts ...grpc.CallOption) (*proto.LogsResponse, error) {
+	return c.client.Logs(ctx, in, opts...)
+}
+func (c *Connection) Events(ctx context.Context, in *proto.EventRequest, opts ...grpc.CallOption) (*proto.EventsResponse, error) {
+	return c.client.Events(ctx, in, opts...)
+}
+func (c *Connection) Find(ctx context.Context, in *proto.FindRequest, opts ...grpc.CallOption) (*proto.FindResponse, error) {
+	return c.client.Find(ctx, in, opts...)
 }
 
 func (c *Connection) authorization() *proto.Authorization {
@@ -93,7 +112,7 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 			if !processing {
 				if toRegister, ok := c.typeRegister[typ]; ok {
 					log.Println("Registering type", typ)
-					resp, err := c.ProtoClient().Define(context.Background(), &proto.SchemaRequest{
+					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
 						Authorization: c.authorization(),
 						Schema:        toRegister,
 					})
