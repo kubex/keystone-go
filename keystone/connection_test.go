@@ -66,8 +66,9 @@ func TestConnection(t *testing.T) {
 
 func writeCustomers() {
 	log.Println("Marshalling")
-	for i := 0; i < 10; i++ {
-		getTestActor(nil).Mutate(FakeCustomer(), "Faker Customer x")
+	actor := getTestActor(nil)
+	for i := 0; i < 10000; i++ {
+		actor.Mutate(FakeCustomer(), "Faker Customer x")
 	}
 	return
 }
