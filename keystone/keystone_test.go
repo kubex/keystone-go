@@ -175,6 +175,11 @@ func FakeCustomer() *Customer {
 	c.LeadDate = faker.Time().Birthday(0, 5)
 	c.UserID = faker.RandomString(10)
 
+	c.AddKeystoneEvent("custom-event", map[string]string{"foo": "bar"})
+	c.AddKeystoneLabel("active", "true")
+	c.AddKeystoneLink("gcs", "Raw Data", "https://google.com")
+	c.AddKeystoneRelationship("src", "targ", map[string]string{"a": "b"}, time.Now())
+
 	c.LogDebug("Created customer", "REF123", "trace-id", "mr-man", nil)
 
 	return c

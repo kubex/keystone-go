@@ -38,6 +38,10 @@ func (a *Actor) Mutate(src interface{}, comment string) error {
 		mutation.Relationships = entityWithRelationships.GetKeystoneRelationships()
 	}
 
+	if entityWithEvents, ok := src.(EntityEventProvider); ok {
+		mutation.Events = entityWithEvents.GetKeystoneEvents()
+	}
+
 	if a.loadedEntity != nil {
 		mutation.Properties = a.getChangedProperties(a.loadedEntity, &proto.EntityResponse{Properties: mutation.Properties})
 	}

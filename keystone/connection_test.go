@@ -50,13 +50,18 @@ func TestWrite(t *testing.T) {
 	}
 }
 
+func TestConnectionSingle(t *testing.T) {
+	t.Log("writing many customers")
+	writeCustomers(1)
+}
+
 func TestConnection(t *testing.T) {
 	t.Log("writing many customers")
 	wg := sync.WaitGroup{}
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go func() {
-			writeCustomers()
+			writeCustomers(10000)
 			wg.Done()
 		}()
 		time.Sleep(time.Millisecond * 100)
@@ -64,21 +69,27 @@ func TestConnection(t *testing.T) {
 	wg.Wait()
 }
 
-func writeCustomers() {
+func writeCustomers(count int) {
 	log.Println("Marshalling")
 	actor := getTestActor(nil)
-	for i := 0; i < 10000; i++ {
+	lastTime := time.Now()
+	for i := 0; i < count; i++ {
+		if i > 0 && i%100 == 0 {
+			log.Println("Writing", i, "of", count, "at", time.Now().Sub(lastTime).Milliseconds()/100, "ms per entity")
+			lastTime = time.Now()
+		}
 		err := actor.Mutate(FakeCustomer(), "Faker Customer x")
 		if err != nil {
 			log.Println(err)
 			break
 		}
+		//time.Sleep(time.Millisecond * 5)
 	}
 	return
 }
 
 func TestMutateEverything(t *testing.T) {
-	t.Skip("Skipping TestMutateEverything")
+	//	t.Skip("Skipping TestMutateEverything")
 	type address struct {
 		Street string `json:"street"`
 		City   string `json:"city"`
