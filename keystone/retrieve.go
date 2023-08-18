@@ -75,10 +75,10 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 	}
 	a.loadedEntity = resp
 	if gr, ok := dst.(GenericResult); ok {
-		return unmarshalGeneric(resp, gr)
+		return UnmarshalGeneric(resp, gr)
 	}
 
-	return unmarshal(resp, dst)
+	return Unmarshal(resp, dst)
 }
 
 // Find returns a list of entities matching the given entityType and retrieveProperties
