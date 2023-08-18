@@ -130,10 +130,6 @@ func (m *MockConnector) Retrieve(ctx context.Context, in *proto.EntityRequest, o
 	log.Println(ctx, in, opts)
 	return &proto.EntityResponse{}, nil
 }
-func (m *MockConnector) RetrieveView(ctx context.Context, in *proto.EntityViewRequest, opts ...grpc.CallOption) (*proto.EntitiesResponse, error) {
-	log.Println(ctx, in, opts)
-	return &proto.EntitiesResponse{}, nil
-}
 func (m *MockConnector) Logs(ctx context.Context, in *proto.LogRequest, opts ...grpc.CallOption) (*proto.LogsResponse, error) {
 	log.Println(ctx, in, opts)
 	return &proto.LogsResponse{}, nil
@@ -145,6 +141,10 @@ func (m *MockConnector) Events(ctx context.Context, in *proto.EventRequest, opts
 func (m *MockConnector) Find(ctx context.Context, in *proto.FindRequest, opts ...grpc.CallOption) (*proto.FindResponse, error) {
 	log.Println(ctx, in, opts)
 	return &proto.FindResponse{}, nil
+}
+func (m *MockConnector) ADSList(ctx context.Context, in *proto.ADSListRequest, opts ...grpc.CallOption) (*proto.ADSListResponse, error) {
+	log.Println(ctx, in, opts)
+	return &proto.ADSListResponse{}, nil
 }
 
 func FakeCustomer() *Customer {

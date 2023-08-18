@@ -86,19 +86,60 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties 
 	findRequest := &proto.FindRequest{
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
-		Properties: []*proto.PropertyRequest{
-			{
-				Properties: retrieveProperties,
-			},
-		},
 	}
+
+	fReq := &filterRequest{Properties: []*proto.PropertyRequest{{Properties: retrieveProperties}}}
+
 	for _, opt := range options {
-		opt.Apply(findRequest)
+		opt.Apply(fReq)
 	}
+
+	findRequest.Properties = fReq.Properties
+	findRequest.Filters = fReq.Filters
+	findRequest.Labels = fReq.Labels
+	findRequest.RelationOf = fReq.RelationOf
 
 	resp, err := a.connection.Find(ctx, findRequest)
 	if err != nil {
 		return nil, err
 	}
 	return resp.Entities, nil
+}
+
+// List returns a list of entities within an active set
+func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
+	listRequest := &proto.ADSListRequest{
+		Authorization: a.authorization(),
+		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
+		AdsName:       activeSetName,
+	}
+
+	fReq := &filterRequest{Properties: []*proto.PropertyRequest{{Properties: retrieveProperties}}}
+	for _, opt := range options {
+		opt.Apply(fReq)
+	}
+
+	listRequest.Properties = fReq.Properties
+	listRequest.Filters = fReq.Filters
+	listRequest.Limit = fReq.Limit
+	listRequest.Offset = fReq.Offset
+	listRequest.SortProperty = fReq.SortProperty
+	listRequest.SortDirection = fReq.SortDirection
+
+	resp, err := a.connection.ADSList(ctx, listRequest)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Entities, nil
+}
+
+type filterRequest struct {
+	Properties    []*proto.PropertyRequest
+	Filters       []*proto.PropertyFilter
+	Labels        []*proto.EntityLabel
+	RelationOf    *proto.RelationOf
+	Limit         int32
+	Offset        int32
+	SortProperty  string
+	SortDirection string
 }

@@ -6,7 +6,7 @@ import (
 
 // FindOption is an interface for options to be applied to a find request
 type FindOption interface {
-	Apply(config *proto.FindRequest)
+	Apply(config *filterRequest)
 }
 
 // WhereEquals is a find option that filters entities by a property equaling a value
@@ -80,7 +80,7 @@ type propertyFilter struct {
 	operator proto.Operator
 }
 
-func (f propertyFilter) Apply(config *proto.FindRequest) {
+func (f propertyFilter) Apply(config *filterRequest) {
 	if config.Filters == nil {
 		config.Filters = make([]*proto.PropertyFilter, 0)
 	}

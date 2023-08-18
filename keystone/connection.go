@@ -40,9 +40,6 @@ func (c *Connection) Mutate(ctx context.Context, in *proto.MutateRequest, opts .
 func (c *Connection) Retrieve(ctx context.Context, in *proto.EntityRequest, opts ...grpc.CallOption) (*proto.EntityResponse, error) {
 	return c.client.Retrieve(ctx, in, opts...)
 }
-func (c *Connection) RetrieveView(ctx context.Context, in *proto.EntityViewRequest, opts ...grpc.CallOption) (*proto.EntitiesResponse, error) {
-	return c.client.RetrieveView(ctx, in, opts...)
-}
 func (c *Connection) Logs(ctx context.Context, in *proto.LogRequest, opts ...grpc.CallOption) (*proto.LogsResponse, error) {
 	return c.client.Logs(ctx, in, opts...)
 }
@@ -51,6 +48,9 @@ func (c *Connection) Events(ctx context.Context, in *proto.EventRequest, opts ..
 }
 func (c *Connection) Find(ctx context.Context, in *proto.FindRequest, opts ...grpc.CallOption) (*proto.FindResponse, error) {
 	return c.client.Find(ctx, in, opts...)
+}
+func (c *Connection) ADSList(ctx context.Context, in *proto.ADSListRequest, opts ...grpc.CallOption) (*proto.ADSListResponse, error) {
+	return c.client.ADSList(ctx, in, opts...)
 }
 
 func (c *Connection) authorization() *proto.Authorization {
