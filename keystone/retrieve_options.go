@@ -53,6 +53,11 @@ func WithDecryptedProperties(properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties, decrypt: true}
 }
 
+// WithProperty is a retrieve option that loads properties
+func WithProperty(decrypt bool, properties ...string) RetrieveOption {
+	return propertyLoader{properties: properties, decrypt: decrypt}
+}
+
 // WithLinks is a retrieve option that loads links
 func WithLinks(links ...string) RetrieveOption {
 	return linksLoader{Links: links}
