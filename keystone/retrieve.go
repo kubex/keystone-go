@@ -112,14 +112,14 @@ func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retr
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
 		AdsName:       activeSetName,
+		Properties:    retrieveProperties,
 	}
 
-	fReq := &filterRequest{Properties: []*proto.PropertyRequest{{Properties: retrieveProperties}}}
+	fReq := &filterRequest{}
 	for _, opt := range options {
 		opt.Apply(fReq)
 	}
 
-	listRequest.Properties = fReq.Properties
 	listRequest.Filters = fReq.Filters
 	listRequest.Limit = fReq.Limit
 	listRequest.Offset = fReq.Offset
