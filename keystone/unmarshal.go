@@ -148,8 +148,10 @@ func setFieldValue(field reflect.StructField, fieldValue reflect.Value, fieldOpt
 		}
 	case typeOfTime:
 		if _, ok := fieldValue.Interface().(time.Time); ok {
-			t := time.Unix(storedProperty.Value.GetTime().Seconds, int64(storedProperty.Value.GetTime().Nanos))
-			fieldValue.Set(reflect.ValueOf(t))
+			if storedProperty.Value.Time != nil {
+				t := time.Unix(storedProperty.Value.GetTime().Seconds, int64(storedProperty.Value.GetTime().Nanos))
+				fieldValue.Set(reflect.ValueOf(t))
+			}
 		}
 	}
 }
