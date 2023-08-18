@@ -135,8 +135,8 @@ func setFieldValue(field reflect.StructField, fieldValue reflect.Value, fieldOpt
 	case typeOfSecretString:
 		if _, ok := fieldValue.Interface().(SecretString); ok {
 			fieldValue.Set(reflect.ValueOf(SecretString{
-				Masked:   storedProperty.Value.SecureText,
-				Original: storedProperty.Value.Text,
+				Masked:   storedProperty.Value.Text,
+				Original: storedProperty.Value.SecureText,
 			}))
 		}
 	case typeOfAmount:
