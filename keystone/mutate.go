@@ -9,7 +9,7 @@ import (
 )
 
 // Mutate is a function that can mutate an entity
-func (a *Actor) Mutate(src interface{}, comment string) error {
+func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) error {
 	if reflect.TypeOf(src).Kind() != reflect.Pointer {
 		return errors.New("mutate requires a pointer to a struct")
 	}
@@ -52,7 +52,7 @@ func (a *Actor) Mutate(src interface{}, comment string) error {
 		Mutation:      mutation,
 	}
 
-	_, err := a.connection.Mutate(context.Background(), m)
+	_, err := a.connection.Mutate(ctx, m)
 	return err
 }
 

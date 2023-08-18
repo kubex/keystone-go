@@ -1,6 +1,7 @@
 package keystone
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"sync"
@@ -45,7 +46,7 @@ func TestWrite(t *testing.T) {
 	cust.AddKeystoneLabel("foo", "bar")
 	cust.AddKeystoneLink("gcs", "logo", "https://storage.googleapis.com/keystone-assets/keystone-logo.png")
 	cust.AddKeystoneRelationship("user", "customer", map[string]string{"foo": "bar"}, time.Now())
-	if err := getTestActor(nil).Mutate(cust, "Creating Customer via Mutate"); err != nil {
+	if err := getTestActor(nil).Mutate(context.Background(), cust, "Creating Customer via Mutate"); err != nil {
 		t.Error(err)
 	}
 }
@@ -78,7 +79,7 @@ func writeCustomers(count int) {
 			log.Println("Writing", i, "of", count, "at", time.Now().Sub(lastTime).Milliseconds()/100, "ms per entity")
 			lastTime = time.Now()
 		}
-		err := actor.Mutate(FakeCustomer(), "Faker Customer x")
+		err := actor.Mutate(context.Background(), FakeCustomer(), "Faker Customer x")
 		if err != nil {
 			log.Println(err)
 			break
@@ -262,5 +263,5 @@ func TestMutateEverything(t *testing.T) {
 		},
 	}
 
-	getTestActor(nil).Mutate(m, "Faker Customer x")
+	getTestActor(nil).Mutate(context.Background(), m, "Faker Customer x")
 }

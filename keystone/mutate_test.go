@@ -1,6 +1,7 @@
 package keystone
 
 import (
+	"context"
 	"reflect"
 	"testing"
 )
@@ -12,7 +13,7 @@ func TestMutate(t *testing.T) {
 		City:  "Springfield",
 	}
 
-	if err := getTestActor(&MockConnector{}).Mutate(addr, "test marshal"); err != nil {
+	if err := getTestActor(&MockConnector{}).Mutate(context.Background(), addr, "test marshal"); err != nil {
 		t.Error(err)
 	}
 }
