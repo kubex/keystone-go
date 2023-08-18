@@ -39,7 +39,7 @@ func TestActorRetrieveByEntityID(t *testing.T) {
 	c := NewConnection(ksClient, "vendor", "appid", "accessToken")
 	actor := c.Actor("test-workspace", "123.45.67.89", "user-1234", "User Agent Unknown")
 
-	gr := GenericResult{}
+	gr := &Customer{}
 	if err := actor.Get(
 		context.Background(),
 		RetrieveByEntityID{EntityID: "14nA6UwmK7zAYsxm"},

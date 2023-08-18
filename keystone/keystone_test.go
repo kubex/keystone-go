@@ -41,7 +41,7 @@ func init() {
 		host = "127.0.0.1"
 	}
 	if port == "" {
-		port = "50031"
+		port = "50051"
 	}
 
 	ksGrpcConn, err := grpc.Dial(host+":"+port, grpc.WithTransportCredentials(insecure.NewCredentials()))
