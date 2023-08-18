@@ -30,7 +30,7 @@ func TestWrite(t *testing.T) {
 		James:         "Eagle",
 		AmountPaid:    NewAmount("USD", 123),
 		LeadDate:      time.Now(),
-		UserID:        "user-233",
+		UserID:        "user-231",
 		Address: Address{
 			Line1: "123 Old Street",
 			Line2: "Line 2 is optional",
@@ -68,7 +68,11 @@ func writeCustomers() {
 	log.Println("Marshalling")
 	actor := getTestActor(nil)
 	for i := 0; i < 10000; i++ {
-		actor.Mutate(FakeCustomer(), "Faker Customer x")
+		err := actor.Mutate(FakeCustomer(), "Faker Customer x")
+		if err != nil {
+			log.Println(err)
+			break
+		}
 	}
 	return
 }

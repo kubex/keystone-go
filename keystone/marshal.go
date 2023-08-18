@@ -97,7 +97,7 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 			if field.Type.Kind() == reflect.Struct || field.Type.Kind() == reflect.Pointer {
 				p.fieldsToProperties(fieldValue, field.Type, fOpt.name+".")
 			} else {
-				fmt.Println("skipping unsupported type ", field.Type.Kind())
+				//fmt.Println("skipping unsupported type ", field.Type.Kind())
 			}
 		}
 	}
