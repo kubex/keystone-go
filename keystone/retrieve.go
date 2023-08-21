@@ -15,6 +15,22 @@ type Actor struct {
 	loadedEntity *proto.EntityResponse
 }
 
+func (a *Actor) VendorID() string {
+	return a.connection.appID.GetVendorId()
+}
+
+func (a *Actor) AppID() string {
+	return a.connection.appID.GetAppId()
+}
+
+func (a *Actor) VendorApp() *proto.VendorApp {
+	return &a.connection.appID
+}
+
+func (a *Actor) WorkspaceID() string {
+	return a.workspaceID
+}
+
 func (a *Actor) authorization() *proto.Authorization {
 	return &proto.Authorization{
 		Source:      &a.connection.appID,
