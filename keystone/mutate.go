@@ -25,7 +25,12 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 	encoder := &PropertyEncoder{}
 	mutation := encoder.Marshal(src)
 	mutation.Mutator = a.mutator
+	entityID := encoder.EntityID
 	mutation.Comment = comment
+	if rawEntity, ok := src.(*Entity); ok && entityID == "" {
+		entityID = rawEntity.GetKeystoneID()
+	}
+
 	if entityWithLabels, ok := src.(EntityLabelProvider); ok {
 		mutation.Labels = entityWithLabels.GetKeystoneLabels()
 	}
@@ -47,12 +52,19 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 	}
 	m := &proto.MutateRequest{
 		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
-		EntityId:      encoder.EntityID,
+		EntityId:      entityID,
 		Schema:        &proto.Key{Key: schema.Type, Source: schema.Source}, // TODO: Should probably provide the schema ID if we have it - and verify against the type / source
 		Mutation:      mutation,
 	}
 
-	_, err := a.connection.Mutate(ctx, m)
+	mResp, err := a.connection.Mutate(ctx, m)
+
+	if err == nil && mResp.Success {
+		if entity, ok := src.(*Entity); ok {
+			entity.entityID = mResp.GetEntityId()
+		}
+	}
+
 	return err
 }
 
