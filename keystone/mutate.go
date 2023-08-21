@@ -3,7 +3,6 @@ package keystone
 import (
 	"context"
 	"errors"
-	"log"
 	"reflect"
 
 	"github.com/kubex/keystone-go/proto"
@@ -28,7 +27,7 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 	mutation.Mutator = a.mutator
 	entityID := encoder.EntityID
 	mutation.Comment = comment
-	if rawEntity, ok := src.(*Entity); ok && entityID == "" {
+	if rawEntity, ok := src.(Entity); ok && entityID == "" {
 		entityID = rawEntity.GetKeystoneID()
 	}
 
@@ -60,15 +59,9 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 
 	mResp, err := a.connection.Mutate(ctx, m)
 
-	entity, ok := src.(*Entity)
-	log.Println("Entity Link", entity, ok)
-
-	entityS, ok := src.(Entity)
-	log.Println("Entity Static", entityS, ok)
-
 	if err == nil && mResp.Success {
-		if entity, ok := src.(*Entity); ok {
-			entity.entityID = mResp.GetEntityId()
+		if rawEntity, ok := src.(Entity); ok && entityID == "" {
+			rawEntity.SetKeystoneID(mResp.GetEntityId())
 		}
 	}
 

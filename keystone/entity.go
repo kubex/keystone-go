@@ -1,6 +1,6 @@
 package keystone
 
-type Entity struct {
+type BaseEntity struct {
 	EntityEvents
 	EntityLabels
 	EntityLinks
@@ -10,6 +10,19 @@ type Entity struct {
 	entityID string
 }
 
-func (e *Entity) GetKeystoneID() string {
+func (e *BaseEntity) GetKeystoneID() string {
 	return e.entityID
+}
+
+func (e *BaseEntity) SetKeystoneID(id string) {
+	e.entityID = id
+}
+
+type testEntity struct {
+	BaseEntity
+}
+
+type Entity interface {
+	GetKeystoneID() string
+	SetKeystoneID(id string)
 }
