@@ -14,16 +14,18 @@ func TestActorRetrieveByUnique(t *testing.T) {
 
 	if err := actor.Get(
 		context.Background(),
-		RetrieveByUnique{UniqueID: "user-233", Property: "user_id"},
+		ByUniqueProperty("user-233", "user_id"),
 		cst,
-		WithProperties("address~"),
-		WithDecryptedProperties("name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date", "user_id"),
-		WithLabels(),
-		WithSummary(),
-		WithDatum(),
-		WithChildren("line_items"),
-		WithLinks("gcs"),
-		WithRelationships("user"),
+		RetrieveOptions(
+			WithProperties("address~"),
+			WithDecryptedProperties("name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date", "user_id"),
+			WithLabels(),
+			WithSummary(),
+			WithDatum(),
+			WithChildren("line_items"),
+			WithLinks("gcs"),
+			WithRelationships("user"),
+		),
 	); err != nil {
 		t.Error(err)
 	}
@@ -42,13 +44,15 @@ func TestActorRetrieveByEntityID(t *testing.T) {
 	gr := &Customer{}
 	if err := actor.Get(
 		context.Background(),
-		RetrieveByEntityID{EntityID: "14nA6UwmK7zAYsxm"},
+		ByEntityID("14nA6UwmK7zAYsxm"),
 		gr,
-		WithProperties("address~"),
-		WithDecryptedProperties("name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date"),
-		WithLabels(),
-		WithSummary(),
-		WithDatum(),
+		RetrieveOptions(
+			WithProperties("address~"),
+			WithDecryptedProperties("name", "email", "city", "state", "country", "postcode", "amount_paid", "lead_date"),
+			WithLabels(),
+			WithSummary(),
+			WithDatum(),
+		),
 	); err != nil {
 		t.Error(err)
 	}
@@ -62,7 +66,7 @@ func TestActorFind(t *testing.T) {
 	resp, err := actor.Find(
 		context.Background(),
 		"Customer",
-		[]string{},
+		nil,
 		WhereEquals("name", "John Doe"),
 	)
 

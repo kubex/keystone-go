@@ -4,35 +4,43 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-// Retriever is an interface that defines a retriever
-type Retriever interface {
+// RetrieveBy is an interface that defines a retriever
+type RetrieveBy interface {
 	BaseRequest() *proto.EntityRequest
 }
 
-// RetrieveByEntityID is a retriever that retrieves an entity by its ID
-type RetrieveByEntityID struct {
+// byEntityID is a retriever that retrieves an entity by its ID
+type byEntityID struct {
 	EntityID string
 }
 
-// BaseRequest returns the base RetrieveByEntityID request
-func (l RetrieveByEntityID) BaseRequest() *proto.EntityRequest {
+func ByEntityID(entityID string) RetrieveBy {
+	return byEntityID{EntityID: entityID}
+}
+
+// BaseRequest returns the base byEntityID request
+func (l byEntityID) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
 		EntityId: l.EntityID,
 		View:     &proto.EntityView{},
 	}
 }
 
-// RetrieveByUnique is a retriever that retrieves an entity by its unique ID
-type RetrieveByUnique struct {
+// byUniqueProperty is a retriever that retrieves an entity by its unique ID
+type byUniqueProperty struct {
 	UniqueID string
 	Property string
 }
 
-// BaseRequest returns the base RetrieveByUnique request
-func (l RetrieveByUnique) BaseRequest() *proto.EntityRequest {
+func ByUniqueProperty(uniqueID, property string) RetrieveBy {
+	return byUniqueProperty{UniqueID: uniqueID, Property: property}
+}
+
+// BaseRequest returns the base byUniqueProperty request
+func (l byUniqueProperty) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
 		UniqueId: &proto.IDLookup{
-			SchemaId: "SCHEMAID",
+			SchemaId: "SCHEMAID", //TODO: THIS!
 			Property: l.Property,
 			UniqueId: l.UniqueID,
 		},
@@ -41,10 +49,22 @@ func (l RetrieveByUnique) BaseRequest() *proto.EntityRequest {
 
 // RetrieveOption is an interface for options to be applied to an entity request
 type RetrieveOption interface {
-	Apply(config *proto.EntityRequest)
+	Apply(config *proto.EntityView)
 }
 
-// WithProperties is a retrieve option that loads properties
+type retrieveOptions []RetrieveOption
+
+func (o retrieveOptions) Apply(config *proto.EntityView) {
+	for _, opt := range o {
+		opt.Apply(config)
+	}
+}
+
+func RetrieveOptions(opts ...RetrieveOption) RetrieveOption {
+	return retrieveOptions(opts)
+}
+
+// WithView is a retrieve option that loads properties
 func WithView(name string) RetrieveOption {
 	return viewName{name: name}
 }
@@ -99,67 +119,67 @@ type propertyLoader struct {
 	decrypt    bool
 }
 
-func (l propertyLoader) Apply(config *proto.EntityRequest) {
-	if config.View.Properties == nil {
-		config.View.Properties = make([]*proto.PropertyRequest, 0)
+func (l propertyLoader) Apply(config *proto.EntityView) {
+	if config.Properties == nil {
+		config.Properties = make([]*proto.PropertyRequest, 0)
 	}
 
-	config.View.Properties = append(config.View.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
+	config.Properties = append(config.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
 }
 
 type viewName struct {
 	name string
 }
 
-func (l viewName) Apply(config *proto.EntityRequest) {
-	config.View.Name = l.name
+func (l viewName) Apply(config *proto.EntityView) {
+	config.Name = l.name
 }
 
 type linksLoader struct{ Links []string }
 
-func (l linksLoader) Apply(config *proto.EntityRequest) {
-	if config.View.LinkByType == nil {
-		config.View.LinkByType = make([]*proto.Key, 0)
+func (l linksLoader) Apply(config *proto.EntityView) {
+	if config.LinkByType == nil {
+		config.LinkByType = make([]*proto.Key, 0)
 	}
 	for _, link := range l.Links {
-		config.View.LinkByType = append(config.View.LinkByType, &proto.Key{Key: link})
+		config.LinkByType = append(config.LinkByType, &proto.Key{Key: link})
 	}
 }
 
 type relationshipsLoader struct{ keys []string }
 
-func (l relationshipsLoader) Apply(config *proto.EntityRequest) {
-	if config.View.RelationshipByType == nil {
-		config.View.RelationshipByType = make([]*proto.Key, 0)
+func (l relationshipsLoader) Apply(config *proto.EntityView) {
+	if config.RelationshipByType == nil {
+		config.RelationshipByType = make([]*proto.Key, 0)
 	}
 	for _, key := range l.keys {
-		config.View.RelationshipByType = append(config.View.RelationshipByType, &proto.Key{Key: key})
+		config.RelationshipByType = append(config.RelationshipByType, &proto.Key{Key: key})
 	}
 }
 
 type summaryLoader struct{ summary bool }
 
-func (l summaryLoader) Apply(config *proto.EntityRequest) { config.View.Summary = l.summary }
+func (l summaryLoader) Apply(config *proto.EntityView) { config.Summary = l.summary }
 
 type datumLoader struct{ datum bool }
 
-func (l datumLoader) Apply(config *proto.EntityRequest) { config.View.Datum = l.datum }
+func (l datumLoader) Apply(config *proto.EntityView) { config.Datum = l.datum }
 
 type labelLoader struct{ labels bool }
 
-func (l labelLoader) Apply(config *proto.EntityRequest) { config.View.Labels = l.labels }
+func (l labelLoader) Apply(config *proto.EntityView) { config.Labels = l.labels }
 
 type childrenLoader struct {
 	childType string
 	ids       []string
 }
 
-func (l childrenLoader) Apply(config *proto.EntityRequest) {
-	if config.View.Children == nil {
-		config.View.Children = make([]*proto.ChildRequest, 0)
+func (l childrenLoader) Apply(config *proto.EntityView) {
+	if config.Children == nil {
+		config.Children = make([]*proto.ChildRequest, 0)
 	}
 
-	config.View.Children = append(config.View.Children, &proto.ChildRequest{
+	config.Children = append(config.Children, &proto.ChildRequest{
 		Type: &proto.Key{Key: l.childType},
 		Cid:  l.ids,
 	})

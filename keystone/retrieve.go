@@ -47,14 +47,14 @@ func (a *Actor) SetClient(client string) {
 }
 
 // Get retrieves an entity by the given retrieveBy, storing the result in dst
-func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, opts ...RetrieveOption) error {
+func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{}, retrieve RetrieveOption) error {
 	entityRequest := retrieveBy.BaseRequest()
 	entityRequest.Authorization = a.authorization()
-	for _, opt := range opts {
-		opt.Apply(entityRequest)
+	if retrieve != nil {
+		retrieve.Apply(entityRequest.View)
 	}
 
-	_, loadByUnique := retrieveBy.(RetrieveByUnique)
+	_, loadByUnique := retrieveBy.(byUniqueProperty)
 	_, genericResult := dst.(GenericResult)
 	if loadByUnique && genericResult {
 		return errors.New("invalid retrieveBy and dst combination")
@@ -73,7 +73,7 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 		r.Source = a.authorization().GetSource()
 	}
 
-	if _, ok := retrieveBy.(RetrieveByUnique); ok {
+	if _, ok := retrieveBy.(byUniqueProperty); ok {
 		schema, registered := a.connection.registerType(dst)
 		if !registered {
 			// wait for the type to be registered with the keystone server
@@ -100,11 +100,15 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 }
 
 // Find returns a list of entities matching the given entityType and retrieveProperties
-func (a *Actor) Find(ctx context.Context, entityType string, options ...FindOption) ([]*proto.EntityResponse, error) {
+func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOption, options ...FindOption) ([]*proto.EntityResponse, error) {
 	findRequest := &proto.FindRequest{
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
 		View:          &proto.EntityView{},
+	}
+
+	if retrieve != nil {
+		retrieve.Apply(findRequest.View)
 	}
 
 	fReq := &filterRequest{Properties: []*proto.PropertyRequest{}}
