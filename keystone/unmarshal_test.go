@@ -15,6 +15,16 @@ func TestUnmarshal(t *testing.T) {
 	checkAddress(t, addr)
 }
 
+func TestUnmarshalSlice(t *testing.T) {
+	var addresses []*Address
+	err := UnmarshalSlice([]*proto.EntityResponse{testAddressResponse, testAddressResponse}, &Address{}, addresses)
+	if err != nil {
+		for _, a := range addresses {
+			checkAddress(t, a)
+		}
+	}
+}
+
 func TestUnmarshalGeneric(t *testing.T) {
 	gr := GenericResult{}
 	if err := UnmarshalGeneric(testAddressResponse, gr); err != nil {

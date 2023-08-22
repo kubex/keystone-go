@@ -9,6 +9,26 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+func UnmarshalSlice(resp []*proto.EntityResponse, dstType interface{}, dst any) error {
+	if reflect.TypeOf(dst).Kind() != reflect.Slice {
+		return fmt.Errorf("dst must be a slice")
+	}
+
+	if reflect.TypeOf(dstType).Kind() != reflect.Ptr {
+		return fmt.Errorf("dstType must be a pointer")
+	}
+
+	dstVal := reflect.ValueOf(dst)
+	for _, r := range resp {
+		dstEle := reflect.New(reflect.TypeOf(dstType).Elem())
+		if err := Unmarshal(r, &dstEle); err != nil {
+			return err
+		}
+		reflect.Append(dstVal, dstEle)
+	}
+	return nil
+}
+
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
 	if baseEntity, ok := dst.(Entity); ok {
@@ -64,7 +84,7 @@ func makeEntityPropertyMap(resp *proto.EntityResponse) map[string]*proto.EntityP
 
 func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, children []*proto.EntityChild, dst interface{}, prefix string) error {
 	dstVal := reflect.ValueOf(dst)
-	fmt.Println("entityResponseToDst", dstVal, dstVal.Type(), prefix)
+	//fmt.Println("entityResponseToDst", dstVal, dstVal.Type(), prefix)
 	for dstVal.Kind() == reflect.Pointer || dstVal.Kind() == reflect.Interface {
 		dstVal = dstVal.Elem()
 	}
