@@ -117,7 +117,6 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOp
 		opt.Apply(fReq)
 	}
 
-	findRequest.View.Properties = fReq.Properties
 	findRequest.PropertyFilters = fReq.Filters
 	findRequest.LabelFilters = fReq.Labels
 	findRequest.RelationOf = fReq.RelationOf
