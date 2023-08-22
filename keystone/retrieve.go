@@ -104,6 +104,7 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties 
 	findRequest := &proto.FindRequest{
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
+		View:          &proto.EntityView{},
 	}
 
 	fReq := &filterRequest{Properties: []*proto.PropertyRequest{{Properties: retrieveProperties}}}
@@ -112,9 +113,9 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties 
 		opt.Apply(fReq)
 	}
 
-	findRequest.Properties = fReq.Properties
-	findRequest.Filters = fReq.Filters
-	findRequest.Labels = fReq.Labels
+	findRequest.View.Properties = fReq.Properties
+	findRequest.PropertyFilters = fReq.Filters
+	findRequest.LabelFilters = fReq.Labels
 	findRequest.RelationOf = fReq.RelationOf
 
 	resp, err := a.connection.Find(ctx, findRequest)
