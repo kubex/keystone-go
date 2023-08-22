@@ -15,12 +15,25 @@ func TestUnmarshal(t *testing.T) {
 	checkAddress(t, addr)
 }
 
-func TestUnmarshalSlice(t *testing.T) {
+func TestUnmarshalSlicePointer(t *testing.T) {
 	var addresses []*Address
-	err := UnmarshalSlice([]*proto.EntityResponse{testAddressResponse, testAddressResponse}, &Address{}, addresses)
+	err := UnmarshalSlice([]*proto.EntityResponse{testAddressResponse, testAddressResponse}, addresses)
 	if err != nil {
+		t.Error(err)
+	} else {
 		for _, a := range addresses {
 			checkAddress(t, a)
+		}
+	}
+}
+func TestUnmarshalSlice(t *testing.T) {
+	var addresses []Address
+	err := UnmarshalSlice([]*proto.EntityResponse{testAddressResponse, testAddressResponse}, addresses)
+	if err != nil {
+		t.Error(err)
+	} else {
+		for _, a := range addresses {
+			checkAddress(t, &a)
 		}
 	}
 }

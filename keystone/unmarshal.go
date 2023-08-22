@@ -9,21 +9,19 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-func UnmarshalSlice(resp []*proto.EntityResponse, dstType interface{}, dst any) error {
-	if reflect.TypeOf(dst).Kind() != reflect.Slice {
+func UnmarshalSlice(resp []*proto.EntityResponse, dst any) error {
+	dstT := reflect.TypeOf(dst)
+	if dstT.Kind() != reflect.Slice {
 		return fmt.Errorf("dst must be a slice")
 	}
-
-	if reflect.TypeOf(dstType).Kind() != reflect.Ptr {
-		return fmt.Errorf("dstType must be a pointer")
-	}
-
+	dstTE := dstT.Elem()
 	dstVal := reflect.ValueOf(dst)
 	for _, r := range resp {
-		dstEle := reflect.New(reflect.TypeOf(dstType).Elem())
+		dstEle := reflect.New(dstTE).Elem()
 		if err := Unmarshal(r, &dstEle); err != nil {
 			return err
 		}
+
 		reflect.Append(dstVal, dstEle)
 	}
 	return nil
