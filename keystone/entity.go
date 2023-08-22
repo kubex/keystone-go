@@ -7,15 +7,15 @@ type BaseEntity struct {
 	EntityLogger
 	EntityRelationships
 
-	entityID string
+	_entityID string
 }
 
 func (e *BaseEntity) GetKeystoneID() string {
-	return e.entityID
+	return e._entityID
 }
 
 func (e *BaseEntity) SetKeystoneID(id string) {
-	e.entityID = id
+	e._entityID = id
 }
 
 type testEntity struct {

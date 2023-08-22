@@ -11,6 +11,9 @@ import (
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
+	if baseEntity, ok := dst.(Entity); ok {
+		baseEntity.SetKeystoneID(resp.GetEntity().GetEntityId())
+	}
 	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
 		entityWithLinks.SetKeystoneLinks(resp.GetLinks())
 	}
