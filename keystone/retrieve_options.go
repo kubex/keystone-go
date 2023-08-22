@@ -18,6 +18,7 @@ type RetrieveByEntityID struct {
 func (l RetrieveByEntityID) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
 		EntityId: l.EntityID,
+		View:     &proto.EntityView{},
 	}
 }
 
@@ -41,6 +42,11 @@ func (l RetrieveByUnique) BaseRequest() *proto.EntityRequest {
 // RetrieveOption is an interface for options to be applied to an entity request
 type RetrieveOption interface {
 	Apply(config *proto.EntityRequest)
+}
+
+// WithProperties is a retrieve option that loads properties
+func WithView(name string) RetrieveOption {
+	return viewName{name: name}
 }
 
 // WithProperties is a retrieve option that loads properties
@@ -94,46 +100,54 @@ type propertyLoader struct {
 }
 
 func (l propertyLoader) Apply(config *proto.EntityRequest) {
-	if config.Properties == nil {
-		config.Properties = make([]*proto.PropertyRequest, 0)
+	if config.View.Properties == nil {
+		config.View.Properties = make([]*proto.PropertyRequest, 0)
 	}
 
-	config.Properties = append(config.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
+	config.View.Properties = append(config.View.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
+}
+
+type viewName struct {
+	name string
+}
+
+func (l viewName) Apply(config *proto.EntityRequest) {
+	config.View.Name = l.name
 }
 
 type linksLoader struct{ Links []string }
 
 func (l linksLoader) Apply(config *proto.EntityRequest) {
-	if config.LinkByType == nil {
-		config.LinkByType = make([]*proto.Key, 0)
+	if config.View.LinkByType == nil {
+		config.View.LinkByType = make([]*proto.Key, 0)
 	}
 	for _, link := range l.Links {
-		config.LinkByType = append(config.LinkByType, &proto.Key{Key: link})
+		config.View.LinkByType = append(config.View.LinkByType, &proto.Key{Key: link})
 	}
 }
 
 type relationshipsLoader struct{ keys []string }
 
 func (l relationshipsLoader) Apply(config *proto.EntityRequest) {
-	if config.RelationshipByType == nil {
-		config.RelationshipByType = make([]*proto.Key, 0)
+	if config.View.RelationshipByType == nil {
+		config.View.RelationshipByType = make([]*proto.Key, 0)
 	}
 	for _, key := range l.keys {
-		config.RelationshipByType = append(config.RelationshipByType, &proto.Key{Key: key})
+		config.View.RelationshipByType = append(config.View.RelationshipByType, &proto.Key{Key: key})
 	}
 }
 
 type summaryLoader struct{ summary bool }
 
-func (l summaryLoader) Apply(config *proto.EntityRequest) { config.Summary = l.summary }
+func (l summaryLoader) Apply(config *proto.EntityRequest) { config.View.Summary = l.summary }
 
 type datumLoader struct{ datum bool }
 
-func (l datumLoader) Apply(config *proto.EntityRequest) { config.Datum = l.datum }
+func (l datumLoader) Apply(config *proto.EntityRequest) { config.View.Datum = l.datum }
 
 type labelLoader struct{ labels bool }
 
-func (l labelLoader) Apply(config *proto.EntityRequest) { config.Labels = l.labels }
+func (l labelLoader) Apply(config *proto.EntityRequest) { config.View.Labels = l.labels }
 
 type childrenLoader struct {
 	childType string
@@ -141,11 +155,11 @@ type childrenLoader struct {
 }
 
 func (l childrenLoader) Apply(config *proto.EntityRequest) {
-	if config.Children == nil {
-		config.Children = make([]*proto.ChildRequest, 0)
+	if config.View.Children == nil {
+		config.View.Children = make([]*proto.ChildRequest, 0)
 	}
 
-	config.Children = append(config.Children, &proto.ChildRequest{
+	config.View.Children = append(config.View.Children, &proto.ChildRequest{
 		Type: &proto.Key{Key: l.childType},
 		Cid:  l.ids,
 	})

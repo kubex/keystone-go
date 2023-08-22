@@ -60,14 +60,16 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 		return errors.New("invalid retrieveBy and dst combination")
 	}
 
+	view := entityRequest.View
+
 	// set source
-	for _, p := range entityRequest.Properties {
+	for _, p := range view.Properties {
 		p.Source = a.authorization().GetSource()
 	}
-	for _, l := range entityRequest.LinkByType {
+	for _, l := range view.LinkByType {
 		l.Source = a.authorization().GetSource()
 	}
-	for _, r := range entityRequest.RelationshipByType {
+	for _, r := range view.RelationshipByType {
 		r.Source = a.authorization().GetSource()
 	}
 
