@@ -25,9 +25,9 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 	encoder := &PropertyEncoder{}
 	mutation := encoder.Marshal(src)
 	mutation.Mutator = a.mutator
-	entityID := encoder.EntityID
+	entityID := ""
 	mutation.Comment = comment
-	if rawEntity, ok := src.(Entity); ok && entityID == "" {
+	if rawEntity, ok := src.(Entity); ok {
 		entityID = rawEntity.GetKeystoneID()
 	}
 

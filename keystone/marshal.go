@@ -10,12 +10,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// EntityIDKey is the key for the entity ID property
-const EntityIDKey = "_entity_id"
-
 // PropertyEncoder extracts properties and children from an entity
 type PropertyEncoder struct {
-	EntityID   string
 	properties []*proto.EntityProperty
 	children   []*proto.EntityChild
 }
@@ -35,11 +31,7 @@ func (p *PropertyEncoder) Marshal(entity interface{}) *proto.Mutation {
 func (p *PropertyEncoder) getProperties() []*proto.EntityProperty {
 	var properties []*proto.EntityProperty
 	for _, prop := range p.properties {
-		if prop.Property.Key[0] == '_' {
-			if prop.Property.Key == EntityIDKey && prop.Value.Text != "" {
-				p.EntityID = prop.Value.Text
-			}
-		} else {
+		if prop.Property.Key[0] != '_' {
 			properties = append(properties, prop)
 		}
 	}

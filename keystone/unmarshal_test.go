@@ -39,9 +39,6 @@ func TestMakeEntityPropertyMap(t *testing.T) {
 	if len(result) != 4 {
 		t.Error("wrong number of properties")
 	}
-	if result[EntityIDKey].Value.Text != "xxx-xxxx" {
-		t.Error("_entity_id not set")
-	}
 	if result["line1"].Value.Text != "123 Fake St." {
 		t.Error("line1 not set")
 	}

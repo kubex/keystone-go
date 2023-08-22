@@ -52,13 +52,7 @@ func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 }
 
 func makeEntityPropertyMap(resp *proto.EntityResponse) map[string]*proto.EntityProperty {
-	//log.Println(resp.GetProperties())
-	entityPropertyMap := map[string]*proto.EntityProperty{
-		EntityIDKey: {
-			Property: &proto.Key{Key: EntityIDKey},
-			Value:    &proto.Value{Text: resp.Entity.EntityId},
-		},
-	}
+	entityPropertyMap := map[string]*proto.EntityProperty{}
 	for _, p := range resp.GetProperties() {
 		entityPropertyMap[p.Property.Key] = p
 	}
