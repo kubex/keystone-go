@@ -10,17 +10,24 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-func typeToSchema(input interface{}) *proto.Schema {
+func baseType(input interface{}) reflect.Type {
 	v := reflect.ValueOf(input)
 	t := v.Type()
 
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
+	return t
+}
 
-	name := strings.ReplaceAll(snakeCase(t.Name()), "_", " ")
+func Type(input interface{}) string { return ksType(baseType(input)) }
+func ksType(p reflect.Type) string  { return strings.ReplaceAll(snakeCase(p.Name()), "_", " ") }
+
+func typeToSchema(input interface{}) *proto.Schema {
+
+	t := baseType(input)
 	returnSchema := &proto.Schema{
-		Name: name,
+		Name: ksType(t),
 		Type: t.Name(),
 	}
 

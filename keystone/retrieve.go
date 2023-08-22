@@ -100,14 +100,14 @@ func (a *Actor) Get(ctx context.Context, retrieveBy Retriever, dst interface{}, 
 }
 
 // Find returns a list of entities matching the given entityType and retrieveProperties
-func (a *Actor) Find(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
+func (a *Actor) Find(ctx context.Context, entityType string, options ...FindOption) ([]*proto.EntityResponse, error) {
 	findRequest := &proto.FindRequest{
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
 		View:          &proto.EntityView{},
 	}
 
-	fReq := &filterRequest{Properties: []*proto.PropertyRequest{{Properties: retrieveProperties}}}
+	fReq := &filterRequest{Properties: []*proto.PropertyRequest{}}
 
 	for _, opt := range options {
 		opt.Apply(fReq)
