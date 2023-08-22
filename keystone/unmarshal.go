@@ -9,21 +9,48 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
-func UnmarshalSlice(resp []*proto.EntityResponse, dst any) error {
-	dstT := reflect.TypeOf(dst)
-	if dstT.Kind() != reflect.Slice {
-		return fmt.Errorf("dst must be a slice")
+func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
+	dstT := reflect.TypeOf(dstPtr)
+	if dstT.Kind() != reflect.Pointer || dstT.Elem().Kind() != reflect.Slice {
+		return fmt.Errorf("dst must be a slice pointer")
 	}
-	dstTE := dstT.Elem()
-	dstVal := reflect.ValueOf(dst)
-	for _, r := range resp {
-		dstEle := reflect.New(dstTE).Elem()
-		if err := Unmarshal(r, &dstEle); err != nil {
+
+	valuePtr := reflect.ValueOf(dstPtr)
+	sliceLen := valuePtr.Elem().Len()
+	appendLen := len(resp)
+	dst := valuePtr.Elem()
+
+	// Pointer > Slice > Slice Element
+	elementType := dstT.Elem().Elem()
+	pointer := elementType.Kind() == reflect.Ptr
+	finalSlice := reflect.MakeSlice(reflect.SliceOf(elementType), sliceLen+appendLen, sliceLen+appendLen)
+
+	for x := 0; x < sliceLen; x++ {
+		finalSlice.Index(x).Set(dst.Index(x))
+	}
+
+	if pointer {
+		elementType = elementType.Elem()
+	}
+
+	for i, r := range resp {
+		dstEle := reflect.New(elementType)
+		ifa := dstEle.Interface()
+		if err := Unmarshal(r, &ifa); err != nil {
 			return err
 		}
-
-		reflect.Append(dstVal, dstEle)
+		val := reflect.ValueOf(ifa)
+		if pointer {
+			val = reflect.ValueOf(&ifa)
+		}
+		if val.Kind() == reflect.Ptr {
+			val = reflect.ValueOf(val.Elem().Interface())
+		}
+		finalSlice.Index(i + sliceLen).Set(val)
 	}
+
+	dst.Set(finalSlice)
+
 	return nil
 }
 

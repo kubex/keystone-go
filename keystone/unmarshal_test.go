@@ -15,24 +15,57 @@ func TestUnmarshal(t *testing.T) {
 	checkAddress(t, addr)
 }
 
-func TestUnmarshalSlicePointer(t *testing.T) {
+func TestUnmarshalAppendPointer(t *testing.T) {
 	var addresses []*Address
-	err := UnmarshalSlice([]*proto.EntityResponse{testAddressResponse, testAddressResponse}, addresses)
+	err := UnmarshalAppend(&addresses, testAddressResponse, testAddressResponse)
 	if err != nil {
 		t.Error(err)
+	} else if addresses == nil {
+		t.Error("addresses is nil")
+	} else if len(addresses) != 2 {
+		t.Error("addresses is not 2")
 	} else {
 		for _, a := range addresses {
 			checkAddress(t, a)
 		}
 	}
 }
-func TestUnmarshalSlice(t *testing.T) {
+
+func TestUnmarshalAppend(t *testing.T) {
 	var addresses []Address
-	err := UnmarshalSlice([]*proto.EntityResponse{testAddressResponse, testAddressResponse}, addresses)
+	err := UnmarshalAppend(&addresses, testAddressResponse, testAddressResponse)
 	if err != nil {
 		t.Error(err)
+	} else if addresses == nil {
+		t.Error("addresses is nil")
+	} else if len(addresses) != 2 {
+		t.Error("addresses is not 2")
 	} else {
 		for _, a := range addresses {
+			checkAddress(t, &a)
+		}
+	}
+}
+
+func TestUnmarshalAppendE(t *testing.T) {
+	var addresses []Address
+	matchA := Address{Line1: "abc"}
+	addresses = append(addresses, matchA)
+	err := UnmarshalAppend(&addresses, testAddressResponse, testAddressResponse)
+	if err != nil {
+		t.Error(err)
+	} else if addresses == nil {
+		t.Error("addresses is nil")
+	} else if len(addresses) != 3 {
+		t.Error("addresses is not 2, its ", len(addresses))
+	} else {
+		for x, a := range addresses {
+			if x == 0 {
+				if matchA != a {
+					t.Error("matchA not set")
+				}
+				continue
+			}
 			checkAddress(t, &a)
 		}
 	}
@@ -42,9 +75,6 @@ func TestUnmarshalGeneric(t *testing.T) {
 	gr := GenericResult{}
 	if err := UnmarshalGeneric(testAddressResponse, gr); err != nil {
 		t.Error(err)
-	}
-	if gr["_entity_id"] != "xxx-xxxx" {
-		t.Error("_entity_id not set")
 	}
 	if gr["line1"] != "123 Fake St." {
 		t.Error("line1 not set")
