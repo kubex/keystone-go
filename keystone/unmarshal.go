@@ -36,7 +36,7 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 	for i, r := range resp {
 		dstEle := reflect.New(elementType)
 		ifa := dstEle.Interface()
-		if err := Unmarshal(r, &ifa); err != nil {
+		if err := Unmarshal(r, ifa); err != nil {
 			return err
 		}
 		val := reflect.ValueOf(ifa)
@@ -56,16 +56,19 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
-	if baseEntity, ok := dst.(Entity); ok {
-		baseEntity.SetKeystoneID(resp.GetEntity().GetEntityId())
-	}
 	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
 		entityWithLinks.SetKeystoneLinks(resp.GetLinks())
 	}
 	if entityWithRelationships, ok := dst.(EntityRelationshipProvider); ok {
 		entityWithRelationships.SetKeystoneRelationships(resp.GetRelationships())
 	}
-	return entityResponseToDst(entityPropertyMap, resp.Children, dst, "")
+	err := entityResponseToDst(entityPropertyMap, resp.Children, dst, "")
+
+	if baseEntity, ok := dst.(Entity); ok {
+		baseEntity.SetKeystoneID(resp.GetEntity().GetEntityId())
+	}
+
+	return err
 }
 
 func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {

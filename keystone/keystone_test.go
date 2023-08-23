@@ -99,6 +99,7 @@ func (l LineItem) ChildID() string {
 }
 
 type Address struct {
+	BaseEntity
 	Line1 string
 	Line2 string
 	City  string

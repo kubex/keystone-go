@@ -61,7 +61,7 @@ func TestUnmarshalAppendE(t *testing.T) {
 	} else {
 		for x, a := range addresses {
 			if x == 0 {
-				if matchA != a {
+				if reflect.DeepEqual(matchA, a) {
 					t.Error("matchA not set")
 				}
 				continue
