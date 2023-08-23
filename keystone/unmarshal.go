@@ -156,7 +156,7 @@ func setFieldValue(field reflect.StructField, fieldValue reflect.Value, fieldOpt
 		//fmt.Println("no value", fieldOpt.name)
 		return
 	}
-	fmt.Println("setting field", fieldOpt.name, storedProperty.Value, field.Name)
+	//fmt.Println("setting field", fieldOpt.name, storedProperty.Value, field.Name)
 	switch field.Type.Kind() {
 	case reflect.String:
 		fieldValue.SetString(storedProperty.Value.Text)
