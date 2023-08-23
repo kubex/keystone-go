@@ -55,6 +55,8 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 }
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
+	//TODO: Support _count_relation_::type
+	//TODO: Support _count_relation_vendor:app:type
 	entityPropertyMap := makeEntityPropertyMap(resp)
 	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
 		entityWithLinks.SetKeystoneLinks(resp.GetLinks())

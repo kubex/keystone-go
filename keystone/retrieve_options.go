@@ -64,11 +64,6 @@ func RetrieveOptions(opts ...RetrieveOption) RetrieveOption {
 	return retrieveOptions(opts)
 }
 
-// WithView is a retrieve option that loads properties
-func WithView(name string) RetrieveOption {
-	return viewName{name: name}
-}
-
 // WithProperties is a retrieve option that loads properties
 func WithProperties(properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties}
@@ -94,16 +89,6 @@ func WithRelationships(keys ...string) RetrieveOption {
 	return relationshipsLoader{keys: keys}
 }
 
-// WithSummary is a retrieve option that loads summaries
-func WithSummary() RetrieveOption {
-	return summaryLoader{summary: true}
-}
-
-// WithDatum is a retrieve option that loads datum
-func WithDatum() RetrieveOption {
-	return datumLoader{datum: true}
-}
-
 // WithLabels is a retrieve option that loads labels
 func WithLabels() RetrieveOption {
 	return labelLoader{labels: true}
@@ -125,14 +110,6 @@ func (l propertyLoader) Apply(config *proto.EntityView) {
 	}
 
 	config.Properties = append(config.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
-}
-
-type viewName struct {
-	name string
-}
-
-func (l viewName) Apply(config *proto.EntityView) {
-	config.Name = l.name
 }
 
 type linksLoader struct{ Links []string }
@@ -157,18 +134,6 @@ func (l relationshipsLoader) Apply(config *proto.EntityView) {
 	}
 }
 
-type summaryLoader struct{ summary bool }
-
-func (l summaryLoader) Apply(config *proto.EntityView) { config.Summary = l.summary }
-
-type datumLoader struct{ datum bool }
-
-func (l datumLoader) Apply(config *proto.EntityView) { config.Datum = l.datum }
-
-type labelLoader struct{ labels bool }
-
-func (l labelLoader) Apply(config *proto.EntityView) { config.Labels = l.labels }
-
 type childrenLoader struct {
 	childType string
 	ids       []string
@@ -184,3 +149,47 @@ func (l childrenLoader) Apply(config *proto.EntityView) {
 		Cid:  l.ids,
 	})
 }
+
+type viewName struct{ name string }
+
+func (l viewName) Apply(config *proto.EntityView) { config.Name = l.name }
+func WithView(name string) RetrieveOption {
+	return viewName{name: name}
+}
+
+type summaryLoader struct{ summary bool }
+
+func (l summaryLoader) Apply(config *proto.EntityView) { config.Summary = l.summary }
+
+// WithSummary is a retrieve option that loads summaries
+func WithSummary() RetrieveOption {
+	return summaryLoader{summary: true}
+}
+
+type datumLoader struct{ datum bool }
+
+func (l datumLoader) Apply(config *proto.EntityView) { config.Datum = l.datum }
+
+// WithDatum is a retrieve option that loads datum
+func WithDatum() RetrieveOption {
+	return datumLoader{datum: true}
+}
+
+type labelLoader struct{ labels bool }
+
+func (l labelLoader) Apply(config *proto.EntityView) { config.Labels = l.labels }
+
+type relationshipCount struct{ count bool }
+
+func (l relationshipCount) Apply(config *proto.EntityView) { config.RelationshipCount = l.count }
+func WithRelationshipCount() RetrieveOption                { return relationshipCount{count: true} }
+
+type childCount struct{ count bool }
+
+func (l childCount) Apply(config *proto.EntityView) { config.ChildCount = l.count }
+func WithChildCount() RetrieveOption                { return relationshipCount{count: true} }
+
+type linkCount struct{ count bool }
+
+func (l linkCount) Apply(config *proto.EntityView) { config.LinkCount = l.count }
+func WithLinkCount() RetrieveOption                { return relationshipCount{count: true} }
