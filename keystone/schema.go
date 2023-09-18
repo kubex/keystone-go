@@ -25,14 +25,14 @@ func baseType(input interface{}) reflect.Type {
 	return t
 }
 
-func Type(input interface{}) string { return ksType(baseType(input)) }
-func ksType(p reflect.Type) string  { return strings.ReplaceAll(snakeCase(p.Name()), "_", " ") }
+func Type(input interface{}) string  { return baseType(input).Name() }
+func TypeName(p reflect.Type) string { return strings.ReplaceAll(snakeCase(p.Name()), "_", " ") }
 
 func typeToSchema(input interface{}) schemaDef {
 
 	t := baseType(input)
 	returnSchema := &proto.Schema{
-		Name: ksType(t),
+		Name: TypeName(t),
 		Type: t.Name(),
 	}
 
