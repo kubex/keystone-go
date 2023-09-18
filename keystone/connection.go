@@ -162,11 +162,6 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 						Schema:        toRegister.schema,
 					})
 
-					schemaKey := &proto.Key{
-						Source: toRegister.schema.GetSource(),
-						Key:    toRegister.schema.GetType(),
-					}
-
 					if err == nil {
 						c.typeRegister[typ].schema.Id = resp.GetId()
 						c.typeRegister[typ].schema.Name = resp.GetName()
@@ -176,6 +171,11 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 						c.typeRegister[typ].schema.Options = resp.GetOptions()
 						c.typeRegister[typ].schema.Singular = resp.GetSingular()
 						c.typeRegister[typ].schema.Plural = resp.GetPlural()
+					}
+
+					schemaKey := &proto.Key{
+						Source: resp.GetSource(),
+						Key:    resp.GetType(),
 					}
 
 					if toRegister.definition.ActiveDataSets != nil {
