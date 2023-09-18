@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KeystoneClient interface {
 	Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error)
+	ApplyADS(ctx context.Context, in *ADS, opts ...grpc.CallOption) (*GenericResponse, error)
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
 	Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error)
@@ -43,6 +44,15 @@ func NewKeystoneClient(cc grpc.ClientConnInterface) KeystoneClient {
 func (c *keystoneClient) Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/Define", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) ApplyADS(ctx context.Context, in *ADS, opts ...grpc.CallOption) (*GenericResponse, error) {
+	out := new(GenericResponse)
+	err := c.cc.Invoke(ctx, "/kubex.keystone.Keystone/ApplyADS", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +118,7 @@ func (c *keystoneClient) ADSList(ctx context.Context, in *ADSListRequest, opts .
 // for forward compatibility
 type KeystoneServer interface {
 	Define(context.Context, *SchemaRequest) (*Schema, error)
+	ApplyADS(context.Context, *ADS) (*GenericResponse, error)
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
 	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
 	Logs(context.Context, *LogRequest) (*LogsResponse, error)
@@ -124,6 +135,9 @@ type UnimplementedKeystoneServer struct {
 
 func (UnimplementedKeystoneServer) Define(context.Context, *SchemaRequest) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Define not implemented")
+}
+func (UnimplementedKeystoneServer) ApplyADS(context.Context, *ADS) (*GenericResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyADS not implemented")
 }
 func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*MutateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Mutate not implemented")
@@ -170,6 +184,24 @@ func _Keystone_Define_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KeystoneServer).Define(ctx, req.(*SchemaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keystone_ApplyADS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ADS)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).ApplyADS(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kubex.keystone.Keystone/ApplyADS",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).ApplyADS(ctx, req.(*ADS))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -292,6 +324,10 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Define",
 			Handler:    _Keystone_Define_Handler,
+		},
+		{
+			MethodName: "ApplyADS",
+			Handler:    _Keystone_ApplyADS_Handler,
 		},
 		{
 			MethodName: "Mutate",

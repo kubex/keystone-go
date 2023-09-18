@@ -20,7 +20,7 @@ type Connection struct {
 	timeLogConfig *logger.TimedLogConfig
 	appID         proto.VendorApp
 	token         string
-	typeRegister  map[reflect.Type]*proto.Schema
+	typeRegister  map[reflect.Type]schemaDef
 	registerQueue map[reflect.Type]bool // true if the type is processing registration
 }
 
@@ -37,7 +37,7 @@ func NewConnection(client proto.KeystoneClient, vendorID, appID, accessToken str
 		client:        client,
 		appID:         proto.VendorApp{VendorId: vendorID, AppId: appID},
 		token:         accessToken,
-		typeRegister:  make(map[reflect.Type]*proto.Schema),
+		typeRegister:  make(map[reflect.Type]schemaDef),
 		registerQueue: make(map[reflect.Type]bool),
 	}
 }
@@ -91,6 +91,13 @@ func (c *Connection) ADSList(ctx context.Context, in *proto.ADSListRequest, opts
 	return resp, err
 }
 
+func (c *Connection) ApplyADS(ctx context.Context, in *proto.ADS, opts ...grpc.CallOption) (*proto.GenericResponse, error) {
+	tl := c.timeLogConfig.NewLog("ADSList", zap.String("schema", in.GetSchema().GetKey()), zap.String("ADS", in.GetName()))
+	resp, err := c.client.ApplyADS(ctx, in, opts...)
+	c.logger.TimedLog(tl)
+	return resp, err
+}
+
 func (c *Connection) authorization() *proto.Authorization {
 	return &proto.Authorization{
 		Source: &c.appID,
@@ -131,14 +138,14 @@ func (c *Connection) registerType(t interface{}) (*proto.Schema, bool) {
 		typ = typ.Elem()
 	}
 
-	schema, ok := c.typeRegister[typ]
+	sDef, ok := c.typeRegister[typ]
 	if !ok {
-		newSchema := typeToSchema(t)
-		c.typeRegister[typ] = newSchema
+		newDef := typeToSchema(t)
+		c.typeRegister[typ] = newDef
 		c.registerQueue[typ] = false
-		return newSchema, false
+		return newDef.schema, false
 	}
-	return schema, true
+	return sDef.schema, true
 }
 
 // SyncSchema syncs the schema with the server
@@ -152,18 +159,28 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 					log.Println("Registering type", typ)
 					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
 						Authorization: c.authorization(),
-						Schema:        toRegister,
+						Schema:        toRegister.schema,
 					})
 					if err == nil {
-						c.typeRegister[typ].Id = resp.GetId()
-						c.typeRegister[typ].Name = resp.GetName()
-						c.typeRegister[typ].Source = resp.GetSource()
-						c.typeRegister[typ].Type = resp.GetType()
-						c.typeRegister[typ].Properties = resp.GetProperties()
-						c.typeRegister[typ].Options = resp.GetOptions()
-						c.typeRegister[typ].Singular = resp.GetSingular()
-						c.typeRegister[typ].Plural = resp.GetPlural()
+						c.typeRegister[typ].schema.Id = resp.GetId()
+						c.typeRegister[typ].schema.Name = resp.GetName()
+						c.typeRegister[typ].schema.Source = resp.GetSource()
+						c.typeRegister[typ].schema.Type = resp.GetType()
+						c.typeRegister[typ].schema.Properties = resp.GetProperties()
+						c.typeRegister[typ].schema.Options = resp.GetOptions()
+						c.typeRegister[typ].schema.Singular = resp.GetSingular()
+						c.typeRegister[typ].schema.Plural = resp.GetPlural()
 					}
+
+					if toRegister.definition.ActiveDataSets != nil {
+						for _, ads := range toRegister.definition.ActiveDataSets {
+							adsResp, adsErr := c.ApplyADS(context.Background(), ads)
+							if adsErr != nil || !adsResp.GetSuccess() {
+								log.Println("Error applying ADS", adsErr, adsResp)
+							}
+						}
+					}
+
 				}
 				wg.Done()
 			}

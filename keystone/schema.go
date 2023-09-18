@@ -10,6 +10,11 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+type schemaDef struct {
+	schema     *proto.Schema
+	definition TypeDefinition
+}
+
 func baseType(input interface{}) reflect.Type {
 	v := reflect.ValueOf(input)
 	t := v.Type()
@@ -23,7 +28,7 @@ func baseType(input interface{}) reflect.Type {
 func Type(input interface{}) string { return ksType(baseType(input)) }
 func ksType(p reflect.Type) string  { return strings.ReplaceAll(snakeCase(p.Name()), "_", " ") }
 
-func typeToSchema(input interface{}) *proto.Schema {
+func typeToSchema(input interface{}) schemaDef {
 
 	t := baseType(input)
 	returnSchema := &proto.Schema{
@@ -31,8 +36,12 @@ func typeToSchema(input interface{}) *proto.Schema {
 		Type: t.Name(),
 	}
 
+	retDef := schemaDef{schema: returnSchema, definition: TypeDefinition{}}
+
 	if definer, ok := input.(EntityDefinition); ok {
 		def := definer.GetKeystoneDefinition()
+		retDef.definition = def
+
 		if def.Name != "" {
 			returnSchema.Name = def.Name
 		}
@@ -49,7 +58,7 @@ func typeToSchema(input interface{}) *proto.Schema {
 
 	returnSchema.Properties = getProperties(t, "")
 
-	return returnSchema
+	return retDef
 }
 
 func getProperties(t reflect.Type, prefix string) []*proto.Property {
