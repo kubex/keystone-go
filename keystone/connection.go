@@ -161,6 +161,12 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 						Authorization: c.authorization(),
 						Schema:        toRegister.schema,
 					})
+
+					schemaKey := &proto.Key{
+						Source: toRegister.schema.GetSource(),
+						Key:    toRegister.schema.GetType(),
+					}
+
 					if err == nil {
 						c.typeRegister[typ].schema.Id = resp.GetId()
 						c.typeRegister[typ].schema.Name = resp.GetName()
@@ -174,6 +180,7 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 
 					if toRegister.definition.ActiveDataSets != nil {
 						for _, ads := range toRegister.definition.ActiveDataSets {
+							ads.Schema = schemaKey
 							adsResp, adsErr := c.ApplyADS(context.Background(), ads)
 							if adsErr != nil || !adsResp.GetSuccess() {
 								log.Println("Error applying ADS", adsErr, adsResp)
