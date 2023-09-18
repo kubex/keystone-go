@@ -2,6 +2,8 @@ package keystone
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"log"
 	"reflect"
 	"regexp"
@@ -25,15 +27,24 @@ func baseType(input interface{}) reflect.Type {
 	return t
 }
 
-func Type(input interface{}) string  { return baseType(input).Name() }
-func TypeName(p reflect.Type) string { return strings.ReplaceAll(snakeCase(p.Name()), "_", " ") }
+func Type(input interface{}) string {
+	return getType(baseType(input))
+}
+
+func getType(p reflect.Type) string {
+	return strings.ReplaceAll(snakeCase(p.Name()), "_", "-")
+}
+
+func typeToName(ksType string) string {
+	return cases.Title(language.English).String(strings.ReplaceAll(ksType, "-", " "))
+}
 
 func typeToSchema(input interface{}) schemaDef {
-
 	t := baseType(input)
+	ksType := getType(t)
 	returnSchema := &proto.Schema{
-		Name: TypeName(t),
-		Type: t.Name(),
+		Name: typeToName(ksType),
+		Type: ksType,
 	}
 
 	retDef := schemaDef{schema: returnSchema, definition: TypeDefinition{}}
