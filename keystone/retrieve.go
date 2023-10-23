@@ -15,6 +15,8 @@ type Actor struct {
 	loadedEntity *proto.EntityResponse
 }
 
+func (a *Actor) ReplaceConnection(c *Connection) { a.connection = c }
+
 func (a *Actor) VendorID() string {
 	return a.connection.appID.GetVendorId()
 }
