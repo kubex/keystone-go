@@ -21,8 +21,8 @@ func ByEntityID(entityID string) RetrieveBy {
 // BaseRequest returns the base byEntityID request
 func (l byEntityID) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
-		EntityId: l.EntityID,
 		View:     &proto.EntityView{},
+		EntityId: l.EntityID,
 	}
 }
 
@@ -39,6 +39,7 @@ func ByUniqueProperty(uniqueID, property string) RetrieveBy {
 // BaseRequest returns the base byUniqueProperty request
 func (l byUniqueProperty) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
+		View: &proto.EntityView{},
 		UniqueId: &proto.IDLookup{
 			SchemaId: "SCHEMAID", //TODO: THIS!
 			Property: l.Property,
