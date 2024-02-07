@@ -102,7 +102,7 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 			continue
 
 		} else if !field.IsExported() {
-			fmt.Println("skipping unexported field ", field.Name)
+			//fmt.Println("skipping unexported field ", field.Name)
 			continue
 		}
 
