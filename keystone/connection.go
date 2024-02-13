@@ -151,8 +151,10 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 				if toRegister, ok := c.typeRegister[typ]; ok {
 					log.Println("Registering type", typ)
 					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
-						Authorization: c.authorization(),
-						Schema:        toRegister.schema,
+						Authorization:  c.authorization(),
+						Schema:         toRegister.schema,
+						ActiveDatasets: toRegister.definition.ActiveDataSets,
+						Views:          toRegister.definition.Views,
 					})
 
 					if err == nil {

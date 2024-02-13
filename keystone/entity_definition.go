@@ -16,4 +16,5 @@ type TypeDefinition struct {
 	Plural         string // Name for a collection of these entities e.g. Users
 	Options        []proto.Schema_Option
 	ActiveDataSets []*proto.ActiveSet
+	Views          []*proto.EntityView
 }
