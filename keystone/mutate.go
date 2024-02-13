@@ -47,6 +47,10 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 		mutation.Events = entityWithEvents.GetKeystoneEvents()
 	}
 
+	if entityWithLogs, ok := src.(EntityLogProvider); ok {
+		mutation.Logs = entityWithLogs.GetKeystoneLogs()
+	}
+
 	if a.loadedEntity != nil {
 		mutation.Properties = a.getChangedProperties(a.loadedEntity, &proto.EntityResponse{Properties: mutation.Properties})
 	}
