@@ -137,7 +137,7 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOp
 
 // List returns a list of entities within an active set
 func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
-	listRequest := &proto.ADSListRequest{
+	listRequest := &proto.ActiveSetListRequest{
 		Authorization: a.authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
 		AdsName:       activeSetName,
@@ -155,7 +155,7 @@ func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retr
 	listRequest.SortProperty = fReq.SortProperty
 	listRequest.SortDirection = fReq.SortDirection
 
-	resp, err := a.connection.ADSList(ctx, listRequest)
+	resp, err := a.connection.ActiveSetList(ctx, listRequest)
 	if err != nil {
 		return nil, err
 	}

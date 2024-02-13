@@ -84,16 +84,9 @@ func (c *Connection) Find(ctx context.Context, in *proto.FindRequest, opts ...gr
 	return resp, err
 }
 
-func (c *Connection) ADSList(ctx context.Context, in *proto.ADSListRequest, opts ...grpc.CallOption) (*proto.ADSListResponse, error) {
+func (c *Connection) ActiveSetList(ctx context.Context, in *proto.ActiveSetListRequest, opts ...grpc.CallOption) (*proto.ActiveSetListResponse, error) {
 	tl := c.timeLogConfig.NewLog("ADSList", zap.String("schema", in.GetSchema().GetKey()), zap.String("ADS", in.GetAdsName()))
-	resp, err := c.client.ADSList(ctx, in, opts...)
-	c.logger.TimedLog(tl)
-	return resp, err
-}
-
-func (c *Connection) ApplyADS(ctx context.Context, in *proto.ADS, opts ...grpc.CallOption) (*proto.GenericResponse, error) {
-	tl := c.timeLogConfig.NewLog("ADSList", zap.String("schema", in.GetSchema().GetKey()), zap.String("ADS", in.GetName()))
-	resp, err := c.client.ApplyADS(ctx, in, opts...)
+	resp, err := c.client.ActiveSetList(ctx, in, opts...)
 	c.logger.TimedLog(tl)
 	return resp, err
 }
@@ -171,21 +164,6 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 						c.typeRegister[typ].schema.Options = resp.GetOptions()
 						c.typeRegister[typ].schema.Singular = resp.GetSingular()
 						c.typeRegister[typ].schema.Plural = resp.GetPlural()
-					}
-
-					schemaKey := &proto.Key{
-						Source: resp.GetSource(),
-						Key:    resp.GetType(),
-					}
-
-					if toRegister.definition.ActiveDataSets != nil {
-						for _, ads := range toRegister.definition.ActiveDataSets {
-							ads.Schema = schemaKey
-							adsResp, adsErr := c.ApplyADS(context.Background(), ads)
-							if adsErr != nil || !adsResp.GetSuccess() {
-								log.Println("Error applying ADS", adsErr, adsResp)
-							}
-						}
 					}
 
 				}

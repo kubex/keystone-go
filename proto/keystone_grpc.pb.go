@@ -19,14 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Keystone_Define_FullMethodName   = "/kubex.keystone.Keystone/Define"
-	Keystone_ApplyADS_FullMethodName = "/kubex.keystone.Keystone/ApplyADS"
-	Keystone_Mutate_FullMethodName   = "/kubex.keystone.Keystone/Mutate"
-	Keystone_Retrieve_FullMethodName = "/kubex.keystone.Keystone/Retrieve"
-	Keystone_Logs_FullMethodName     = "/kubex.keystone.Keystone/Logs"
-	Keystone_Events_FullMethodName   = "/kubex.keystone.Keystone/Events"
-	Keystone_Find_FullMethodName     = "/kubex.keystone.Keystone/Find"
-	Keystone_ADSList_FullMethodName  = "/kubex.keystone.Keystone/ADSList"
+	Keystone_Define_FullMethodName        = "/kubex.keystone.Keystone/Define"
+	Keystone_Mutate_FullMethodName        = "/kubex.keystone.Keystone/Mutate"
+	Keystone_Retrieve_FullMethodName      = "/kubex.keystone.Keystone/Retrieve"
+	Keystone_Logs_FullMethodName          = "/kubex.keystone.Keystone/Logs"
+	Keystone_Events_FullMethodName        = "/kubex.keystone.Keystone/Events"
+	Keystone_Find_FullMethodName          = "/kubex.keystone.Keystone/Find"
+	Keystone_ActiveSetList_FullMethodName = "/kubex.keystone.Keystone/ActiveSetList"
 )
 
 // KeystoneClient is the client API for Keystone service.
@@ -34,14 +33,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KeystoneClient interface {
 	Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error)
-	ApplyADS(ctx context.Context, in *ADS, opts ...grpc.CallOption) (*GenericResponse, error)
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
 	Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error)
 	Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
 	// Active Data Set
-	ADSList(ctx context.Context, in *ADSListRequest, opts ...grpc.CallOption) (*ADSListResponse, error)
+	ActiveSetList(ctx context.Context, in *ActiveSetListRequest, opts ...grpc.CallOption) (*ActiveSetListResponse, error)
 }
 
 type keystoneClient struct {
@@ -55,15 +53,6 @@ func NewKeystoneClient(cc grpc.ClientConnInterface) KeystoneClient {
 func (c *keystoneClient) Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, Keystone_Define_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *keystoneClient) ApplyADS(ctx context.Context, in *ADS, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, Keystone_ApplyADS_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -115,9 +104,9 @@ func (c *keystoneClient) Find(ctx context.Context, in *FindRequest, opts ...grpc
 	return out, nil
 }
 
-func (c *keystoneClient) ADSList(ctx context.Context, in *ADSListRequest, opts ...grpc.CallOption) (*ADSListResponse, error) {
-	out := new(ADSListResponse)
-	err := c.cc.Invoke(ctx, Keystone_ADSList_FullMethodName, in, out, opts...)
+func (c *keystoneClient) ActiveSetList(ctx context.Context, in *ActiveSetListRequest, opts ...grpc.CallOption) (*ActiveSetListResponse, error) {
+	out := new(ActiveSetListResponse)
+	err := c.cc.Invoke(ctx, Keystone_ActiveSetList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,14 +118,13 @@ func (c *keystoneClient) ADSList(ctx context.Context, in *ADSListRequest, opts .
 // for forward compatibility
 type KeystoneServer interface {
 	Define(context.Context, *SchemaRequest) (*Schema, error)
-	ApplyADS(context.Context, *ADS) (*GenericResponse, error)
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
 	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
 	Logs(context.Context, *LogRequest) (*LogsResponse, error)
 	Events(context.Context, *EventRequest) (*EventsResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
 	// Active Data Set
-	ADSList(context.Context, *ADSListRequest) (*ADSListResponse, error)
+	ActiveSetList(context.Context, *ActiveSetListRequest) (*ActiveSetListResponse, error)
 	mustEmbedUnimplementedKeystoneServer()
 }
 
@@ -146,9 +134,6 @@ type UnimplementedKeystoneServer struct {
 
 func (UnimplementedKeystoneServer) Define(context.Context, *SchemaRequest) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Define not implemented")
-}
-func (UnimplementedKeystoneServer) ApplyADS(context.Context, *ADS) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ApplyADS not implemented")
 }
 func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*MutateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Mutate not implemented")
@@ -165,8 +150,8 @@ func (UnimplementedKeystoneServer) Events(context.Context, *EventRequest) (*Even
 func (UnimplementedKeystoneServer) Find(context.Context, *FindRequest) (*FindResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Find not implemented")
 }
-func (UnimplementedKeystoneServer) ADSList(context.Context, *ADSListRequest) (*ADSListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ADSList not implemented")
+func (UnimplementedKeystoneServer) ActiveSetList(context.Context, *ActiveSetListRequest) (*ActiveSetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActiveSetList not implemented")
 }
 func (UnimplementedKeystoneServer) mustEmbedUnimplementedKeystoneServer() {}
 
@@ -195,24 +180,6 @@ func _Keystone_Define_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KeystoneServer).Define(ctx, req.(*SchemaRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Keystone_ApplyADS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ADS)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeystoneServer).ApplyADS(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Keystone_ApplyADS_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeystoneServer).ApplyADS(ctx, req.(*ADS))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -307,20 +274,20 @@ func _Keystone_Find_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keystone_ADSList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ADSListRequest)
+func _Keystone_ActiveSetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActiveSetListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeystoneServer).ADSList(ctx, in)
+		return srv.(KeystoneServer).ActiveSetList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keystone_ADSList_FullMethodName,
+		FullMethod: Keystone_ActiveSetList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeystoneServer).ADSList(ctx, req.(*ADSListRequest))
+		return srv.(KeystoneServer).ActiveSetList(ctx, req.(*ActiveSetListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -335,10 +302,6 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Define",
 			Handler:    _Keystone_Define_Handler,
-		},
-		{
-			MethodName: "ApplyADS",
-			Handler:    _Keystone_ApplyADS_Handler,
 		},
 		{
 			MethodName: "Mutate",
@@ -361,8 +324,8 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keystone_Find_Handler,
 		},
 		{
-			MethodName: "ADSList",
-			Handler:    _Keystone_ADSList_Handler,
+			MethodName: "ActiveSetList",
+			Handler:    _Keystone_ActiveSetList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
