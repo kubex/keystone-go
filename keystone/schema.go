@@ -126,7 +126,7 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 		}
 
 		protoField := &proto.Property{}
-		protoField.DataType, protoField.Classification = getFieldType(field)
+		protoField.DataType, protoField.ExtendedType = getFieldType(field)
 		fOpt.applyTo(protoField)
 
 		returnFields = append(returnFields, protoField)
@@ -155,33 +155,33 @@ func appendOption(protoField *proto.Property, option proto.Property_Option, when
 	}
 }
 
-func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Property_Classification) {
-	defaultClassification := proto.Property_Anonymous
+func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Property_ExtendedType) {
+	extendedType := proto.Property_ExtendedNone
 	switch fieldType.Type.Kind() {
 	case reflect.String:
-		return proto.Property_Text, defaultClassification
+		return proto.Property_Text, extendedType
 	case reflect.Int32, reflect.Int64, reflect.Int:
-		return proto.Property_Number, defaultClassification
+		return proto.Property_Number, extendedType
 	case reflect.Bool:
-		return proto.Property_Boolean, defaultClassification
+		return proto.Property_Boolean, extendedType
 	case reflect.Float32, reflect.Float64:
-		return proto.Property_Float, defaultClassification
+		return proto.Property_Float, extendedType
 	case reflect.Map:
-		return proto.Property_Map, defaultClassification
+		return proto.Property_Map, extendedType
 	case reflect.Slice:
-		return proto.Property_Set, defaultClassification
+		return proto.Property_Set, extendedType
 	}
 
 	switch fieldType.Type {
 	case typeOfSecretString:
 		return proto.Property_Text, proto.Property_Secure
 	case typeOfAmount:
-		return proto.Property_Amount, defaultClassification
+		return proto.Property_Amount, extendedType
 	case typeOfTime:
-		return proto.Property_Time, defaultClassification
+		return proto.Property_Time, extendedType
 	}
 
-	return proto.Property_Text, defaultClassification
+	return proto.Property_Text, extendedType
 }
 
 func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {
@@ -246,9 +246,9 @@ type fieldOptions struct {
 func (fOpt fieldOptions) applyTo(protoField *proto.Property) {
 	protoField.Name = fOpt.name
 	if fOpt.personalData {
-		protoField.Classification = proto.Property_Personal
+		protoField.ExtendedType = proto.Property_Personal
 	} else if fOpt.userInputData {
-		protoField.Classification = proto.Property_UserInput
+		protoField.ExtendedType = proto.Property_UserInput
 	}
 
 	appendOption(protoField, proto.Property_Unique, fOpt.unique)
