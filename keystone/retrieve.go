@@ -64,6 +64,8 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 		retrieve.Apply(entityRequest.View)
 	}
 
+	entityRequest.Schema = &proto.Key{Key: retrieveBy.EntityType(), Source: a.authorization().Source}
+
 	_, loadByUnique := retrieveBy.(byUniqueProperty)
 	_, genericResult := dst.(GenericResult)
 	if loadByUnique && genericResult {

@@ -7,15 +7,17 @@ import (
 // RetrieveBy is an interface that defines a retriever
 type RetrieveBy interface {
 	BaseRequest() *proto.EntityRequest
+	EntityType() string
 }
 
 // byEntityID is a retriever that retrieves an entity by its ID
 type byEntityID struct {
 	EntityID string
+	Type     string
 }
 
-func ByEntityID(entityID string) RetrieveBy {
-	return byEntityID{EntityID: entityID}
+func ByEntityID(entityType interface{}, entityID string) RetrieveBy {
+	return byEntityID{EntityID: entityID, Type: Type(entityType)}
 }
 
 // BaseRequest returns the base byEntityID request
@@ -26,14 +28,17 @@ func (l byEntityID) BaseRequest() *proto.EntityRequest {
 	}
 }
 
+func (l byEntityID) EntityType() string { return l.Type }
+
 // byUniqueProperty is a retriever that retrieves an entity by its unique ID
 type byUniqueProperty struct {
 	UniqueID string
 	Property string
+	Type     string
 }
 
-func ByUniqueProperty(uniqueID, property string) RetrieveBy {
-	return byUniqueProperty{UniqueID: uniqueID, Property: property}
+func ByUniqueProperty(entityType interface{}, uniqueID, property string) RetrieveBy {
+	return byUniqueProperty{UniqueID: uniqueID, Property: property, Type: Type(entityType)}
 }
 
 // BaseRequest returns the base byUniqueProperty request
@@ -47,6 +52,8 @@ func (l byUniqueProperty) BaseRequest() *proto.EntityRequest {
 		},
 	}
 }
+
+func (l byUniqueProperty) EntityType() string { return l.Type }
 
 // RetrieveOption is an interface for options to be applied to an entity request
 type RetrieveOption interface {

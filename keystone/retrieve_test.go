@@ -14,7 +14,7 @@ func TestActorRetrieveByUnique(t *testing.T) {
 
 	if err := actor.Get(
 		context.Background(),
-		ByUniqueProperty("user-233", "user_id"),
+		ByUniqueProperty(cst, "user-233", "user_id"),
 		cst,
 		RetrieveOptions(
 			WithProperties("address~"),
@@ -44,7 +44,7 @@ func TestActorRetrieveByEntityID(t *testing.T) {
 	gr := &Customer{}
 	if err := actor.Get(
 		context.Background(),
-		ByEntityID("14nA6UwmK7zAYsxm"),
+		ByEntityID(gr, "14nA6UwmK7zAYsxm"),
 		gr,
 		RetrieveOptions(
 			WithProperties("address~"),
