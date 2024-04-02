@@ -39,7 +39,7 @@ func (a *Actor) WorkspaceID() string {
 }
 
 func (a *Actor) authorization() *proto.Authorization {
-	if a.connection == nil {
+	if a == nil || a.connection == nil {
 		return nil
 	}
 	return &proto.Authorization{
