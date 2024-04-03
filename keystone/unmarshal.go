@@ -55,9 +55,35 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 }
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
-	//TODO: Support _count_relation_::type
-	//TODO: Support _count_relation_vendor:app:type
 	entityPropertyMap := makeEntityPropertyMap(resp)
+
+	if resp.GetRelationshipCounts() != nil {
+		for _, v := range resp.GetRelationshipCounts() {
+			t := v.GetType()
+			var variants []string
+			if t.GetKey() == "" {
+				variants = []string{"_count_relation"}
+			} else {
+				variants = []string{
+					fmt.Sprintf("_count_relation:%s:%s:%s", t.GetSource().GetVendorId(), t.GetSource().GetAppId(), t.GetKey()),
+					fmt.Sprintf("_count_relation:%s:%s", t.GetSource().GetAppId(), t.GetKey()),
+					fmt.Sprintf("_count_relation:%s", t.GetKey()),
+				}
+			}
+
+			for _, variant := range variants {
+				entityPropertyMap[variant] = &proto.EntityProperty{
+					Property: &proto.Key{
+						Key: variant,
+					},
+					Value: &proto.Value{
+						Int: int64(v.GetCount()),
+					},
+				}
+			}
+		}
+	}
+
 	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
 		entityWithLinks.SetKeystoneLinks(resp.GetLinks())
 	}

@@ -190,7 +190,30 @@ func (l labelLoader) Apply(config *proto.EntityView) { config.Labels = l.labels 
 type relationshipCount struct{ count bool }
 
 func (l relationshipCount) Apply(config *proto.EntityView) { config.RelationshipCount = l.count }
-func WithRelationshipCount() RetrieveOption                { return relationshipCount{count: true} }
+
+type relationshipTypeCount struct{ entityType, appId, vendorId string }
+
+func (l relationshipTypeCount) Apply(config *proto.EntityView) {
+	config.RelationshipByType = append(config.RelationshipByType, &proto.Key{Source: &proto.VendorApp{
+		VendorId: l.vendorId, AppId: l.appId,
+	}, Key: l.entityType})
+}
+
+func WithTotalRelationshipCount() RetrieveOption {
+	return relationshipCount{count: true}
+}
+
+func WithRelationshipCount(entityType, appId, vendorId string) RetrieveOption {
+	if entityType == "" && appId == "" && vendorId == "" {
+		return WithTotalRelationshipCount()
+	} else {
+		return relationshipTypeCount{
+			entityType: entityType,
+			appId:      appId,
+			vendorId:   vendorId,
+		}
+	}
+}
 
 type childCount struct{ count bool }
 
