@@ -47,6 +47,10 @@ func typeToSchema(input interface{}) schemaDef {
 		Type: ksType,
 	}
 
+	if _, ok := input.(ChildEntity); ok {
+		returnSchema.IsChild = true
+	}
+
 	retDef := schemaDef{schema: returnSchema, definition: TypeDefinition{}}
 
 	if definer, ok := input.(EntityDefinition); ok {

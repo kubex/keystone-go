@@ -1,5 +1,7 @@
 package keystone
 
+import "strings"
+
 type BaseEntity struct {
 	EntityEvents
 	EntityLabels
@@ -25,4 +27,17 @@ type testEntity struct {
 type Entity interface {
 	GetKeystoneID() string
 	SetKeystoneID(id string)
+}
+
+type ChildEntity interface {
+	GetKeystoneParentID() string
+}
+
+type BaseChildEntity struct {
+	BaseEntity
+}
+
+func (e *BaseChildEntity) GetKeystoneParentID() string {
+	split := strings.Split(e._entityID, "-")
+	return split[0]
 }

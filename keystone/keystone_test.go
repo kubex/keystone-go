@@ -143,14 +143,15 @@ func (m *MockConnector) Find(ctx context.Context, in *proto.FindRequest, opts ..
 	log.Println(ctx, in, opts)
 	return &proto.FindResponse{}, nil
 }
-func (m *MockConnector) ADSList(ctx context.Context, in *proto.ADSListRequest, opts ...grpc.CallOption) (*proto.ADSListResponse, error) {
+
+/*func (m *MockConnector) ADSList(ctx context.Context, in *proto.ADSListRequest, opts ...grpc.CallOption) (*proto.ADSListResponse, error) {
 	log.Println(ctx, in, opts)
 	return &proto.ADSListResponse{}, nil
 }
 func (m *MockConnector) ApplyADS(ctx context.Context, in *proto.ADS, opts ...grpc.CallOption) (*proto.GenericResponse, error) {
 	log.Println(ctx, in, opts)
 	return &proto.GenericResponse{}, nil
-}
+}*/
 
 func FakeCustomer() *Customer {
 

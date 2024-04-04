@@ -2,15 +2,14 @@ package keystone
 
 import (
 	"context"
+	"github.com/kubex/keystone-go/proto"
 	"github.com/packaged/logger/v3/logger"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 	"log"
 	"reflect"
 	"sync"
 	"time"
-
-	"github.com/kubex/keystone-go/proto"
-	"google.golang.org/grpc"
 )
 
 // Connection is a connection to a keystone server
@@ -116,7 +115,16 @@ func (c *Connection) Actor(workspaceID, remoteIP, userID, userAgent string) Acto
 func (c *Connection) RegisterTypes(types ...interface{}) int {
 	registered := 0
 	for _, t := range types {
-		if _, reg := c.registerType(t); !reg {
+		tt := reflect.TypeOf(t)
+		alreadyRegistered := false
+		if tt.Kind() == reflect.Ptr {
+			_, alreadyRegistered = c.registerType(t)
+		} else {
+			vp := reflect.New(tt)
+			vp.Elem().Set(reflect.ValueOf(t))
+			_, alreadyRegistered = c.registerType(vp.Interface())
+		}
+		if !alreadyRegistered {
 			registered++
 		}
 	}
