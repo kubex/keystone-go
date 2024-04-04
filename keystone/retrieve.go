@@ -132,6 +132,7 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOp
 	findRequest.PropertyFilters = fReq.Filters
 	findRequest.LabelFilters = fReq.Labels
 	findRequest.RelationOf = fReq.RelationOf
+	findRequest.ParentEntityId = fReq.ParentEntityID
 
 	resp, err := a.connection.Find(ctx, findRequest)
 	if err != nil {
@@ -168,12 +169,13 @@ func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retr
 }
 
 type filterRequest struct {
-	Properties    []*proto.PropertyRequest
-	Filters       []*proto.PropertyFilter
-	Labels        []*proto.EntityLabel
-	RelationOf    *proto.RelationOf
-	Limit         int32
-	Offset        int32
-	SortProperty  string
-	SortDirection string
+	Properties     []*proto.PropertyRequest
+	Filters        []*proto.PropertyFilter
+	Labels         []*proto.EntityLabel
+	RelationOf     *proto.RelationOf
+	ParentEntityID string
+	Limit          int32
+	Offset         int32
+	SortProperty   string
+	SortDirection  string
 }
