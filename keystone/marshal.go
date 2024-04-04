@@ -73,7 +73,7 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 				}
 			}
 			if field.Type.Kind() == reflect.Slice && fieldValue.Len() > 0 {
-				if _, child := fieldValue.Index(0).Interface().(EntityChild); child {
+				if _, child := fieldValue.Index(0).Interface().(NestedChild); child {
 					for i := 0; i < fieldValue.Len(); i++ {
 						childData, err := json.Marshal(fieldValue.Index(i).Interface())
 						if err == nil {

@@ -9,9 +9,22 @@ import (
 // GenericResult is a map that can be used to retrieve a generic result
 type GenericResult map[string]interface{}
 
-// EntityChild is an interface that defines a child entity
-type EntityChild interface {
+// NestedChild is an interface that defines a child entity
+type NestedChild interface {
 	ChildID() string
+	SetChildID(id string)
+}
+
+type BaseNestedChild struct {
+	_childID string
+}
+
+func (e *BaseNestedChild) SetChildID(id string) {
+	e._childID = id
+}
+
+func (e *BaseNestedChild) ChildID() string {
+	return e._childID
 }
 
 // SecretString is a string that represents sensitive data
