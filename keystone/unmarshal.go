@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"sort"
 	"time"
 
 	"github.com/kubex/keystone-go/proto"
@@ -14,6 +15,8 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 	if dstT.Kind() != reflect.Pointer || dstT.Elem().Kind() != reflect.Slice {
 		return fmt.Errorf("dst must be a slice pointer")
 	}
+
+	sort.Sort(proto.EntityResponseIDSort(resp))
 
 	valuePtr := reflect.ValueOf(dstPtr)
 	sliceLen := valuePtr.Elem().Len()
