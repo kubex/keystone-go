@@ -46,7 +46,7 @@ func (l byUniqueProperty) BaseRequest() *proto.EntityRequest {
 	return &proto.EntityRequest{
 		View: &proto.EntityView{},
 		UniqueId: &proto.IDLookup{
-			SchemaId: "SCHEMAID", //TODO: THIS!
+			SchemaId: l.Type,
 			Property: l.Property,
 			UniqueId: l.UniqueID,
 		},
