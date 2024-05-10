@@ -64,8 +64,6 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 		retrieve.Apply(entityRequest.View)
 	}
 
-	entityRequest.Schema = &proto.Key{Key: retrieveBy.EntityType(), Source: a.authorization().Source}
-
 	_, loadByUnique := retrieveBy.(byUniqueProperty)
 	_, genericResult := dst.(GenericResult)
 	if loadByUnique && genericResult {
@@ -85,13 +83,14 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 		r.Source = a.authorization().GetSource()
 	}
 
-	if _, ok := retrieveBy.(byUniqueProperty); ok {
-		schema, registered := a.connection.registerType(dst)
-		if !registered {
-			// wait for the type to be registered with the keystone server
-			a.connection.SyncSchema().Wait()
-		}
+	schema, registered := a.connection.registerType(dst)
+	if !registered {
+		// wait for the type to be registered with the keystone server
+		a.connection.SyncSchema().Wait()
+	}
+	entityRequest.Schema = &proto.Key{Key: schema.GetType(), Source: a.authorization().Source}
 
+	if _, ok := retrieveBy.(byUniqueProperty); ok {
 		schemaID := schema.Id
 		if schemaID == "" {
 			schemaID = schema.Type
