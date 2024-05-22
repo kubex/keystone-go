@@ -76,9 +76,7 @@ func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 
 			for _, variant := range variants {
 				entityPropertyMap[variant] = &proto.EntityProperty{
-					Property: &proto.Key{
-						Key: variant,
-					},
+					Property: variant,
 					Value: &proto.Value{
 						Int: int64(v.GetCount()),
 					},
@@ -106,28 +104,28 @@ func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
 	for _, p := range entityPropertyMap {
 		if p.Value.GetText() != "" {
-			dst[p.Property.Key] = p.Value.GetText()
+			dst[p.Property] = p.Value.GetText()
 		}
 		if p.Value.GetInt() != 0 {
-			dst[p.Property.Key] = p.Value.GetInt()
+			dst[p.Property] = p.Value.GetInt()
 		}
 		if p.Value.GetBool() {
-			dst[p.Property.Key] = p.Value.GetBool()
+			dst[p.Property] = p.Value.GetBool()
 		}
 		if p.Value.GetFloat() != 0 {
-			dst[p.Property.Key] = p.Value.GetFloat()
+			dst[p.Property] = p.Value.GetFloat()
 		}
 		if p.Value.GetSecureText() != "" {
-			dst[p.Property.Key] = p.Value.GetSecureText()
+			dst[p.Property] = p.Value.GetSecureText()
 		}
 		if len(p.Value.GetSet()) > 0 {
-			dst[p.Property.Key] = p.Value.GetSet()
+			dst[p.Property] = p.Value.GetSet()
 		}
 		if len(p.Value.GetMap()) > 0 {
-			dst[p.Property.Key] = p.Value.GetMap()
+			dst[p.Property] = p.Value.GetMap()
 		}
 		if p.Value.GetTime() != nil {
-			dst[p.Property.Key] = time.Unix(p.Value.GetTime().Seconds, int64(p.Value.GetTime().Nanos))
+			dst[p.Property] = time.Unix(p.Value.GetTime().Seconds, int64(p.Value.GetTime().Nanos))
 		}
 	}
 	return nil
@@ -136,7 +134,7 @@ func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 func makeEntityPropertyMap(resp *proto.EntityResponse) map[string]*proto.EntityProperty {
 	entityPropertyMap := map[string]*proto.EntityProperty{}
 	for _, p := range resp.GetProperties() {
-		entityPropertyMap[p.Property.Key] = p
+		entityPropertyMap[p.Property] = p
 	}
 	return entityPropertyMap
 }

@@ -31,7 +31,7 @@ func (p *PropertyEncoder) Marshal(entity interface{}) *proto.Mutation {
 func (p *PropertyEncoder) getProperties() []*proto.EntityProperty {
 	var properties []*proto.EntityProperty
 	for _, prop := range p.properties {
-		if prop.Property.Key[0] != '_' {
+		if prop.Property[0] != '_' {
 			properties = append(properties, prop)
 		}
 	}
@@ -96,7 +96,7 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 }
 
 func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, fOpt fieldOptions) (*proto.EntityProperty, bool) {
-	prop := &proto.EntityProperty{Property: &proto.Key{Key: fOpt.name}, Value: &proto.Value{}}
+	prop := &proto.EntityProperty{Property: fOpt.name, Value: &proto.Value{}}
 	switch fieldType.Kind() {
 	case reflect.String:
 		prop.Value.Text = fieldValue.String()

@@ -7,11 +7,6 @@ import (
 )
 
 func (a *Actor) SetDynamicProperties(ctx context.Context, entityID string, setProperties []*proto.EntityProperty, removeProperties []string, comment string) error {
-
-	for _, prop := range setProperties {
-		prop.Property.Source = a.VendorApp()
-	}
-
 	mutation := &proto.Mutation{
 		DynamicProperties:       setProperties,
 		RemoveDynamicProperties: removeProperties,

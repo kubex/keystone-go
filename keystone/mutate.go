@@ -86,7 +86,7 @@ func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) 
 			result = append(result, v)
 			continue
 		}
-		if newMap[k].Property.Key == exMap[k].Property.Key &&
+		if newMap[k].Property == exMap[k].Property &&
 			newMap[k].Value.Text == exMap[k].Value.Text &&
 			newMap[k].Value.SecureText == exMap[k].Value.SecureText &&
 			newMap[k].Value.Int == exMap[k].Value.Int &&
