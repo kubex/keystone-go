@@ -62,7 +62,7 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 		}
 
 		if supportedType(field.Type) {
-			if protoProp, isEmpty := p.entityPropertyFromField(fieldValue, field, fOpt); !isEmpty {
+			if protoProp, isEmpty := entityPropertyFromField(fieldValue, field.Type, fOpt); !isEmpty {
 				p.properties = append(p.properties, protoProp)
 			}
 		} else {
@@ -95,10 +95,9 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 	}
 }
 
-func (p *PropertyEncoder) entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.StructField, fOpt fieldOptions) (*proto.EntityProperty, bool) {
+func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, fOpt fieldOptions) (*proto.EntityProperty, bool) {
 	prop := &proto.EntityProperty{Property: &proto.Key{Key: fOpt.name}, Value: &proto.Value{}}
-
-	switch fieldType.Type.Kind() {
+	switch fieldType.Kind() {
 	case reflect.String:
 		prop.Value.Text = fieldValue.String()
 		return prop, prop.Value.Text == ""
@@ -127,7 +126,7 @@ func (p *PropertyEncoder) entityPropertyFromField(fieldValue reflect.Value, fiel
 		return prop, len(prop.Value.Set) == 0
 	}
 
-	switch fieldType.Type {
+	switch fieldType {
 	case typeOfSecretString:
 		if iVal, ok := fieldValue.Interface().(SecretString); ok {
 			prop.Value.Text = iVal.Masked

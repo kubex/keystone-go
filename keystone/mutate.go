@@ -3,6 +3,7 @@ package keystone
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/kubex/keystone-go/proto"
@@ -72,7 +73,7 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 		}
 	}
 
-	return err
+	return mutateToError(mResp, err)
 }
 
 func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) []*proto.EntityProperty {
@@ -98,4 +99,19 @@ func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) 
 		}
 	}
 	return result
+}
+
+func mutateToError(resp *proto.MutateResponse, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if resp == nil {
+		return errors.New("nil response")
+	}
+
+	if resp.ErrorCode > 0 || resp.ErrorMessage != "" {
+		return fmt.Errorf("error %d: %s", resp.ErrorCode, resp.ErrorMessage)
+	}
+	return nil
 }
