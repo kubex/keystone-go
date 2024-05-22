@@ -51,9 +51,12 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 		mutation.Logs = entityWithLogs.GetKeystoneLogs()
 	}
 
-	if a.loadedEntity != nil {
-		mutation.Properties = a.getChangedProperties(a.loadedEntity, &proto.EntityResponse{Properties: mutation.Properties})
+	if base, ok := src.(BaseEntity); ok && base._lastLoad != nil {
+		mutation.Properties = a.getChangedProperties(base._lastLoad, &proto.EntityResponse{Properties: mutation.Properties})
+	} else if entityID != "" {
+		mutation.Properties = a.getChangedProperties(nil, &proto.EntityResponse{Properties: mutation.Properties})
 	}
+
 	m := &proto.MutateRequest{
 		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
 		EntityId:      entityID,

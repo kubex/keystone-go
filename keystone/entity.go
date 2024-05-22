@@ -1,6 +1,9 @@
 package keystone
 
-import "strings"
+import (
+	"github.com/kubex/keystone-go/proto"
+	"strings"
+)
 
 type BaseEntity struct {
 	EntityEvents
@@ -8,7 +11,7 @@ type BaseEntity struct {
 	EntityLinks
 	EntityLogger
 	EntityRelationships
-
+	_lastLoad *proto.EntityResponse
 	_entityID string
 }
 

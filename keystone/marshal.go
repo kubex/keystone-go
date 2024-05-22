@@ -142,8 +142,10 @@ func (p *PropertyEncoder) entityPropertyFromField(fieldValue reflect.Value, fiel
 		}
 	case typeOfTime:
 		if iVal, ok := fieldValue.Interface().(time.Time); ok {
-			prop.Value.Time = timestamppb.New(iVal)
-			return prop, prop.Value.Time == nil
+			if !iVal.IsZero() {
+				prop.Value.Time = timestamppb.New(iVal)
+				return prop, prop.Value.Time == nil
+			}
 		}
 	}
 

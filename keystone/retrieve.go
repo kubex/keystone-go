@@ -9,10 +9,9 @@ import (
 
 // Actor is a struct that represents an actor
 type Actor struct {
-	connection   *Connection
-	workspaceID  string
-	mutator      *proto.Mutator
-	loadedEntity *proto.EntityResponse
+	connection  *Connection
+	workspaceID string
+	mutator     *proto.Mutator
 }
 
 func (a *Actor) ReplaceConnection(c *Connection) { a.connection = c }
@@ -102,7 +101,9 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 	if err != nil {
 		return err
 	}
-	a.loadedEntity = resp
+	if be, ok := dst.(BaseEntity); ok {
+		be._lastLoad = resp
+	}
 	if gr, ok := dst.(GenericResult); ok {
 		return UnmarshalGeneric(resp, gr)
 	}
