@@ -200,7 +200,7 @@ func TestMutateEverything(t *testing.T) {
 					},
 				},
 			},
-			RemoveProperties: nil,
+			RemoveDynamicProperties: nil,
 			Logs: []*proto.EntityLog{
 				{
 					Actor:     "Random Thing",
