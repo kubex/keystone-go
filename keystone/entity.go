@@ -11,6 +11,7 @@ type BaseEntity struct {
 	EntityLinks
 	EntityLogger
 	EntityRelationships
+	EntitySensors
 	_lastLoad *proto.EntityResponse
 	_entityID string
 }
