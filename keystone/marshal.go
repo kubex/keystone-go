@@ -111,17 +111,26 @@ func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, f
 		prop.Value.Float = fieldValue.Float()
 		return prop, prop.Value.Float == 0
 	case reflect.Map:
-		prop.Value.Map = map[string][]byte{}
+		prop.Value.Map = map[string]string{}
 		iter := fieldValue.MapRange()
 		for iter.Next() {
-			prop.Value.Map[iter.Key().String()] = []byte(iter.Value().String())
+			var mv string
+			if _, ok := iter.Value().Interface().(string); ok {
+				mv = iter.Value().String()
+				/*} else if iter.Value().Int() != 0 {
+				mv = strconv.Itoa(int(iter.Value().Int()))
+				*/
+			} else {
+				fmt.Println("only map[string]string is supported (" + fOpt.name + ")")
+			}
+			prop.Value.Map[iter.Key().String()] = mv
 		}
 		return prop, len(prop.Value.Map) == 0
 	case reflect.Slice:
 		if set, ok := fieldValue.Interface().([]string); ok {
 			prop.Value.Set = set
 		} else {
-			fmt.Println("only []string is supported")
+			fmt.Println("only []string is supported (" + fOpt.name + ")")
 		}
 		return prop, len(prop.Value.Set) == 0
 	}

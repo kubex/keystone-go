@@ -23,6 +23,30 @@ func (a *Actor) SetDynamicProperties(ctx context.Context, entityID string, setPr
 	return mutateToError(a.connection.Mutate(ctx, m))
 }
 
+func (a *Actor) GetDynamicProperties(ctx context.Context, entityID string, properties ...string) (PropertyValueList, error) {
+	m := &proto.EntityRequest{
+		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
+		EntityId:      entityID,
+		View: &proto.EntityView{
+			DynamicProperties: properties,
+		},
+	}
+
+	resp, err := a.connection.Retrieve(ctx, m)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make(PropertyValueList)
+	for _, prop := range resp.GetDynamicProperties() {
+		res[prop.Property] = prop.GetValue()
+	}
+
+	return res, nil
+}
+
+type PropertyValueList map[string]*proto.Value
+
 func NewProperties(props map[string]interface{}) []*proto.EntityProperty {
 	properties := make([]*proto.EntityProperty, 0, len(props))
 	for key, value := range props {
