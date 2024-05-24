@@ -224,3 +224,23 @@ type linkCount struct{ count bool }
 
 func (l linkCount) Apply(config *proto.EntityView) { config.LinkCount = l.count }
 func WithLinkCount() RetrieveOption                { return relationshipCount{count: true} }
+
+type descendantTypeCount struct{ entityType, appId, vendorId string }
+
+func (l descendantTypeCount) Apply(config *proto.EntityView) {
+	config.DescendantCountType = append(config.DescendantCountType, &proto.Key{Source: &proto.VendorApp{
+		VendorId: l.vendorId, AppId: l.appId,
+	}, Key: l.entityType})
+}
+
+func WithDescendantCount(entityType string) RetrieveOption {
+	if entityType == "" {
+		return nil
+	}
+
+	return descendantTypeCount{
+		entityType: entityType,
+		/*appId:      appId,
+		vendorId:   vendorId,*/
+	}
+}

@@ -60,29 +60,37 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
 
+	var countReplace = map[string]int64{}
+
 	if resp.GetRelationshipCounts() != nil {
 		for _, v := range resp.GetRelationshipCounts() {
 			t := v.GetType()
-			var variants []string
+			cnt := int64(v.GetCount())
 			if t.GetKey() == "" {
-				variants = []string{"_count_relation"}
+				countReplace["_count_relation"] = cnt
 			} else {
-				variants = []string{
-					fmt.Sprintf("_count_relation:%s:%s:%s", t.GetSource().GetVendorId(), t.GetSource().GetAppId(), t.GetKey()),
-					fmt.Sprintf("_count_relation:%s:%s", t.GetSource().GetAppId(), t.GetKey()),
-					fmt.Sprintf("_count_relation:%s", t.GetKey()),
-				}
-			}
-
-			for _, variant := range variants {
-				entityPropertyMap[variant] = &proto.EntityProperty{
-					Property: variant,
-					Value: &proto.Value{
-						Int: int64(v.GetCount()),
-					},
-				}
+				countReplace[fmt.Sprintf("_count_relation:%s:%s:%s", t.GetSource().GetVendorId(), t.GetSource().GetAppId(), t.GetKey())] = cnt
+				countReplace[fmt.Sprintf("_count_relation:%s:%s", t.GetSource().GetAppId(), t.GetKey())] = cnt
+				countReplace[fmt.Sprintf("_count_relation:%s", t.GetKey())] = cnt
 			}
 		}
+	}
+	if resp.GetDescendantCounts() != nil {
+		for _, v := range resp.GetDescendantCounts() {
+			t := v.GetType()
+			cnt := int64(v.GetCount())
+			if t.GetKey() == "" {
+				countReplace["_count_descendant"] = cnt
+			} else {
+				countReplace[fmt.Sprintf("_count_descendant:%s:%s:%s", t.GetSource().GetVendorId(), t.GetSource().GetAppId(), t.GetKey())] = cnt
+				countReplace[fmt.Sprintf("_count_descendant:%s:%s", t.GetSource().GetAppId(), t.GetKey())] = cnt
+				countReplace[fmt.Sprintf("_count_descendant:%s", t.GetKey())] = cnt
+			}
+		}
+	}
+
+	for variant, cnt := range countReplace {
+		entityPropertyMap[variant] = &proto.EntityProperty{Property: variant, Value: &proto.Value{Int: cnt}}
 	}
 
 	if entityWithLinks, ok := dst.(EntityLinkProvider); ok {
