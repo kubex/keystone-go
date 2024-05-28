@@ -87,11 +87,6 @@ func WithProperty(decrypt bool, properties ...string) RetrieveOption {
 	return propertyLoader{properties: properties, decrypt: decrypt}
 }
 
-// WithLinks is a retrieve option that loads links
-func WithLinks(links ...string) RetrieveOption {
-	return linksLoader{Links: links}
-}
-
 // WithRelationships is a retrieve option that loads relationships
 func WithRelationships(keys ...string) RetrieveOption {
 	return relationshipsLoader{keys: keys}
@@ -118,17 +113,6 @@ func (l propertyLoader) Apply(config *proto.EntityView) {
 	}
 
 	config.Properties = append(config.Properties, &proto.PropertyRequest{Properties: l.properties, Decrypt: l.decrypt})
-}
-
-type linksLoader struct{ Links []string }
-
-func (l linksLoader) Apply(config *proto.EntityView) {
-	if config.LinkByType == nil {
-		config.LinkByType = make([]*proto.Key, 0)
-	}
-	for _, link := range l.Links {
-		config.LinkByType = append(config.LinkByType, &proto.Key{Key: link})
-	}
 }
 
 type relationshipsLoader struct{ keys []string }
@@ -219,11 +203,6 @@ type childCount struct{ count bool }
 
 func (l childCount) Apply(config *proto.EntityView) { config.ChildCount = l.count }
 func WithChildCount() RetrieveOption                { return relationshipCount{count: true} }
-
-type linkCount struct{ count bool }
-
-func (l linkCount) Apply(config *proto.EntityView) { config.LinkCount = l.count }
-func WithLinkCount() RetrieveOption                { return relationshipCount{count: true} }
 
 type descendantTypeCount struct{ entityType, appId, vendorId string }
 

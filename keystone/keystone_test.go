@@ -56,7 +56,6 @@ type Customer struct {
 	EntityLogger
 	EntityEvents
 	EntityLabels
-	EntityLinks
 	EntityRelationships
 	ID                  string       `keystone:"_entity_id" json:",omitempty"`
 	Name                SecretString `keystone:",indexed,personal,omitempty" json:",omitempty"`
@@ -183,7 +182,6 @@ func FakeCustomer() *Customer {
 
 	c.AddKeystoneEvent("custom-event", map[string]string{"foo": "bar"})
 	c.AddKeystoneLabel("active", "true")
-	c.AddKeystoneLink("gcs", "Raw Data", "https://google.com")
 	c.AddKeystoneRelationship("src", "targ", map[string]string{"a": "b"}, time.Now())
 
 	c.LogDebug("Created customer", "REF123", "trace-id", "mr-man", nil)

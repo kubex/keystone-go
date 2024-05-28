@@ -23,7 +23,6 @@ func TestActorRetrieveByUnique(t *testing.T) {
 			WithSummary(),
 			WithDatum(),
 			WithChildren("line_items"),
-			WithLinks("gcs"),
 			WithRelationships("user"),
 		),
 	); err != nil {
@@ -33,7 +32,6 @@ func TestActorRetrieveByUnique(t *testing.T) {
 	//actor.Mutate(cst, "testing actor")
 	//
 	log.Println(cst)
-	log.Println(cst.GetKeystoneLinks())
 	log.Println(cst.GetKeystoneRelationships())
 }
 

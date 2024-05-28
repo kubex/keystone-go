@@ -19,13 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Keystone_Define_FullMethodName        = "/kubex.keystone.Keystone/Define"
-	Keystone_Mutate_FullMethodName        = "/kubex.keystone.Keystone/Mutate"
-	Keystone_Retrieve_FullMethodName      = "/kubex.keystone.Keystone/Retrieve"
-	Keystone_Logs_FullMethodName          = "/kubex.keystone.Keystone/Logs"
-	Keystone_Events_FullMethodName        = "/kubex.keystone.Keystone/Events"
-	Keystone_Find_FullMethodName          = "/kubex.keystone.Keystone/Find"
-	Keystone_ActiveSetList_FullMethodName = "/kubex.keystone.Keystone/ActiveSetList"
+	Keystone_Define_FullMethodName           = "/kubex.keystone.Keystone/Define"
+	Keystone_Mutate_FullMethodName           = "/kubex.keystone.Keystone/Mutate"
+	Keystone_Retrieve_FullMethodName         = "/kubex.keystone.Keystone/Retrieve"
+	Keystone_Logs_FullMethodName             = "/kubex.keystone.Keystone/Logs"
+	Keystone_Events_FullMethodName           = "/kubex.keystone.Keystone/Events"
+	Keystone_Find_FullMethodName             = "/kubex.keystone.Keystone/Find"
+	Keystone_DailyEntities_FullMethodName    = "/kubex.keystone.Keystone/DailyEntities"
+	Keystone_SchemaStatistics_FullMethodName = "/kubex.keystone.Keystone/SchemaStatistics"
+	Keystone_ActiveSetList_FullMethodName    = "/kubex.keystone.Keystone/ActiveSetList"
 )
 
 // KeystoneClient is the client API for Keystone service.
@@ -38,6 +40,8 @@ type KeystoneClient interface {
 	Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error)
 	Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
+	DailyEntities(ctx context.Context, in *DailyEntityRequest, opts ...grpc.CallOption) (*DailyEntityResponse, error)
+	SchemaStatistics(ctx context.Context, in *SchemaStatisticsRequest, opts ...grpc.CallOption) (*SchemaStatisticsResponse, error)
 	// Active Data Set
 	ActiveSetList(ctx context.Context, in *ActiveSetListRequest, opts ...grpc.CallOption) (*ActiveSetListResponse, error)
 }
@@ -104,6 +108,24 @@ func (c *keystoneClient) Find(ctx context.Context, in *FindRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *keystoneClient) DailyEntities(ctx context.Context, in *DailyEntityRequest, opts ...grpc.CallOption) (*DailyEntityResponse, error) {
+	out := new(DailyEntityResponse)
+	err := c.cc.Invoke(ctx, Keystone_DailyEntities_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) SchemaStatistics(ctx context.Context, in *SchemaStatisticsRequest, opts ...grpc.CallOption) (*SchemaStatisticsResponse, error) {
+	out := new(SchemaStatisticsResponse)
+	err := c.cc.Invoke(ctx, Keystone_SchemaStatistics_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *keystoneClient) ActiveSetList(ctx context.Context, in *ActiveSetListRequest, opts ...grpc.CallOption) (*ActiveSetListResponse, error) {
 	out := new(ActiveSetListResponse)
 	err := c.cc.Invoke(ctx, Keystone_ActiveSetList_FullMethodName, in, out, opts...)
@@ -123,6 +145,8 @@ type KeystoneServer interface {
 	Logs(context.Context, *LogRequest) (*LogsResponse, error)
 	Events(context.Context, *EventRequest) (*EventsResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
+	DailyEntities(context.Context, *DailyEntityRequest) (*DailyEntityResponse, error)
+	SchemaStatistics(context.Context, *SchemaStatisticsRequest) (*SchemaStatisticsResponse, error)
 	// Active Data Set
 	ActiveSetList(context.Context, *ActiveSetListRequest) (*ActiveSetListResponse, error)
 	mustEmbedUnimplementedKeystoneServer()
@@ -149,6 +173,12 @@ func (UnimplementedKeystoneServer) Events(context.Context, *EventRequest) (*Even
 }
 func (UnimplementedKeystoneServer) Find(context.Context, *FindRequest) (*FindResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Find not implemented")
+}
+func (UnimplementedKeystoneServer) DailyEntities(context.Context, *DailyEntityRequest) (*DailyEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DailyEntities not implemented")
+}
+func (UnimplementedKeystoneServer) SchemaStatistics(context.Context, *SchemaStatisticsRequest) (*SchemaStatisticsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SchemaStatistics not implemented")
 }
 func (UnimplementedKeystoneServer) ActiveSetList(context.Context, *ActiveSetListRequest) (*ActiveSetListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActiveSetList not implemented")
@@ -274,6 +304,42 @@ func _Keystone_Find_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keystone_DailyEntities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DailyEntityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).DailyEntities(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keystone_DailyEntities_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).DailyEntities(ctx, req.(*DailyEntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keystone_SchemaStatistics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SchemaStatisticsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).SchemaStatistics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keystone_SchemaStatistics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).SchemaStatistics(ctx, req.(*SchemaStatisticsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Keystone_ActiveSetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ActiveSetListRequest)
 	if err := dec(in); err != nil {
@@ -322,6 +388,14 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Find",
 			Handler:    _Keystone_Find_Handler,
+		},
+		{
+			MethodName: "DailyEntities",
+			Handler:    _Keystone_DailyEntities_Handler,
+		},
+		{
+			MethodName: "SchemaStatistics",
+			Handler:    _Keystone_SchemaStatistics_Handler,
 		},
 		{
 			MethodName: "ActiveSetList",

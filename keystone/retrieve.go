@@ -75,9 +75,7 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 	for _, p := range view.Properties {
 		p.Source = a.authorization().GetSource()
 	}
-	for _, l := range view.LinkByType {
-		l.Source = a.authorization().GetSource()
-	}
+
 	for _, r := range view.RelationshipByType {
 		r.Source = a.authorization().GetSource()
 	}

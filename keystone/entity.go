@@ -8,7 +8,6 @@ import (
 type BaseEntity struct {
 	EntityEvents
 	EntityLabels
-	EntityLinks
 	EntityLogger
 	EntityRelationships
 	EntitySensors

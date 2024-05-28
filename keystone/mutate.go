@@ -40,10 +40,6 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 		mutation.Measurements = entityWithSensor.GetKeystoneSensorMeasurements()
 	}
 
-	if entityWithLinks, ok := src.(EntityLinkProvider); ok {
-		mutation.Links = entityWithLinks.GetKeystoneLinks()
-	}
-
 	if entityWithRelationships, ok := src.(EntityRelationshipProvider); ok {
 		mutation.Relationships = entityWithRelationships.GetKeystoneRelationships()
 	}

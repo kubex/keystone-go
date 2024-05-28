@@ -44,7 +44,6 @@ func TestWrite(t *testing.T) {
 		},
 	}
 	cust.AddKeystoneLabel("foo", "bar")
-	cust.AddKeystoneLink("gcs", "logo", "https://storage.googleapis.com/keystone-assets/keystone-logo.png")
 	cust.AddKeystoneRelationship("user", "customer", map[string]string{"foo": "bar"}, time.Now())
 	if err := getTestActor(nil).Mutate(context.Background(), cust, "Creating Customer via Mutate"); err != nil {
 		t.Error(err)
@@ -243,16 +242,6 @@ func TestMutateEverything(t *testing.T) {
 				},
 			},
 			//RemoveRelationships: nil,
-			Links: []*proto.EntityLink{
-				{
-					Type: &proto.Key{
-						Key: "website",
-					},
-					Location: "https://microsoft.com",
-					Name:     "Microsoft Site",
-				},
-			},
-			//RemoveLinks:         nil,
 			Labels: []*proto.EntityLabel{
 				{Name: "account-manager", Value: "frank_turner"},
 			},
