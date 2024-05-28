@@ -6,7 +6,6 @@ import (
 	"github.com/packaged/logger/v3/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"log"
 	"reflect"
 	"sync"
 	"time"
@@ -157,7 +156,6 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 		for typ, processing := range c.registerQueue {
 			if !processing {
 				if toRegister, ok := c.typeRegister[typ]; ok {
-					log.Println("Registering type", typ)
 					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
 						Authorization:  c.authorization(),
 						Schema:         toRegister.schema,
