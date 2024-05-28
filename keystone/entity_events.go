@@ -1,10 +1,9 @@
 package keystone
 
 import (
-	"time"
-
 	"github.com/kubex/keystone-go/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 )
 
 // EntityEventProvider is an interface for entities that can have events
@@ -31,14 +30,8 @@ func (e *EntityEvents) GetKeystoneEvents() []*proto.EntityEvent {
 
 // AddKeystoneEvent adds an event
 func (e *EntityEvents) AddKeystoneEvent(eventType string, properties map[string]string) {
-	e.AddKeystoneEventWithDedupe("", eventType, properties)
-}
-
-// AddKeystoneEventWithDedupe adds an event with a dedupe key
-func (e *EntityEvents) AddKeystoneEventWithDedupe(dedupeKey, eventType string, properties map[string]string) {
 	e.ksEntityEvents = append(e.ksEntityEvents, &proto.EntityEvent{
 		Type: &proto.Key{Key: eventType},
-		Tid:  dedupeKey,
 		Time: timestamppb.New(time.Now()),
 		Data: properties,
 	})
