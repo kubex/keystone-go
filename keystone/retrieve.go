@@ -37,7 +37,7 @@ func (a *Actor) WorkspaceID() string {
 	return a.workspaceID
 }
 
-func (a *Actor) authorization() *proto.Authorization {
+func (a *Actor) Authorization() *proto.Authorization {
 	if a == nil || a.connection == nil {
 		return nil
 	}
@@ -58,7 +58,7 @@ func (a *Actor) SetClient(client string) {
 // Get retrieves an entity by the given retrieveBy, storing the result in dst
 func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{}, retrieve RetrieveOption) error {
 	entityRequest := retrieveBy.BaseRequest()
-	entityRequest.Authorization = a.authorization()
+	entityRequest.Authorization = a.Authorization()
 	if retrieve != nil {
 		retrieve.Apply(entityRequest.View)
 	}
@@ -73,11 +73,11 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 
 	// set source
 	for _, p := range view.Properties {
-		p.Source = a.authorization().GetSource()
+		p.Source = a.Authorization().GetSource()
 	}
 
 	for _, r := range view.RelationshipByType {
-		r.Source = a.authorization().GetSource()
+		r.Source = a.Authorization().GetSource()
 	}
 
 	schema, registered := a.connection.registerType(dst)
@@ -85,7 +85,7 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 		// wait for the type to be registered with the keystone server
 		a.connection.SyncSchema().Wait()
 	}
-	entityRequest.Schema = &proto.Key{Key: schema.GetType(), Source: a.authorization().Source}
+	entityRequest.Schema = &proto.Key{Key: schema.GetType(), Source: a.Authorization().Source}
 
 	if _, ok := retrieveBy.(byUniqueProperty); ok {
 		schemaID := schema.Id
@@ -112,8 +112,8 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 // Find returns a list of entities matching the given entityType and retrieveProperties
 func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOption, options ...FindOption) ([]*proto.EntityResponse, error) {
 	findRequest := &proto.FindRequest{
-		Authorization: a.authorization(),
-		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
+		Authorization: a.Authorization(),
+		Schema:        &proto.Key{Key: entityType, Source: a.Authorization().Source},
 		View:          &proto.EntityView{},
 	}
 
@@ -142,8 +142,8 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOp
 // List returns a list of entities within an active set
 func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
 	listRequest := &proto.ActiveSetListRequest{
-		Authorization: a.authorization(),
-		Schema:        &proto.Key{Key: entityType, Source: a.authorization().Source},
+		Authorization: a.Authorization(),
+		Schema:        &proto.Key{Key: entityType, Source: a.Authorization().Source},
 		AdsName:       activeSetName,
 		Properties:    retrieveProperties,
 	}

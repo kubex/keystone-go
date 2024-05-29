@@ -15,7 +15,7 @@ func (a *Actor) SetDynamicProperties(ctx context.Context, entityID string, setPr
 	mutation.Mutator = a.mutator
 
 	m := &proto.MutateRequest{
-		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
+		Authorization: a.Authorization(),
 		EntityId:      entityID,
 		Mutation:      mutation,
 	}
@@ -25,7 +25,7 @@ func (a *Actor) SetDynamicProperties(ctx context.Context, entityID string, setPr
 
 func (a *Actor) GetDynamicProperties(ctx context.Context, entityID string, properties ...string) (PropertyValueList, error) {
 	m := &proto.EntityRequest{
-		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
+		Authorization: a.Authorization(),
 		EntityId:      entityID,
 		View: &proto.EntityView{
 			DynamicProperties: properties,

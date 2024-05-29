@@ -59,7 +59,7 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 	}
 
 	m := &proto.MutateRequest{
-		Authorization: &proto.Authorization{WorkspaceId: a.workspaceID, Source: &a.connection.appID},
+		Authorization: a.Authorization(),
 		EntityId:      entityID,
 		Schema:        &proto.Key{Key: schema.Type, Source: schema.Source}, // TODO: Should probably provide the schema ID if we have it - and verify against the type / source
 		Mutation:      mutation,

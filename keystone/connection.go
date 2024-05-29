@@ -40,6 +40,9 @@ func NewConnection(client proto.KeystoneClient, vendorID, appID, accessToken str
 	}
 }
 
+// DirectClient avoid using the direct client in case of changes
+func (c *Connection) DirectClient() proto.KeystoneClient { return c.client }
+
 func (c *Connection) Define(ctx context.Context, in *proto.SchemaRequest, opts ...grpc.CallOption) (*proto.Schema, error) {
 	tl := c.timeLogConfig.NewLog("Define", zap.String("schema", in.GetSchema().GetType()))
 	resp, err := c.client.Define(ctx, in, opts...)
