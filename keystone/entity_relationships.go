@@ -36,9 +36,9 @@ func (e *EntityRelationships) SetKeystoneRelationships(links []*proto.EntityRela
 }
 
 // AddKeystoneRelationship adds a relationship
-func (e *EntityRelationships) AddKeystoneRelationship(source, target string, meta map[string]string, since time.Time) {
+func (e *EntityRelationships) AddKeystoneRelationship(relationshipType, target string, meta map[string]string, since time.Time) {
 	e.ksEntityRelationships = append(e.ksEntityRelationships, &proto.EntityRelationship{
-		Relationship: &proto.Key{Key: source},
+		Relationship: &proto.Key{Key: relationshipType},
 		TargetId:     target,
 		Data:         meta,
 		Since:        timestamppb.New(since),

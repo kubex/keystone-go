@@ -175,27 +175,32 @@ type relationshipCount struct{ count bool }
 
 func (l relationshipCount) Apply(config *proto.EntityView) { config.RelationshipCount = l.count }
 
-type relationshipTypeCount struct{ entityType, appId, vendorId string }
+type relationshipTypeCount struct{ relationType, appId, vendorId string }
 
 func (l relationshipTypeCount) Apply(config *proto.EntityView) {
-	config.RelationshipByType = append(config.RelationshipByType, &proto.Key{Source: &proto.VendorApp{
+	config.RelationshipCountType = append(config.RelationshipByType, &proto.Key{Source: &proto.VendorApp{
 		VendorId: l.vendorId, AppId: l.appId,
-	}, Key: l.entityType})
+	}, Key: l.relationType})
 }
 
 func WithTotalRelationshipCount() RetrieveOption {
 	return relationshipCount{count: true}
 }
 
-func WithRelationshipCount(entityType, appId, vendorId string) RetrieveOption {
-	if entityType == "" && appId == "" && vendorId == "" {
+func WithRelationshipCount(relationType, appId, vendorId string) RetrieveOption {
+	if relationType == "" && appId == "" && vendorId == "" {
 		return WithTotalRelationshipCount()
 	} else {
 		return relationshipTypeCount{
-			entityType: entityType,
-			appId:      appId,
-			vendorId:   vendorId,
+			relationType: relationType,
+			appId:        appId,
+			vendorId:     vendorId,
 		}
+	}
+}
+func WithSiblingRelationshipCount(relationType string) RetrieveOption {
+	return relationshipTypeCount{
+		relationType: relationType,
 	}
 }
 

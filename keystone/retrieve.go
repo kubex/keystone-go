@@ -3,7 +3,6 @@ package keystone
 import (
 	"context"
 	"errors"
-
 	"github.com/kubex/keystone-go/proto"
 )
 
@@ -53,6 +52,14 @@ func (a *Actor) SetClient(client string) {
 	if a.mutator != nil {
 		a.mutator.Client = client
 	}
+}
+
+func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}, retrieve RetrieveOption) error {
+	return a.Get(ctx, ByEntityID(Type(dst), entityID), dst, retrieve)
+}
+
+func (a *Actor) GetByUniqueProperty(ctx context.Context, uniqueId, propertyName string, dst interface{}, retrieve RetrieveOption) error {
+	return a.Get(ctx, ByUniqueProperty(Type(dst), uniqueId, propertyName), dst, retrieve)
 }
 
 // Get retrieves an entity by the given retrieveBy, storing the result in dst
