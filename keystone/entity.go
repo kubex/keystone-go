@@ -15,6 +15,10 @@ type BaseEntity struct {
 	_entityID string
 }
 
+func (e *BaseEntity) KSType() string {
+	return getType(baseType(e))
+}
+
 func (e *BaseEntity) GetKeystoneID() string {
 	return e._entityID
 }
