@@ -85,9 +85,9 @@ func (c *Connection) Find(ctx context.Context, in *proto.FindRequest, opts ...gr
 	return resp, err
 }
 
-func (c *Connection) ActiveSetList(ctx context.Context, in *proto.ActiveSetListRequest, opts ...grpc.CallOption) (*proto.ActiveSetListResponse, error) {
-	tl := c.timeLogConfig.NewLog("ADSList", zap.String("schema", in.GetSchema().GetKey()), zap.String("ADS", in.GetAdsName()))
-	resp, err := c.client.ActiveSetList(ctx, in, opts...)
+func (c *Connection) List(ctx context.Context, in *proto.ListRequest, opts ...grpc.CallOption) (*proto.ListResponse, error) {
+	tl := c.timeLogConfig.NewLog("List", zap.String("schema", in.GetSchema().GetKey()), zap.String("from", in.GetFromView()))
+	resp, err := c.client.List(ctx, in, opts...)
 	c.logger.TimedLog(tl)
 	return resp, err
 }
@@ -160,10 +160,10 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 			if !processing {
 				if toRegister, ok := c.typeRegister[typ]; ok {
 					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
-						Authorization:  c.authorization(),
-						Schema:         toRegister.schema,
-						ActiveDatasets: toRegister.definition.ActiveDataSets,
-						Views:          toRegister.definition.Views,
+						Authorization: c.authorization(),
+						Schema:        toRegister.schema,
+						StoredViews:   toRegister.definition.StoredViews,
+						Views:         toRegister.definition.Views,
 					})
 
 					if err == nil {

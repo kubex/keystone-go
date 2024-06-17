@@ -1,15 +1,15 @@
 package keystone
 
 type sortBy struct {
-	property  string
-	direction string
+	property   string
+	descending bool
 }
 
 func (f sortBy) Apply(config *filterRequest) {
 	config.SortProperty = f.property
-	config.SortDirection = f.direction
+	config.SortDescending = f.descending
 }
 
-func SortBy(property string, direction string) FindOption {
-	return sortBy{property: property, direction: direction}
+func SortBy(property string, descending bool) FindOption {
+	return sortBy{property: property, descending: descending}
 }

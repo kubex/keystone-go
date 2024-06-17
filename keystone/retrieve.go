@@ -148,10 +148,10 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOp
 
 // List returns a list of entities within an active set
 func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
-	listRequest := &proto.ActiveSetListRequest{
+	listRequest := &proto.ListRequest{
 		Authorization: a.Authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.Authorization().Source},
-		AdsName:       activeSetName,
+		FromView:      activeSetName,
 		Properties:    retrieveProperties,
 	}
 
@@ -161,12 +161,18 @@ func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retr
 	}
 
 	listRequest.Filters = fReq.Filters
-	listRequest.Limit = fReq.Limit
-	listRequest.Offset = fReq.Offset
-	listRequest.SortProperty = fReq.SortProperty
-	listRequest.SortDirection = fReq.SortDirection
+	listRequest.Page = &proto.PageRequest{
+		PerPage:    fReq.PerPage,
+		PageNumber: fReq.PageNumber,
+	}
 
-	resp, err := a.connection.ActiveSetList(ctx, listRequest)
+	listRequest.Sort = []*proto.PropertySort{{
+		Property:   fReq.SortProperty,
+		Descending: fReq.SortDescending,
+	},
+	}
+
+	resp, err := a.connection.List(ctx, listRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +185,8 @@ type filterRequest struct {
 	Labels         []*proto.EntityLabel
 	RelationOf     *proto.RelationOf
 	ParentEntityID string
-	Limit          int32
-	Offset         int32
+	PerPage        int32
+	PageNumber     int32
 	SortProperty   string
-	SortDirection  string
+	SortDescending bool
 }

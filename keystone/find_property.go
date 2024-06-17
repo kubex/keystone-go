@@ -79,7 +79,7 @@ func (f propertyFilter) Apply(config *filterRequest) {
 	}
 
 	config.Filters = append(config.Filters, &proto.PropertyFilter{
-		Property: &proto.Key{Key: f.key},
+		Property: f.key,
 		Operator: f.operator,
 		Values:   f.values,
 	})

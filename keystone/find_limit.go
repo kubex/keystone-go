@@ -1,15 +1,15 @@
 package keystone
 
 type withLimit struct {
-	limit  int32
-	offset int32
+	perPage    int32
+	pageNumber int32
 }
 
 func (f withLimit) Apply(config *filterRequest) {
-	config.Limit = f.limit
-	config.Offset = f.offset
+	config.PerPage = f.perPage
+	config.PageNumber = f.pageNumber
 }
 
-func Limit(limit, offset int32) FindOption {
-	return withLimit{limit: limit, offset: offset}
+func Limit(perPage, pageNumber int32) FindOption {
+	return withLimit{perPage: perPage, pageNumber: pageNumber}
 }
