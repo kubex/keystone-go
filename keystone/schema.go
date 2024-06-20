@@ -178,7 +178,7 @@ func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Pro
 
 	switch fieldType.Type {
 	case typeOfSecretString:
-		return proto.Property_Text, proto.Property_Secure
+		return proto.Property_SecureText, extendedType
 	case typeOfAmount:
 		return proto.Property_Amount, extendedType
 	case typeOfTime:
@@ -219,6 +219,8 @@ func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {
 			opt.required = true
 		case "lookup":
 			opt.reverseLookup = true
+		case "verify":
+			opt.verifyOnly = true
 
 		case "pii", "personal", "gdpr":
 			opt.personalData = true
@@ -241,6 +243,7 @@ type fieldOptions struct {
 	immutable     bool
 	required      bool
 	reverseLookup bool
+	verifyOnly    bool
 
 	// data classification
 	personalData  bool
@@ -251,8 +254,11 @@ func (fOpt fieldOptions) applyTo(protoField *proto.Property) {
 	protoField.Name = fOpt.name
 	if fOpt.personalData {
 		protoField.ExtendedType = proto.Property_Personal
+		protoField.DataType = proto.Property_SecureText
 	} else if fOpt.userInputData {
 		protoField.ExtendedType = proto.Property_UserInput
+	} else if fOpt.verifyOnly {
+		protoField.DataType = proto.Property_VerifyText
 	}
 
 	appendOption(protoField, proto.Property_Unique, fOpt.unique)
