@@ -213,6 +213,8 @@ func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {
 			opt.unique = true
 		case "indexed":
 			opt.indexed = true
+		case "searchable", "search":
+			opt.searchable = true
 		case "immutable":
 			opt.immutable = true
 		case "required":
@@ -240,6 +242,7 @@ type fieldOptions struct {
 	// options
 	unique        bool
 	indexed       bool
+	searchable    bool
 	immutable     bool
 	required      bool
 	reverseLookup bool
@@ -266,6 +269,7 @@ func (fOpt fieldOptions) applyTo(protoField *proto.Property) {
 	appendOption(protoField, proto.Property_Immutable, fOpt.immutable)
 	appendOption(protoField, proto.Property_Required, fOpt.required)
 	appendOption(protoField, proto.Property_ReverseLookup, fOpt.reverseLookup)
+	appendOption(protoField, proto.Property_Searchable, fOpt.searchable)
 }
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
