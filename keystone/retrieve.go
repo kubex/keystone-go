@@ -10,15 +10,15 @@ import (
 type Actor struct {
 	connection  *Connection
 	workspaceID string
-	mutator     *proto.Mutator
+	user        *proto.User
 }
 
 func (a *Actor) ReplaceConnection(c *Connection) { a.connection = c }
 
-func (a *Actor) UserAgent() string { return a.mutator.GetUserAgent() }
-func (a *Actor) RemoteIp() string  { return a.mutator.GetRemoteIp() }
-func (a *Actor) UserId() string    { return a.mutator.GetUserId() }
-func (a *Actor) Client() string    { return a.mutator.GetClient() }
+func (a *Actor) UserAgent() string { return a.user.GetUserAgent() }
+func (a *Actor) RemoteIp() string  { return a.user.GetRemoteIp() }
+func (a *Actor) UserId() string    { return a.user.GetUserId() }
+func (a *Actor) Client() string    { return a.user.GetClient() }
 
 func (a *Actor) VendorID() string {
 	return a.connection.appID.GetVendorId()
@@ -49,8 +49,8 @@ func (a *Actor) Authorization() *proto.Authorization {
 
 // SetClient sets the client name for the actor
 func (a *Actor) SetClient(client string) {
-	if a.mutator != nil {
-		a.mutator.Client = client
+	if a.user != nil {
+		a.user.Client = client
 	}
 }
 

@@ -104,7 +104,7 @@ func (c *Connection) Actor(workspaceID, remoteIP, userID, userAgent string) Acto
 	return Actor{
 		connection:  c,
 		workspaceID: workspaceID,
-		mutator: &proto.Mutator{
+		user: &proto.User{
 			UserAgent: userAgent,
 			RemoteIp:  remoteIP,
 			UserId:    userID,

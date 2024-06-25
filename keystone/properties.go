@@ -12,7 +12,7 @@ func (a *Actor) SetDynamicProperties(ctx context.Context, entityID string, setPr
 		RemoveDynamicProperties: removeProperties,
 		Comment:                 comment,
 	}
-	mutation.Mutator = a.mutator
+	mutation.Mutator = a.user
 
 	m := &proto.MutateRequest{
 		Authorization: a.Authorization(),
