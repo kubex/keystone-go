@@ -6,6 +6,8 @@ import (
 	"github.com/packaged/logger/v3/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"log"
 	"reflect"
 	"sync"
 	"time"
@@ -20,6 +22,16 @@ type Connection struct {
 	token         string
 	typeRegister  map[reflect.Type]schemaDef
 	registerQueue map[reflect.Type]bool // true if the type is processing registration
+}
+
+func DefaultConnection(host, port, vendorID, appID, accessToken string) *Connection {
+	ksGrpcConn, err := grpc.Dial(host+":"+port, grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithIdleTimeout(time.Minute*5), grpc.WithConnectParams(grpc.ConnectParams{MinConnectTimeout: time.Second * 5}))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+
+	return NewConnection(proto.NewKeystoneClient(ksGrpcConn), vendorID, appID, accessToken)
 }
 
 // NewConnection creates a new connection to a keystone server
