@@ -162,7 +162,7 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
 						Authorization: c.authorization(),
 						Schema:        toRegister.schema,
-						StoredViews:   toRegister.definition.StoredViews,
+						IndexViews:    toRegister.definition.IndexViews,
 						Views:         toRegister.definition.Views,
 					})
 

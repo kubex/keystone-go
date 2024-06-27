@@ -15,6 +15,6 @@ type TypeDefinition struct {
 	Singular    string // Name for a single one of these entities e.g. User
 	Plural      string // Name for a collection of these entities e.g. Users
 	Options     []proto.Schema_Option
-	StoredViews []*proto.StoredView
+	IndexViews  []*proto.IndexView
 	Views       []*proto.EntityView
 }
