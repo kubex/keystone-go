@@ -211,13 +211,13 @@ func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {
 
 		case "unique":
 			opt.unique = true
-		case "indexed":
+		case "indexed", "query":
 			opt.indexed = true
 		case "searchable", "search":
 			opt.searchable = true
 		case "immutable":
 			opt.immutable = true
-		case "required":
+		case "required", "req":
 			opt.required = true
 		case "lookup":
 			opt.reverseLookup = true
