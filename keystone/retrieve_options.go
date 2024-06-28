@@ -97,7 +97,7 @@ func WithLabels() RetrieveOption {
 	return labelLoader{labels: true}
 }
 
-// WithChildren is a retrieve option that loads children
+// WithChildren is a retrieve option that loads Children
 func WithChildren(childType string, ids ...string) RetrieveOption {
 	return childrenLoader{childType: childType, ids: ids}
 }

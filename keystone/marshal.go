@@ -1,7 +1,6 @@
 package keystone
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -10,13 +9,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// PropertyEncoder extracts properties and children from an entity
+// PropertyEncoder extracts properties and Children from an entity
 type PropertyEncoder struct {
 	properties []*proto.EntityProperty
 	children   []*proto.EntityChild
 }
 
-// Marshal extracts properties and children from an entity
+// Marshal extracts properties and Children from an entity
 func (p *PropertyEncoder) Marshal(entity interface{}) *proto.Mutation {
 	entityValue := reflect.ValueOf(entity)
 	for entityValue.Kind() == reflect.Ptr || entityValue.Kind() == reflect.Interface {
@@ -73,23 +72,31 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 				}
 			}
 			if field.Type.Kind() == reflect.Slice && fieldValue.Len() > 0 {
-				if _, child := fieldValue.Index(0).Interface().(NestedChild); child {
+				ch := fieldValue.Index(0).Interface()
+				if child, ok := ch.(NestedChild); ok {
 					for i := 0; i < fieldValue.Len(); i++ {
-						childData, err := json.Marshal(fieldValue.Index(i).Interface())
-						if err == nil {
-							p.children = append(p.children, &proto.EntityChild{
-								Type: &proto.Key{Key: snakeCase(fOpt.name)},
-								Data: childData,
-							})
+						ech := &proto.EntityChild{
+							Type:  &proto.Key{Key: snakeCase(fOpt.name)},
+							Value: child.AggregateValue(),
 						}
+
+						if childData, ok := child.(NestedChildData); ok {
+							ech.Data = childData.KeystoneData()
+						} else {
+							ech.Data = getChildData(ch)
+						}
+
+						p.children = append(p.children, ech)
 					}
+				} else {
+					fmt.Println("skipping unsupported slice type ", field.Type.Kind(), fieldValue.Index(0).Interface().(NestedChild))
 				}
 			}
 
 			if field.Type.Kind() == reflect.Struct || field.Type.Kind() == reflect.Pointer {
 				p.fieldsToProperties(fieldValue, field.Type, fOpt.name+".")
 			} else {
-				//fmt.Println("skipping unsupported type ", field.Type.Kind())
+				fmt.Println("skipping unsupported type ", field.Type.Kind())
 			}
 		}
 	}

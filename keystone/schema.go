@@ -248,7 +248,7 @@ type fieldOptions struct {
 	reverseLookup bool
 	verifyOnly    bool
 
-	// data classification
+	// Data classification
 	personalData  bool
 	userInputData bool
 }

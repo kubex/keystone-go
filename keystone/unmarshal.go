@@ -1,7 +1,6 @@
 package keystone
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -157,17 +156,28 @@ func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, chi
 		fieldOpt.name = prefix + fieldOpt.name
 		if supportedType(field.Type) {
 			setFieldValue(field, fieldValue, fieldOpt, entityPropertyMap)
-		} else {
-			// hydrate children
+		} else if field.IsExported() {
+			// hydrate Children
 			if field.Type.Kind() == reflect.Slice && len(children) > 0 {
+				childSlice := reflect.MakeSlice(field.Type, 0, 0)
 				for _, child := range children {
 					if child.Type.Key == fieldOpt.name {
 						el := reflect.New(field.Type.Elem())
-						if err := json.Unmarshal(child.Data, el.Interface()); err != nil {
-							continue
+						if el.Type().Kind() == reflect.Ptr {
+							el = reflect.New(el.Elem().Type().Elem())
 						}
-						fieldValue.Set(reflect.Append(fieldValue, el.Elem()))
+
+						ch := el.Interface()
+						if childData, ok := ch.(NestedChildData); ok {
+							childData.HydrateKeystoneData(child.Data)
+						} else {
+							hydrateChildData(child.Data, ch)
+						}
+						childSlice = reflect.Append(childSlice, el)
 					}
+				}
+				if fieldValue.CanSet() {
+					fieldValue.Set(childSlice)
 				}
 				continue
 			}

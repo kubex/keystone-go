@@ -54,20 +54,20 @@ func (a *Actor) SetClient(client string) {
 	}
 }
 
-func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}, retrieve RetrieveOption) error {
-	return a.Get(ctx, ByEntityID(Type(dst), entityID), dst, retrieve)
+func (a *Actor) GetByID(ctx context.Context, entityID string, dst interface{}, retrieve ...RetrieveOption) error {
+	return a.Get(ctx, ByEntityID(Type(dst), entityID), dst, retrieve...)
 }
 
-func (a *Actor) GetByUniqueProperty(ctx context.Context, uniqueId, propertyName string, dst interface{}, retrieve RetrieveOption) error {
-	return a.Get(ctx, ByUniqueProperty(Type(dst), uniqueId, propertyName), dst, retrieve)
+func (a *Actor) GetByUniqueProperty(ctx context.Context, uniqueId, propertyName string, dst interface{}, retrieve ...RetrieveOption) error {
+	return a.Get(ctx, ByUniqueProperty(Type(dst), uniqueId, propertyName), dst, retrieve...)
 }
 
 // Get retrieves an entity by the given retrieveBy, storing the result in dst
-func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{}, retrieve RetrieveOption) error {
+func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{}, retrieve ...RetrieveOption) error {
 	entityRequest := retrieveBy.BaseRequest()
 	entityRequest.Authorization = a.Authorization()
-	if retrieve != nil {
-		retrieve.Apply(entityRequest.View)
+	for _, rOpt := range retrieve {
+		rOpt.Apply(entityRequest.View)
 	}
 
 	_, loadByUnique := retrieveBy.(byUniqueProperty)
