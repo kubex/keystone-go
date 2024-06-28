@@ -56,3 +56,9 @@ type testBaseChildEntity struct {
 	Data      []byte
 	ChildName string
 }
+
+func (e *testBaseChildEntity) AggregateValue() int64 {
+	return 3
+}
+
+func (e *testBaseChildEntity) SetAggregateValue(v int64) {}

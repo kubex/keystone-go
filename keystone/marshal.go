@@ -72,12 +72,17 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 				}
 			}
 			if field.Type.Kind() == reflect.Slice && fieldValue.Len() > 0 {
-				ch := fieldValue.Index(0).Interface()
-				if child, ok := ch.(NestedChild); ok {
+				firstChild := fieldValue.Index(0).Interface()
+				if _, ok := firstChild.(NestedChild); ok {
 					for i := 0; i < fieldValue.Len(); i++ {
+						ch := fieldValue.Index(i).Interface()
+						child := ch.(NestedChild)
 						ech := &proto.EntityChild{
-							Type:  &proto.Key{Key: snakeCase(fOpt.name)},
-							Value: child.AggregateValue(),
+							Type: &proto.Key{Key: snakeCase(fOpt.name)},
+						}
+
+						if childData, ok := ch.(NestedChildAggregateValue); ok {
+							ech.Value = childData.AggregateValue()
 						}
 
 						if childData, ok := child.(NestedChildData); ok {

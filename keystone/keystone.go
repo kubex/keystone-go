@@ -14,6 +14,9 @@ type GenericResult map[string]interface{}
 type NestedChild interface {
 	ChildID() string
 	SetChildID(id string)
+}
+
+type NestedChildAggregateValue interface {
 	AggregateValue() int64
 	SetAggregateValue(val int64)
 }
@@ -24,20 +27,7 @@ type NestedChildData interface {
 }
 
 type BaseNestedChild struct {
-	_childID        string
-	_aggregateValue int64
-}
-
-func (e *BaseNestedChild) SetAggregateValue(val int64) {
-	e._aggregateValue = val
-}
-
-func (e *BaseNestedChild) AggregateValue() int64 {
-	if e._aggregateValue == 0 {
-		return 1
-	}
-
-	return e._aggregateValue
+	_childID string
 }
 
 func getChildData(from any) map[string][]byte {

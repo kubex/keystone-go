@@ -168,6 +168,15 @@ func entityResponseToDst(entityPropertyMap map[string]*proto.EntityProperty, chi
 						}
 
 						ch := el.Interface()
+
+						if childData, ok := ch.(NestedChild); ok {
+							childData.SetChildID(child.Cid)
+						}
+
+						if childData, ok := ch.(NestedChildAggregateValue); ok {
+							childData.SetAggregateValue(child.Value)
+						}
+
 						if childData, ok := ch.(NestedChildData); ok {
 							childData.HydrateKeystoneData(child.Data)
 						} else {
