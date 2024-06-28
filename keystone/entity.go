@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+func RemoteEntity(entityID string) *BaseEntity {
+	return &BaseEntity{
+		_entityID: entityID,
+	}
+}
+
 type BaseEntity struct {
 	EntityEvents
 	EntityLabels

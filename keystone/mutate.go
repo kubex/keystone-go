@@ -9,6 +9,36 @@ import (
 	"github.com/kubex/keystone-go/proto"
 )
 
+func (a *Actor) RemoteMutate(ctx context.Context, src interface{}, comment string) error {
+	mutation := &proto.Mutation{}
+	entityID := ""
+	if rawEntity, ok := src.(Entity); ok {
+		entityID = rawEntity.GetKeystoneID()
+	}
+
+	if entityID == "" {
+		return errors.New("entityID is required for remote mutations")
+	}
+
+	if entityWithSensor, ok := src.(EntitySensorProvider); ok {
+		mutation.Measurements = entityWithSensor.GetKeystoneSensorMeasurements()
+	}
+	if entityWithEvents, ok := src.(EntityEventProvider); ok {
+		mutation.Events = entityWithEvents.GetKeystoneEvents()
+	}
+	if entityWithLogs, ok := src.(EntityLogProvider); ok {
+		mutation.Logs = entityWithLogs.GetKeystoneLogs()
+	}
+
+	m := &proto.MutateRequest{
+		Authorization: a.Authorization(),
+		EntityId:      entityID,
+		Mutation:      mutation,
+	}
+
+	return mutateToError(a.connection.Mutate(ctx, m))
+}
+
 // Mutate is a function that can mutate an entity
 func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) error {
 	if reflect.TypeOf(src).Kind() != reflect.Pointer {
