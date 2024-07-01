@@ -1,6 +1,9 @@
 package keystone
 
-import "github.com/kubex/keystone-go/proto"
+import (
+	"github.com/kubex/keystone-go/proto"
+	"reflect"
+)
 
 // WhereEquals is a find option that filters entities by a property equaling a value
 func WhereEquals(key string, value any) FindOption {
@@ -86,15 +89,16 @@ func (f propertyFilter) Apply(config *filterRequest) {
 }
 
 func valueFromAny(value any) *proto.Value {
-	switch v := value.(type) {
-	case string:
-		return &proto.Value{Text: v}
-	case int, int32, int64:
-		return &proto.Value{Int: int64(v.(int))}
-	case bool:
-		return &proto.Value{Bool: v}
-	case float64:
-		return &proto.Value{Float: v}
+	v := reflect.ValueOf(value)
+	switch v.Kind().String() {
+	case "string":
+		return &proto.Value{Text: v.String()}
+	case "int", "int32", "int64":
+		return &proto.Value{Int: v.Int()}
+	case "bool":
+		return &proto.Value{Bool: v.Bool()}
+	case "float64":
+		return &proto.Value{Float: v.Float()}
 	}
 	return &proto.Value{}
 }
