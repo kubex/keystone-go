@@ -112,6 +112,17 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 	if be, ok := dst.(BaseEntity); ok {
 		be._lastLoad = resp
 	}
+
+	if lk, ok := dst.(EntityLocker); ok && resp.GetLock() != nil {
+		LockData := &EntityLockInfo{
+			LockAcquired: resp.GetLock().GetLockAcquired(),
+			ID:           resp.GetLock().GetLockId(),
+			LockedUntil:  resp.GetLock().GetLockedUntil().AsTime(),
+			Message:      resp.GetLock().GetMessage(),
+		}
+		lk.SetKeystoneLockResult(LockData)
+	}
+
 	if gr, ok := dst.(GenericResult); ok {
 		return UnmarshalGeneric(resp, gr)
 	}
