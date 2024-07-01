@@ -68,6 +68,9 @@ func (a *Actor) Get(ctx context.Context, retrieveBy RetrieveBy, dst interface{},
 	entityRequest.Authorization = a.Authorization()
 	for _, rOpt := range retrieve {
 		rOpt.Apply(entityRequest.View)
+		if reOpt, ok := rOpt.(RetrieveEntityOption); ok {
+			reOpt.ApplyRequest(entityRequest)
+		}
 	}
 
 	_, loadByUnique := retrieveBy.(byUniqueProperty)

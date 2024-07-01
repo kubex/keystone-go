@@ -60,6 +60,10 @@ type RetrieveOption interface {
 	Apply(config *proto.EntityView)
 }
 
+type RetrieveEntityOption interface {
+	ApplyRequest(config *proto.EntityRequest)
+}
+
 type retrieveOptions []RetrieveOption
 
 func (o retrieveOptions) Apply(config *proto.EntityView) {
@@ -227,4 +231,20 @@ func WithDescendantCount(entityType string) RetrieveOption {
 		/*appId:      appId,
 		vendorId:   vendorId,*/
 	}
+}
+
+type withLock struct {
+	message    string
+	ttlSeconds int32
+}
+
+func (l withLock) Apply(config *proto.EntityView) {}
+
+func (l withLock) ApplyRequest(config *proto.EntityRequest) {
+	config.RequestLock = true
+	config.LockTtlSeconds = l.ttlSeconds
+	config.LockMessage = l.message
+}
+func WithLock(note string, ttlSeconds int32) RetrieveOption {
+	return withLock{message: note, ttlSeconds: ttlSeconds}
 }
