@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/packaged/logger/v3 v3.1.0
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.64.0
+	google.golang.org/grpc v1.64.1
 )
 
 require (
