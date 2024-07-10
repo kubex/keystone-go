@@ -124,7 +124,7 @@ func getProperties(t reflect.Type, prefix string) []*proto.Property {
 			if field.Type.Kind() == reflect.Struct {
 				returnFields = append(returnFields, getProperties(field.Type, fOpt.name+".")...)
 			} else {
-				log.Println("skipping unsupported field ", field.Name, field.Type.Kind())
+				log.Println("skipping unsupported field", field.Name, field.Type.Kind())
 			}
 			continue
 		}

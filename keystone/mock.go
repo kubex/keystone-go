@@ -1,0 +1,98 @@
+package keystone
+
+import (
+	"context"
+	"github.com/kubex/keystone-go/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/test/bufconn"
+	"net"
+)
+
+const bufSize = 1024 * 1024
+
+var mockListener *bufconn.Listener
+
+type mockServer struct {
+	proto.UnimplementedKeystoneServer
+	DefineFunc           func(context.Context, *proto.SchemaRequest) (*proto.Schema, error)
+	MutateFunc           func(context.Context, *proto.MutateRequest) (*proto.MutateResponse, error)
+	RetrieveFunc         func(context.Context, *proto.EntityRequest) (*proto.EntityResponse, error)
+	FindFunc             func(context.Context, *proto.FindRequest) (*proto.FindResponse, error)
+	ListFunc             func(context.Context, *proto.ListRequest) (*proto.ListResponse, error)
+	LogsFunc             func(context.Context, *proto.LogRequest) (*proto.LogsResponse, error)
+	EventsFunc           func(context.Context, *proto.EventRequest) (*proto.EventsResponse, error)
+	DailyEntitiesFunc    func(context.Context, *proto.DailyEntityRequest) (*proto.DailyEntityResponse, error)
+	SchemaStatisticsFunc func(context.Context, *proto.SchemaStatisticsRequest) (*proto.SchemaStatisticsResponse, error)
+}
+
+func bufDialer(context.Context, string) (net.Conn, error) {
+	return mockListener.Dial()
+}
+
+// server.Serve(listener) / defer close
+
+func MockConnection() (*Connection, *bufconn.Listener, *grpc.Server) {
+	mockListener = bufconn.Listen(bufSize)
+	s := grpc.NewServer()
+	proto.RegisterKeystoneServer(s, &mockServer{})
+	conn, err := grpc.DialContext(context.Background(), "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	return NewConnection(proto.NewKeystoneClient(conn), "", "", ""), mockListener, s
+}
+
+func (m *mockServer) Define(ctx context.Context, req *proto.SchemaRequest) (*proto.Schema, error) {
+	if m.DefineFunc == nil {
+		return m.UnimplementedKeystoneServer.Define(ctx, req)
+	}
+	return m.DefineFunc(ctx, req)
+}
+func (m *mockServer) Mutate(ctx context.Context, req *proto.MutateRequest) (*proto.MutateResponse, error) {
+	if m.MutateFunc == nil {
+		return m.UnimplementedKeystoneServer.Mutate(ctx, req)
+	}
+	return m.MutateFunc(ctx, req)
+}
+func (m *mockServer) Retrieve(ctx context.Context, req *proto.EntityRequest) (*proto.EntityResponse, error) {
+	if m.RetrieveFunc == nil {
+		return m.UnimplementedKeystoneServer.Retrieve(ctx, req)
+	}
+	return m.RetrieveFunc(ctx, req)
+}
+func (m *mockServer) Find(ctx context.Context, req *proto.FindRequest) (*proto.FindResponse, error) {
+	if m.FindFunc == nil {
+		return m.UnimplementedKeystoneServer.Find(ctx, req)
+	}
+	return m.FindFunc(ctx, req)
+}
+func (m *mockServer) List(ctx context.Context, req *proto.ListRequest) (*proto.ListResponse, error) {
+	if m.ListFunc == nil {
+		return m.UnimplementedKeystoneServer.List(ctx, req)
+	}
+	return m.ListFunc(ctx, req)
+}
+func (m *mockServer) Logs(ctx context.Context, req *proto.LogRequest) (*proto.LogsResponse, error) {
+	if m.LogsFunc == nil {
+		return m.UnimplementedKeystoneServer.Logs(ctx, req)
+	}
+	return m.LogsFunc(ctx, req)
+}
+func (m *mockServer) Events(ctx context.Context, req *proto.EventRequest) (*proto.EventsResponse, error) {
+	if m.EventsFunc == nil {
+		return m.UnimplementedKeystoneServer.Events(ctx, req)
+	}
+	return m.EventsFunc(ctx, req)
+}
+func (m *mockServer) DailyEntities(ctx context.Context, req *proto.DailyEntityRequest) (*proto.DailyEntityResponse, error) {
+	if m.DailyEntitiesFunc == nil {
+		return m.UnimplementedKeystoneServer.DailyEntities(ctx, req)
+	}
+	return m.DailyEntitiesFunc(ctx, req)
+}
+func (m *mockServer) SchemaStatistics(ctx context.Context, req *proto.SchemaStatisticsRequest) (*proto.SchemaStatisticsResponse, error) {
+	if m.SchemaStatisticsFunc == nil {
+		return m.UnimplementedKeystoneServer.SchemaStatistics(ctx, req)
+	}
+	return m.SchemaStatisticsFunc(ctx, req)
+}
