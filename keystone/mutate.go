@@ -43,16 +43,17 @@ type MutateOption interface {
 	apply(*proto.MutateRequest)
 }
 
-type MutateByLookup struct {
-	Property string
-	UniqueID string
+// OnConflictUseID should set the unique properties that can be used to identify an existing identity
+func OnConflictUseID(property ...string) MutateOption {
+	return onConflictUseID{Property: property}
 }
 
-func (m MutateByLookup) apply(mutate *proto.MutateRequest) {
-	mutate.AttemptLookup = &proto.IDLookup{
-		UniqueId: m.UniqueID,
-		Property: m.Property,
-	}
+type onConflictUseID struct {
+	Property []string
+}
+
+func (m onConflictUseID) apply(mutate *proto.MutateRequest) {
+	mutate.ConflictUniquePropertyAcquire = m.Property
 }
 
 // Mutate is a function that can mutate an entity
