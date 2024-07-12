@@ -39,8 +39,24 @@ func (a *Actor) RemoteMutate(ctx context.Context, src interface{}, comment strin
 	return mutateToError(a.connection.Mutate(ctx, m))
 }
 
+type MutateOption interface {
+	apply(*proto.MutateRequest)
+}
+
+type MutateByLookup struct {
+	Property string
+	UniqueID string
+}
+
+func (m MutateByLookup) apply(mutate *proto.MutateRequest) {
+	mutate.AttemptLookup = &proto.IDLookup{
+		UniqueId: m.UniqueID,
+		Property: m.Property,
+	}
+}
+
 // Mutate is a function that can mutate an entity
-func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) error {
+func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string, options ...MutateOption) error {
 	if reflect.TypeOf(src).Kind() != reflect.Pointer {
 		return errors.New("mutate requires a pointer to a struct")
 	}
@@ -93,6 +109,10 @@ func (a *Actor) Mutate(ctx context.Context, src interface{}, comment string) err
 		EntityId:      entityID,
 		Schema:        &proto.Key{Key: schema.Type, Source: schema.Source}, // TODO: Should probably provide the schema ID if we have it - and verify against the type / source
 		Mutation:      mutation,
+	}
+
+	for _, option := range options {
+		option.apply(m)
 	}
 
 	mResp, err := a.connection.Mutate(ctx, m)
