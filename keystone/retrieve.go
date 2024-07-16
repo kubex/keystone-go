@@ -19,6 +19,7 @@ func (a *Actor) UserAgent() string { return a.user.GetUserAgent() }
 func (a *Actor) RemoteIp() string  { return a.user.GetRemoteIp() }
 func (a *Actor) UserId() string    { return a.user.GetUserId() }
 func (a *Actor) Client() string    { return a.user.GetClient() }
+func (a *Actor) User() *proto.User { return a.user }
 
 func (a *Actor) VendorID() string {
 	return a.connection.appID.GetVendorId()
@@ -44,6 +45,7 @@ func (a *Actor) Authorization() *proto.Authorization {
 		Source:      &a.connection.appID,
 		Token:       a.connection.token,
 		WorkspaceId: a.workspaceID,
+		User:        a.User(),
 	}
 }
 
