@@ -19,7 +19,8 @@ type MockServer struct {
 	RetrieveFunc         func(context.Context, *proto.EntityRequest) (*proto.EntityResponse, error)
 	FindFunc             func(context.Context, *proto.FindRequest) (*proto.FindResponse, error)
 	ListFunc             func(context.Context, *proto.ListRequest) (*proto.ListResponse, error)
-	LogsFunc             func(context.Context, *proto.LogRequest) (*proto.LogsResponse, error)
+	LogFunc              func(context.Context, *proto.LogRequest) (*proto.LogResponse, error)
+	LogsFunc             func(context.Context, *proto.LogsRequest) (*proto.LogsResponse, error)
 	EventsFunc           func(context.Context, *proto.EventRequest) (*proto.EventsResponse, error)
 	DailyEntitiesFunc    func(context.Context, *proto.DailyEntityRequest) (*proto.DailyEntityResponse, error)
 	SchemaStatisticsFunc func(context.Context, *proto.SchemaStatisticsRequest) (*proto.SchemaStatisticsResponse, error)
@@ -73,7 +74,13 @@ func (m *MockServer) List(ctx context.Context, req *proto.ListRequest) (*proto.L
 	}
 	return m.ListFunc(ctx, req)
 }
-func (m *MockServer) Logs(ctx context.Context, req *proto.LogRequest) (*proto.LogsResponse, error) {
+func (m *MockServer) Log(ctx context.Context, req *proto.LogRequest) (*proto.LogResponse, error) {
+	if m.LogsFunc == nil {
+		return m.UnimplementedKeystoneServer.Log(ctx, req)
+	}
+	return m.LogFunc(ctx, req)
+}
+func (m *MockServer) Logs(ctx context.Context, req *proto.LogsRequest) (*proto.LogsResponse, error) {
 	if m.LogsFunc == nil {
 		return m.UnimplementedKeystoneServer.Logs(ctx, req)
 	}

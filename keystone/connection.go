@@ -76,7 +76,14 @@ func (c *Connection) Retrieve(ctx context.Context, in *proto.EntityRequest, opts
 	return resp, err
 }
 
-func (c *Connection) Logs(ctx context.Context, in *proto.LogRequest, opts ...grpc.CallOption) (*proto.LogsResponse, error) {
+func (c *Connection) Log(ctx context.Context, in *proto.LogRequest, opts ...grpc.CallOption) (*proto.LogResponse, error) {
+	tl := c.timeLogConfig.NewLog("Logs", zap.String("EntityId", in.GetEntityId()))
+	resp, err := c.client.Log(ctx, in, opts...)
+	c.logger.TimedLog(tl)
+	return resp, err
+}
+
+func (c *Connection) Logs(ctx context.Context, in *proto.LogsRequest, opts ...grpc.CallOption) (*proto.LogsResponse, error) {
 	tl := c.timeLogConfig.NewLog("Logs", zap.String("EntityId", in.GetEntityId()))
 	resp, err := c.client.Logs(ctx, in, opts...)
 	c.logger.TimedLog(tl)
