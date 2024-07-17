@@ -208,10 +208,10 @@ func WithSiblingRelationshipCount(relationType string) RetrieveOption {
 	}
 }
 
-type childCount struct{ count bool }
+type childSummary struct{ retrieveSummary bool }
 
-func (l childCount) Apply(config *proto.EntityView) { config.ChildCount = l.count }
-func WithChildCount() RetrieveOption                { return relationshipCount{count: true} }
+func (l childSummary) Apply(config *proto.EntityView) { config.ChildSummary = l.retrieveSummary }
+func WithChildSummary() RetrieveOption                { return relationshipCount{count: true} }
 
 type descendantTypeCount struct{ entityType, appId, vendorId string }
 
