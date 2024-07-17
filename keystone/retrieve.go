@@ -163,11 +163,10 @@ func (a *Actor) Find(ctx context.Context, entityType string, retrieve RetrieveOp
 }
 
 // List returns a list of entities within an active set
-func (a *Actor) List(ctx context.Context, entityType, activeSetName string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
+func (a *Actor) List(ctx context.Context, entityType string, retrieveProperties []string, options ...FindOption) ([]*proto.EntityResponse, error) {
 	listRequest := &proto.ListRequest{
 		Authorization: a.Authorization(),
 		Schema:        &proto.Key{Key: entityType, Source: a.Authorization().Source},
-		FromView:      activeSetName,
 		Properties:    retrieveProperties,
 	}
 

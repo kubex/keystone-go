@@ -105,7 +105,7 @@ func (c *Connection) Find(ctx context.Context, in *proto.FindRequest, opts ...gr
 }
 
 func (c *Connection) List(ctx context.Context, in *proto.ListRequest, opts ...grpc.CallOption) (*proto.ListResponse, error) {
-	tl := c.timeLogConfig.NewLog("List", zap.String("schema", in.GetSchema().GetKey()), zap.String("from", in.GetFromView()))
+	tl := c.timeLogConfig.NewLog("List", zap.String("schema", in.GetSchema().GetKey()))
 	resp, err := c.client.List(ctx, in, opts...)
 	c.logger.TimedLog(tl)
 	return resp, err
@@ -181,7 +181,6 @@ func (c *Connection) SyncSchema() *sync.WaitGroup {
 					resp, err := c.Define(context.Background(), &proto.SchemaRequest{
 						Authorization: c.authorization(),
 						Schema:        toRegister.schema,
-						IndexViews:    toRegister.definition.IndexViews,
 						Views:         toRegister.definition.Views,
 					})
 
