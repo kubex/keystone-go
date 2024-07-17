@@ -56,13 +56,13 @@ func WhereEndsWith(key string, value string) FindOption {
 }
 
 // WhereIn is a find option that filters entities by a property being in a list of values
-func WhereIn(key string, value ...string) FindOption {
-	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_In}
+func WhereIn(key string, value ...any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value...), operator: proto.Operator_In}
 }
 
 // WhereNotIn is a find option that filters entities by a property not being in a list of values
-func WhereNotIn(key string, value string) FindOption {
-	return propertyFilter{key: key, values: valuesFromAny(value), operator: proto.Operator_Equal}
+func WhereNotIn(key string, value ...any) FindOption {
+	return propertyFilter{key: key, values: valuesFromAny(value...), operator: proto.Operator_Equal}
 }
 
 // WhereBetween is a find option that filters entities by a property being between two values
