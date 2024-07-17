@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Keystone_Define_FullMethodName           = "/kubex.keystone.Keystone/Define"
 	Keystone_Mutate_FullMethodName           = "/kubex.keystone.Keystone/Mutate"
+	Keystone_Log_FullMethodName              = "/kubex.keystone.Keystone/Log"
 	Keystone_Retrieve_FullMethodName         = "/kubex.keystone.Keystone/Retrieve"
 	Keystone_Find_FullMethodName             = "/kubex.keystone.Keystone/Find"
 	Keystone_List_FullMethodName             = "/kubex.keystone.Keystone/List"
@@ -38,11 +39,12 @@ type KeystoneClient interface {
 	Define(ctx context.Context, in *SchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	// Store
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
+	Log(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error)
 	// Load
 	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
-	Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error)
+	Logs(ctx context.Context, in *LogsRequest, opts ...grpc.CallOption) (*LogsResponse, error)
 	Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	// Management
 	DailyEntities(ctx context.Context, in *DailyEntityRequest, opts ...grpc.CallOption) (*DailyEntityResponse, error)
@@ -69,6 +71,15 @@ func (c *keystoneClient) Define(ctx context.Context, in *SchemaRequest, opts ...
 func (c *keystoneClient) Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error) {
 	out := new(MutateResponse)
 	err := c.cc.Invoke(ctx, Keystone_Mutate_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) Log(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error) {
+	out := new(LogResponse)
+	err := c.cc.Invoke(ctx, Keystone_Log_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +113,7 @@ func (c *keystoneClient) List(ctx context.Context, in *ListRequest, opts ...grpc
 	return out, nil
 }
 
-func (c *keystoneClient) Logs(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogsResponse, error) {
+func (c *keystoneClient) Logs(ctx context.Context, in *LogsRequest, opts ...grpc.CallOption) (*LogsResponse, error) {
 	out := new(LogsResponse)
 	err := c.cc.Invoke(ctx, Keystone_Logs_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -146,11 +157,12 @@ type KeystoneServer interface {
 	Define(context.Context, *SchemaRequest) (*Schema, error)
 	// Store
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
+	Log(context.Context, *LogRequest) (*LogResponse, error)
 	// Load
 	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
 	List(context.Context, *ListRequest) (*ListResponse, error)
-	Logs(context.Context, *LogRequest) (*LogsResponse, error)
+	Logs(context.Context, *LogsRequest) (*LogsResponse, error)
 	Events(context.Context, *EventRequest) (*EventsResponse, error)
 	// Management
 	DailyEntities(context.Context, *DailyEntityRequest) (*DailyEntityResponse, error)
@@ -168,6 +180,9 @@ func (UnimplementedKeystoneServer) Define(context.Context, *SchemaRequest) (*Sch
 func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*MutateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Mutate not implemented")
 }
+func (UnimplementedKeystoneServer) Log(context.Context, *LogRequest) (*LogResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Log not implemented")
+}
 func (UnimplementedKeystoneServer) Retrieve(context.Context, *EntityRequest) (*EntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retrieve not implemented")
 }
@@ -177,7 +192,7 @@ func (UnimplementedKeystoneServer) Find(context.Context, *FindRequest) (*FindRes
 func (UnimplementedKeystoneServer) List(context.Context, *ListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedKeystoneServer) Logs(context.Context, *LogRequest) (*LogsResponse, error) {
+func (UnimplementedKeystoneServer) Logs(context.Context, *LogsRequest) (*LogsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logs not implemented")
 }
 func (UnimplementedKeystoneServer) Events(context.Context, *EventRequest) (*EventsResponse, error) {
@@ -238,6 +253,24 @@ func _Keystone_Mutate_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keystone_Log_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).Log(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keystone_Log_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).Log(ctx, req.(*LogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Keystone_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EntityRequest)
 	if err := dec(in); err != nil {
@@ -293,7 +326,7 @@ func _Keystone_List_Handler(srv interface{}, ctx context.Context, dec func(inter
 }
 
 func _Keystone_Logs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LogRequest)
+	in := new(LogsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -305,7 +338,7 @@ func _Keystone_Logs_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: Keystone_Logs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeystoneServer).Logs(ctx, req.(*LogRequest))
+		return srv.(KeystoneServer).Logs(ctx, req.(*LogsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -378,6 +411,10 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Mutate",
 			Handler:    _Keystone_Mutate_Handler,
+		},
+		{
+			MethodName: "Log",
+			Handler:    _Keystone_Log_Handler,
 		},
 		{
 			MethodName: "Retrieve",
