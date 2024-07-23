@@ -10,6 +10,7 @@ import (
 type Actor struct {
 	connection  *Connection
 	workspaceID string
+	traceID     string
 	user        *proto.User
 }
 
@@ -37,6 +38,11 @@ func (a *Actor) WorkspaceID() string {
 	return a.workspaceID
 }
 
+func (a *Actor) TraceID() string {
+	return a.traceID
+}
+func (a *Actor) SetTraceID(id string) { a.traceID = id }
+
 func (a *Actor) Authorization() *proto.Authorization {
 	if a == nil || a.connection == nil {
 		return nil
@@ -44,6 +50,7 @@ func (a *Actor) Authorization() *proto.Authorization {
 	return &proto.Authorization{
 		Source:      &a.connection.appID,
 		Token:       a.connection.token,
+		TraceId:     a.traceID,
 		WorkspaceId: a.workspaceID,
 		User:        a.User(),
 	}
