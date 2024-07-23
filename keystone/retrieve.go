@@ -181,10 +181,11 @@ func (a *Actor) List(ctx context.Context, entityType string, retrieveProperties 
 		PageNumber: fReq.PageNumber,
 	}
 
-	listRequest.Sort = []*proto.PropertySort{{
-		Property:   fReq.SortProperty,
-		Descending: fReq.SortDescending,
-	},
+	if fReq.SortProperty != "" {
+		listRequest.Sort = []*proto.PropertySort{{
+			Property:   fReq.SortProperty,
+			Descending: fReq.SortDescending,
+		}}
 	}
 
 	resp, err := a.connection.List(ctx, listRequest)

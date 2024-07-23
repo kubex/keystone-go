@@ -61,6 +61,10 @@ func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 
 	var countReplace = map[string]int64{}
 
+	if entityDetail, ok := dst.(EntityDetail); ok {
+		entityDetail.SetEntityDetail(resp.GetEntity())
+	}
+
 	if resp.GetRelationshipCounts() != nil {
 		for _, v := range resp.GetRelationshipCounts() {
 			t := v.GetType()
@@ -74,6 +78,7 @@ func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 			}
 		}
 	}
+
 	if resp.GetDescendantCounts() != nil {
 		for _, v := range resp.GetDescendantCounts() {
 			t := v.GetType()

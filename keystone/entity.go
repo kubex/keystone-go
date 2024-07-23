@@ -18,6 +18,7 @@ type BaseEntity struct {
 	EntityRelationships
 	EntitySensors
 	EntityLock
+	EntityDetails
 	_lastLoad *proto.EntityResponse
 	_entityID string
 }
