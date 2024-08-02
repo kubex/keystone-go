@@ -2,7 +2,9 @@ package keystone
 
 import (
 	"github.com/kubex/keystone-go/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"reflect"
+	"time"
 )
 
 // WhereEquals is a find option that filters entities by a property equaling a value
@@ -90,6 +92,9 @@ func (f propertyFilter) Apply(config *filterRequest) {
 
 func valueFromAny(value any) *proto.Value {
 	v := reflect.ValueOf(value)
+	for v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
 	switch v.Kind().String() {
 	case "string":
 		return &proto.Value{Text: v.String()}
@@ -99,6 +104,13 @@ func valueFromAny(value any) *proto.Value {
 		return &proto.Value{Bool: v.Bool()}
 	case "float64":
 		return &proto.Value{Float: v.Float()}
+	}
+
+	switch v.Type().String() {
+	case "time.Time":
+		return &proto.Value{Time: timestamppb.New(value.(time.Time))}
+	case "timestamppb.Timestamp":
+		return &proto.Value{Time: value.(*timestamppb.Timestamp)}
 	}
 	return &proto.Value{}
 }

@@ -52,11 +52,13 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 		}
 
 		if !field.IsExported() {
-			continue //fmt.Println("skipping unexported field ", field.Name)
+			// Skip unexported fields
+			continue
 		}
 
 		fOpt := getFieldOptions(field, prefix)
 		if fOpt.name == "" {
+			// Skip fields with no name, for desired exclusions (Marked with -)
 			continue
 		}
 

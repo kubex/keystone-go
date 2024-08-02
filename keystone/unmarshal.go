@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/kubex/keystone-go/proto"
@@ -58,6 +59,21 @@ func UnmarshalAppend(dstPtr any, resp ...*proto.EntityResponse) error {
 
 func Unmarshal(resp *proto.EntityResponse, dst interface{}) error {
 	entityPropertyMap := makeEntityPropertyMap(resp)
+
+	if resp.GetEntity() != nil {
+		e := resp.GetEntity()
+		split := strings.Split(e.GetEntityId(), "-")
+		entityPropertyMap["_entity_id"] = &proto.EntityProperty{Value: valueFromAny(split[0])}
+		if len(split) == 2 {
+			entityPropertyMap["_child_id"] = &proto.EntityProperty{Value: valueFromAny(split[1])}
+		}
+
+		entityPropertyMap["_schema_id"] = &proto.EntityProperty{Value: valueFromAny(e.GetSchemaId())}
+		entityPropertyMap["_created"] = &proto.EntityProperty{Value: valueFromAny(e.GetCreated())}
+		entityPropertyMap["_state_change"] = &proto.EntityProperty{Value: valueFromAny(e.GetStateChange())}
+		entityPropertyMap["_state"] = &proto.EntityProperty{Value: valueFromAny(e.GetState())}
+		entityPropertyMap["_last_update"] = &proto.EntityProperty{Value: valueFromAny(e.GetLastUpdate())}
+	}
 
 	var countReplace = map[string]int64{}
 
