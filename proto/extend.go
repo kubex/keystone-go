@@ -20,6 +20,8 @@ func CreateDate(time time.Time) *Date {
 
 func NewValue() *Value {
 	return &Value{
-		Array: &RepeatedValue{},
+		Array:       &RepeatedValue{},
+		ArrayAppend: &RepeatedValue{},
+		ArrayReduce: &RepeatedValue{},
 	}
 }

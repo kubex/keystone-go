@@ -9,17 +9,32 @@ type IntSet struct {
 }
 
 func (s *IntSet) Clear() {
-	s.values = make(map[int64]bool)
-	s.toAdd = make(map[int64]bool)
-	s.toRemove = make(map[int64]bool)
+	s.values = nil
+	s.toAdd = nil
+	s.toRemove = nil
+	s.prepare()
+}
+
+func (s *IntSet) prepare() {
+	if s.toAdd == nil {
+		s.toAdd = make(map[int64]bool)
+	}
+	if s.toRemove == nil {
+		s.toRemove = make(map[int64]bool)
+	}
+	if s.values == nil {
+		s.values = make(map[int64]bool)
+	}
 }
 
 func (s *IntSet) Add(value int64) {
+	s.prepare()
 	s.toAdd[value] = true
 	delete(s.toRemove, value)
 }
 
 func (s *IntSet) Remove(value int64) {
+	s.prepare()
 	s.toRemove[value] = true
 	delete(s.toAdd, value)
 }
@@ -33,6 +48,9 @@ func (s *IntSet) Values() []int64 {
 }
 
 func (s *IntSet) Has(value int64) bool {
+	if s.values == nil {
+		return false
+	}
 	_, ok := s.values[value]
 	return ok
 }
@@ -44,6 +62,7 @@ func (s *IntSet) ReplaceWith(values ...int64) {
 }
 
 func (s *IntSet) applyValues(values ...int64) {
+	s.prepare()
 	for _, value := range values {
 		s.values[value] = true
 	}
@@ -54,6 +73,7 @@ func (s *IntSet) IsEmpty() bool {
 }
 
 func (s *IntSet) ToAdd() []int64 {
+	s.prepare()
 	var values []int64
 	for value := range s.toAdd {
 		values = append(values, value)
@@ -62,6 +82,7 @@ func (s *IntSet) ToAdd() []int64 {
 }
 
 func (s *IntSet) ToRemove() []int64 {
+	s.prepare()
 	var values []int64
 	for value := range s.toRemove {
 		values = append(values, value)
@@ -74,6 +95,7 @@ func (s *IntSet) ReplaceExisting() bool {
 }
 
 func (s *IntSet) Diff(values ...int64) []int64 {
+	s.prepare()
 	check := make(map[int64]bool, len(values))
 	for _, x := range values {
 		check[x] = s.Has(x)

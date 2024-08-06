@@ -191,12 +191,16 @@ func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, f
 	case typeOfStringSet:
 		if iVal, ok := fieldValue.Interface().(StringSet); ok {
 			prop.Value.Array.Strings = iVal.Values()
-			return prop, prop.Value.Array.GetStrings() == nil
+			prop.Value.ArrayAppend.Strings = iVal.ToAdd()
+			prop.Value.ArrayReduce.Strings = iVal.ToRemove()
+			return prop, prop.Value.GetArray().GetStrings() == nil && prop.Value.GetArrayAppend().GetStrings() == nil && prop.Value.GetArrayReduce().GetStrings() == nil
 		}
 	case typeOfIntSet:
 		if iVal, ok := fieldValue.Interface().(IntSet); ok {
 			prop.Value.Array.Ints = iVal.Values()
-			return prop, prop.Value.Array.GetInts() == nil
+			prop.Value.ArrayAppend.Ints = iVal.ToAdd()
+			prop.Value.ArrayReduce.Ints = iVal.ToRemove()
+			return prop, prop.Value.GetArray().GetInts() == nil && prop.Value.GetArrayAppend().GetInts() == nil && prop.Value.GetArrayReduce().GetInts() == nil
 		}
 	}
 

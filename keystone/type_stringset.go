@@ -9,22 +9,37 @@ type StringSet struct {
 }
 
 func (s *StringSet) Clear() {
-	s.values = make(map[string]bool)
-	s.toAdd = make(map[string]bool)
-	s.toRemove = make(map[string]bool)
+	s.values = nil
+	s.toAdd = nil
+	s.toRemove = nil
+	s.prepare()
 }
 
+func (s *StringSet) prepare() {
+	if s.toAdd == nil {
+		s.toAdd = make(map[string]bool)
+	}
+	if s.toRemove == nil {
+		s.toRemove = make(map[string]bool)
+	}
+	if s.values == nil {
+		s.values = make(map[string]bool)
+	}
+}
 func (s *StringSet) Add(value string) {
+	s.prepare()
 	s.toAdd[value] = true
 	delete(s.toRemove, value)
 }
 
 func (s *StringSet) Remove(value string) {
+	s.prepare()
 	s.toRemove[value] = true
 	delete(s.toAdd, value)
 }
 
 func (s *StringSet) Values() []string {
+	s.prepare()
 	var values []string
 	for value := range s.values {
 		values = append(values, value)
@@ -33,6 +48,9 @@ func (s *StringSet) Values() []string {
 }
 
 func (s *StringSet) Has(value string) bool {
+	if s.values == nil {
+		return false
+	}
 	_, ok := s.values[value]
 	return ok
 }
@@ -44,6 +62,7 @@ func (s *StringSet) ReplaceWith(values ...string) {
 }
 
 func (s *StringSet) applyValues(values ...string) {
+	s.prepare()
 	for _, value := range values {
 		s.values[value] = true
 	}
@@ -54,6 +73,7 @@ func (s *StringSet) IsEmpty() bool {
 }
 
 func (s *StringSet) ToAdd() []string {
+	s.prepare()
 	var values []string
 	for value := range s.toAdd {
 		values = append(values, value)
@@ -62,6 +82,7 @@ func (s *StringSet) ToAdd() []string {
 }
 
 func (s *StringSet) ToRemove() []string {
+	s.prepare()
 	var values []string
 	for value := range s.toRemove {
 		values = append(values, value)

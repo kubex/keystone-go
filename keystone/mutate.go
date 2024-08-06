@@ -146,6 +146,12 @@ func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) 
 			reflect.DeepEqual(newMap[k].Value.Array.KeyValue, exMap[k].Value.Array.KeyValue) &&
 			reflect.DeepEqual(newMap[k].Value.Array.Strings, exMap[k].Value.Array.Strings) &&
 			reflect.DeepEqual(newMap[k].Value.Array.Ints, exMap[k].Value.Array.Ints) &&
+			reflect.DeepEqual(newMap[k].Value.ArrayAppend.KeyValue, exMap[k].Value.ArrayAppend.KeyValue) &&
+			reflect.DeepEqual(newMap[k].Value.ArrayAppend.Strings, exMap[k].Value.ArrayAppend.Strings) &&
+			reflect.DeepEqual(newMap[k].Value.ArrayAppend.Ints, exMap[k].Value.ArrayAppend.Ints) &&
+			reflect.DeepEqual(newMap[k].Value.ArrayReduce.KeyValue, exMap[k].Value.ArrayReduce.KeyValue) &&
+			reflect.DeepEqual(newMap[k].Value.ArrayReduce.Strings, exMap[k].Value.ArrayReduce.Strings) &&
+			reflect.DeepEqual(newMap[k].Value.ArrayReduce.Ints, exMap[k].Value.ArrayReduce.Ints) &&
 			reflect.DeepEqual(newMap[k].Value.Time, exMap[k].Value.Time) {
 			continue
 		}
