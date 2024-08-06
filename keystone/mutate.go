@@ -143,8 +143,9 @@ func (a *Actor) getChangedProperties(existing, newValues *proto.EntityResponse) 
 			newMap[k].Value.Int == exMap[k].Value.Int &&
 			newMap[k].Value.Float == exMap[k].Value.Float &&
 			newMap[k].Value.Bool == exMap[k].Value.Bool &&
-			reflect.DeepEqual(newMap[k].Value.Map, exMap[k].Value.Map) &&
-			reflect.DeepEqual(newMap[k].Value.Set, exMap[k].Value.Set) &&
+			reflect.DeepEqual(newMap[k].Value.Array.KeyValue, exMap[k].Value.Array.KeyValue) &&
+			reflect.DeepEqual(newMap[k].Value.Array.Strings, exMap[k].Value.Array.Strings) &&
+			reflect.DeepEqual(newMap[k].Value.Array.Ints, exMap[k].Value.Array.Ints) &&
 			reflect.DeepEqual(newMap[k].Value.Time, exMap[k].Value.Time) {
 			continue
 		}

@@ -96,7 +96,7 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 						p.children = append(p.children, ech)
 					}
 				} else {
-					fmt.Println("skipping unsupported slice type ", field.Type.Kind(), fieldValue.Index(0).Interface().(NestedChild))
+					fmt.Println("skipping unsupported slice type ", field.Type.Kind(), fieldValue.Index(0).Interface())
 				}
 			}
 
@@ -110,7 +110,7 @@ func (p *PropertyEncoder) fieldsToProperties(value reflect.Value, t reflect.Type
 }
 
 func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, fOpt fieldOptions) (*proto.EntityProperty, bool) {
-	prop := &proto.EntityProperty{Property: fOpt.name, Value: &proto.Value{}}
+	prop := &proto.EntityProperty{Property: fOpt.name, Value: proto.NewValue()}
 	switch fieldType.Kind() {
 	case reflect.String:
 		prop.Value.Text = fieldValue.String()
@@ -121,32 +121,46 @@ func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, f
 	case reflect.Bool:
 		prop.Value.Bool = fieldValue.Bool()
 		return prop, !prop.Value.Bool
+	case reflect.Uint8:
+		prop.Value.Raw = fieldValue.Bytes()
+		return prop, len(prop.Value.GetRaw()) > 0
 	case reflect.Float32, reflect.Float64:
 		prop.Value.Float = fieldValue.Float()
 		return prop, prop.Value.Float == 0
 	case reflect.Map:
-		prop.Value.Map = map[string]string{}
+		prop.Value.Array.KeyValue = map[string][]byte{}
 		iter := fieldValue.MapRange()
 		for iter.Next() {
 			var mv string
 			if _, ok := iter.Value().Interface().(string); ok {
 				mv = iter.Value().String()
-				/*} else if iter.Value().Int() != 0 {
-				mv = strconv.Itoa(int(iter.Value().Int()))
-				*/
 			} else {
 				fmt.Println("only map[string]string is supported (" + fOpt.name + ")")
 			}
-			prop.Value.Map[iter.Key().String()] = mv
+			prop.Value.Array.KeyValue[iter.Key().String()] = []byte(mv)
 		}
-		return prop, len(prop.Value.Map) == 0
+		return prop, len(prop.Value.Array.KeyValue) == 0
 	case reflect.Slice:
-		if set, ok := fieldValue.Interface().([]string); ok {
-			prop.Value.Set = set
+		if i64set, i64ok := fieldValue.Interface().([]int64); i64ok {
+			prop.Value.Array.Ints = i64set
+		} else if iset, iok := fieldValue.Interface().([]int); iok {
+			for _, i := range iset {
+				prop.Value.Array.Ints = append(prop.Value.Array.Ints, int64(i))
+			}
+		} else if i32set, iok := fieldValue.Interface().([]int32); iok {
+			for _, i := range i32set {
+				prop.Value.Array.Ints = append(prop.Value.Array.Ints, int64(i))
+			}
+		} else if set, ok := fieldValue.Interface().([]string); ok {
+			prop.Value.Array.Strings = set
+			return prop, len(prop.Value.Array.Strings) == 0
+		} else if rawBytes, ok := fieldValue.Interface().([]byte); ok {
+			prop.Value.Raw = rawBytes
+			return prop, len(prop.Value.Raw) == 0
 		} else {
-			fmt.Println("only []string is supported (" + fOpt.name + ")")
+			fmt.Println("only []string or []int is supported (" + fOpt.name + ")")
 		}
-		return prop, len(prop.Value.Set) == 0
+		return prop, len(prop.Value.Array.Ints) == 0
 	}
 
 	switch fieldType {
@@ -168,6 +182,21 @@ func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, f
 				prop.Value.Time = timestamppb.New(iVal)
 				return prop, prop.Value.Time == nil
 			}
+		}
+	case typeOfVerifyString:
+		if iVal, ok := fieldValue.Interface().(VerifyString); ok {
+			prop.Value.SecureText = iVal.Original
+			return prop, prop.Value.SecureText == ""
+		}
+	case typeOfStringSet:
+		if iVal, ok := fieldValue.Interface().(StringSet); ok {
+			prop.Value.Array.Strings = iVal.Values()
+			return prop, prop.Value.Array.GetStrings() == nil
+		}
+	case typeOfIntSet:
+		if iVal, ok := fieldValue.Interface().(IntSet); ok {
+			prop.Value.Array.Ints = iVal.Values()
+			return prop, prop.Value.Array.GetInts() == nil
 		}
 	}
 

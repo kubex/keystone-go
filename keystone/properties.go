@@ -69,12 +69,14 @@ func NewProperty(key string, value interface{}) *proto.EntityProperty {
 
 func NewAppendProperty(key string, value interface{}) *proto.EntityProperty {
 	prop := NewProperty(key, value)
-	prop.ModifyType = proto.EntityProperty_Append
+	prop.Value.ArrayAppend = prop.Value.Array
+	prop.Value.Array = nil
 	return prop
 }
 
 func NewReduceProperty(key string, value interface{}) *proto.EntityProperty {
 	prop := NewProperty(key, value)
-	prop.ModifyType = proto.EntityProperty_Reduce
+	prop.Value.ArrayReduce = prop.Value.Array
+	prop.Value.Array = nil
 	return prop
 }

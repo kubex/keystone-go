@@ -140,14 +140,20 @@ func UnmarshalGeneric(resp *proto.EntityResponse, dst GenericResult) error {
 		if p.Value.GetFloat() != 0 {
 			dst[p.Property] = p.Value.GetFloat()
 		}
+		if len(p.Value.GetRaw()) != 0 {
+			dst[p.Property] = p.Value.GetRaw()
+		}
 		if p.Value.GetSecureText() != "" {
 			dst[p.Property] = p.Value.GetSecureText()
 		}
-		if len(p.Value.GetSet()) > 0 {
-			dst[p.Property] = p.Value.GetSet()
+		if len(p.GetValue().GetArray().GetStrings()) > 0 {
+			dst[p.Property] = p.GetValue().GetArray().GetStrings()
 		}
-		if len(p.Value.GetMap()) > 0 {
-			dst[p.Property] = p.Value.GetMap()
+		if len(p.GetValue().GetArray().GetInts()) > 0 {
+			dst[p.Property] = p.GetValue().GetArray().GetInts()
+		}
+		if len(p.GetValue().GetArray().GetKeyValue()) > 0 {
+			dst[p.Property] = p.GetValue().GetArray().GetKeyValue()
 		}
 		if p.Value.GetTime() != nil {
 			dst[p.Property] = time.Unix(p.Value.GetTime().Seconds, int64(p.Value.GetTime().Nanos))
@@ -234,27 +240,63 @@ func setFieldValue(field reflect.StructField, fieldValue reflect.Value, fieldOpt
 	switch field.Type.Kind() {
 	case reflect.String:
 		fieldValue.SetString(storedProperty.Value.Text)
+		return
 	case reflect.Int32, reflect.Int64, reflect.Int:
 		fieldValue.SetInt(storedProperty.Value.Int)
+		return
 	case reflect.Bool:
 		fieldValue.SetBool(storedProperty.Value.Bool)
+		return
 	case reflect.Float32, reflect.Float64:
 		fieldValue.SetFloat(storedProperty.Value.Float)
+		return
 	case reflect.Map:
-		for k, v := range storedProperty.Value.Map {
-			fieldValue.SetMapIndex(reflect.ValueOf(k), reflect.ValueOf(v))
+		if fieldValue.IsNil() {
+			fieldValue.Set(reflect.MakeMap(fieldValue.Type()))
+		}
+		for k, v := range storedProperty.GetValue().GetArray().GetKeyValue() {
+			stringVal := string(v) //TODO: Support other map types
+			fieldValue.SetMapIndex(reflect.ValueOf(k), reflect.ValueOf(stringVal))
+		}
+		return
+	case reflect.Slice:
+		if fieldValue.Type().Elem().Kind() == reflect.Uint8 {
+			fieldValue.SetBytes(storedProperty.Value.GetRaw())
+			return
 		}
 	}
 
 	switch field.Type {
 	case typeOfStringSlice:
-		for _, v := range storedProperty.Value.Set {
+		for _, v := range storedProperty.GetValue().GetArray().GetStrings() {
 			fieldValue.Set(reflect.Append(fieldValue, reflect.ValueOf(v)))
 		}
+		return
+	case typeOfIntSlice:
+		for _, v := range storedProperty.GetValue().GetArray().GetInts() {
+			fieldValue.Set(reflect.Append(fieldValue, reflect.ValueOf(int(v))))
+		}
+		return
+	case typeOfInt32Slice:
+		for _, v := range storedProperty.GetValue().GetArray().GetInts() {
+			fieldValue.Set(reflect.Append(fieldValue, reflect.ValueOf(int32(v))))
+		}
+		return
+	case typeOfInt64Slice:
+		for _, v := range storedProperty.GetValue().GetArray().GetInts() {
+			fieldValue.Set(reflect.Append(fieldValue, reflect.ValueOf(v)))
+		}
+		return
 	case typeOfSecretString:
 		if _, ok := fieldValue.Interface().(SecretString); ok {
 			fieldValue.Set(reflect.ValueOf(SecretString{
 				Masked:   storedProperty.Value.Text,
+				Original: storedProperty.Value.SecureText,
+			}))
+		}
+	case typeOfVerifyString:
+		if _, ok := fieldValue.Interface().(VerifyString); ok {
+			fieldValue.Set(reflect.ValueOf(VerifyString{
 				Original: storedProperty.Value.SecureText,
 			}))
 		}
@@ -271,6 +313,14 @@ func setFieldValue(field reflect.StructField, fieldValue reflect.Value, fieldOpt
 				t := time.Unix(storedProperty.Value.GetTime().Seconds, int64(storedProperty.Value.GetTime().Nanos))
 				fieldValue.Set(reflect.ValueOf(t))
 			}
+		}
+	case typeOfStringSet:
+		if _, ok := fieldValue.Interface().(StringSet); ok {
+			fieldValue.Set(reflect.ValueOf(NewStringSet(storedProperty.GetValue().GetArray().GetStrings()...)))
+		}
+	case typeOfIntSet:
+		if _, ok := fieldValue.Interface().(IntSet); ok {
+			fieldValue.Set(reflect.ValueOf(NewIntSet(storedProperty.GetValue().GetArray().GetInts()...)))
 		}
 	}
 }

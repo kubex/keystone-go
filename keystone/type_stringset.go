@@ -73,6 +73,25 @@ func (s *StringSet) ReplaceExisting() bool {
 	return s.replaceExisting
 }
 
+func (s *StringSet) Diff(values ...string) []string {
+	check := make(map[string]bool, len(values))
+	for _, x := range values {
+		check[x] = s.Has(x)
+	}
+	var diff []string
+	for x := range s.values {
+		if _, ok := check[x]; !ok {
+			diff = append(diff, x)
+		}
+	}
+	for x, matched := range check {
+		if !matched {
+			diff = append(diff, x)
+		}
+	}
+	return diff
+}
+
 func NewStringSet(values ...string) StringSet {
 	v := StringSet{}
 	v.Clear()

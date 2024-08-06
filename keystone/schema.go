@@ -145,8 +145,17 @@ func supportedType(t reflect.Type) bool {
 		return true
 	}
 
+	if t.Kind() == reflect.Slice {
+		switch t.Elem().Kind() {
+		case reflect.Uint8, reflect.String, reflect.Int, reflect.Int32, reflect.Int64:
+			return true
+		}
+	}
+
 	switch t {
-	case typeOfSecretString, typeOfAmount, typeOfTime, typeOfStringSlice:
+	case typeOfSecretString, typeOfVerifyString,
+		typeOfAmount, typeOfTime,
+		typeOfStringSet, typeOfIntSet:
 		return true
 	}
 
@@ -171,9 +180,17 @@ func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Pro
 	case reflect.Float32, reflect.Float64:
 		return proto.Property_Float, extendedType
 	case reflect.Map:
-		return proto.Property_Map, extendedType
+		return proto.Property_KeyValue, extendedType
 	case reflect.Slice:
-		return proto.Property_Set, extendedType
+		switch fieldType.Type.Elem().Kind() {
+		case reflect.String:
+			return proto.Property_Strings, extendedType
+		case reflect.Int, reflect.Int64, reflect.Int32:
+			return proto.Property_Ints, extendedType
+		case reflect.Uint8:
+			return proto.Property_Bytes, extendedType
+		}
+		return proto.Property_Strings, extendedType
 	}
 
 	switch fieldType.Type {
@@ -183,9 +200,15 @@ func getFieldType(fieldType reflect.StructField) (proto.Property_Type, proto.Pro
 		return proto.Property_Amount, extendedType
 	case typeOfTime:
 		return proto.Property_Time, extendedType
+	case typeOfVerifyString:
+		return proto.Property_VerifyText, extendedType
+	case typeOfIntSet:
+		return proto.Property_IntSet, extendedType
+	case typeOfStringSet:
+		return proto.Property_StringSet, extendedType
 	}
 
-	return proto.Property_Text, extendedType
+	return proto.Property_Bytes, extendedType
 }
 
 func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {

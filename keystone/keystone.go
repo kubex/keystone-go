@@ -80,6 +80,12 @@ func (e *BaseNestedChild) ChildID() string {
 var (
 	typeOfTime         = reflect.TypeOf(time.Time{})
 	typeOfSecretString = reflect.TypeOf(SecretString{})
+	typeOfVerifyString = reflect.TypeOf(VerifyString{})
 	typeOfAmount       = reflect.TypeOf(Amount{})
+	typeOfStringSet    = reflect.TypeOf(StringSet{})
+	typeOfIntSet       = reflect.TypeOf(IntSet{})
 	typeOfStringSlice  = reflect.TypeOf([]string{})
+	typeOfIntSlice     = reflect.TypeOf([]int{})
+	typeOfInt32Slice   = reflect.TypeOf([]int32{})
+	typeOfInt64Slice   = reflect.TypeOf([]int64{})
 )

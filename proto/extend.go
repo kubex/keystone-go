@@ -17,3 +17,9 @@ func CreateDate(time time.Time) *Date {
 		Day:   int32(time.Day()),
 	}
 }
+
+func NewValue() *Value {
+	return &Value{
+		Array: &RepeatedValue{},
+	}
+}

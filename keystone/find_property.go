@@ -92,9 +92,14 @@ func (f propertyFilter) Apply(config *filterRequest) {
 
 func valueFromAny(value any) *proto.Value {
 	v := reflect.ValueOf(value)
+
 	for v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return nil
+		}
 		v = v.Elem()
 	}
+
 	switch v.Kind().String() {
 	case "string":
 		return &proto.Value{Text: v.String()}
@@ -112,7 +117,7 @@ func valueFromAny(value any) *proto.Value {
 	case "timestamppb.Timestamp":
 		return &proto.Value{Time: value.(*timestamppb.Timestamp)}
 	}
-	return &proto.Value{}
+	return proto.NewValue()
 }
 
 func valuesFromAny(values ...any) []*proto.Value {
