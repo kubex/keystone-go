@@ -25,6 +25,7 @@ const (
 	Keystone_Retrieve_FullMethodName         = "/kubex.keystone.Keystone/Retrieve"
 	Keystone_Find_FullMethodName             = "/kubex.keystone.Keystone/Find"
 	Keystone_List_FullMethodName             = "/kubex.keystone.Keystone/List"
+	Keystone_GroupCount_FullMethodName       = "/kubex.keystone.Keystone/GroupCount"
 	Keystone_Logs_FullMethodName             = "/kubex.keystone.Keystone/Logs"
 	Keystone_Events_FullMethodName           = "/kubex.keystone.Keystone/Events"
 	Keystone_DailyEntities_FullMethodName    = "/kubex.keystone.Keystone/DailyEntities"
@@ -44,6 +45,7 @@ type KeystoneClient interface {
 	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	GroupCount(ctx context.Context, in *GroupCountRequest, opts ...grpc.CallOption) (*GroupCountResponse, error)
 	Logs(ctx context.Context, in *LogsRequest, opts ...grpc.CallOption) (*LogsResponse, error)
 	Events(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	// Management
@@ -113,6 +115,15 @@ func (c *keystoneClient) List(ctx context.Context, in *ListRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *keystoneClient) GroupCount(ctx context.Context, in *GroupCountRequest, opts ...grpc.CallOption) (*GroupCountResponse, error) {
+	out := new(GroupCountResponse)
+	err := c.cc.Invoke(ctx, Keystone_GroupCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *keystoneClient) Logs(ctx context.Context, in *LogsRequest, opts ...grpc.CallOption) (*LogsResponse, error) {
 	out := new(LogsResponse)
 	err := c.cc.Invoke(ctx, Keystone_Logs_FullMethodName, in, out, opts...)
@@ -162,6 +173,7 @@ type KeystoneServer interface {
 	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
 	List(context.Context, *ListRequest) (*ListResponse, error)
+	GroupCount(context.Context, *GroupCountRequest) (*GroupCountResponse, error)
 	Logs(context.Context, *LogsRequest) (*LogsResponse, error)
 	Events(context.Context, *EventRequest) (*EventsResponse, error)
 	// Management
@@ -191,6 +203,9 @@ func (UnimplementedKeystoneServer) Find(context.Context, *FindRequest) (*FindRes
 }
 func (UnimplementedKeystoneServer) List(context.Context, *ListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedKeystoneServer) GroupCount(context.Context, *GroupCountRequest) (*GroupCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupCount not implemented")
 }
 func (UnimplementedKeystoneServer) Logs(context.Context, *LogsRequest) (*LogsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logs not implemented")
@@ -325,6 +340,24 @@ func _Keystone_List_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keystone_GroupCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).GroupCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keystone_GroupCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).GroupCount(ctx, req.(*GroupCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Keystone_Logs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogsRequest)
 	if err := dec(in); err != nil {
@@ -427,6 +460,10 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _Keystone_List_Handler,
+		},
+		{
+			MethodName: "GroupCount",
+			Handler:    _Keystone_GroupCount_Handler,
 		},
 		{
 			MethodName: "Logs",
