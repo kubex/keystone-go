@@ -111,6 +111,13 @@ func (c *Connection) List(ctx context.Context, in *proto.ListRequest, opts ...gr
 	return resp, err
 }
 
+func (c *Connection) GroupCount(ctx context.Context, in *proto.GroupCountRequest, opts ...grpc.CallOption) (*proto.GroupCountResponse, error) {
+	tl := c.timeLogConfig.NewLog("GroupCount", zap.String("schema", in.GetSchema().GetKey()))
+	resp, err := c.client.GroupCount(ctx, in, opts...)
+	c.logger.TimedLog(tl)
+	return resp, err
+}
+
 func (c *Connection) authorization() *proto.Authorization {
 	return &proto.Authorization{
 		Source: &c.appID,

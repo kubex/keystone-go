@@ -19,6 +19,7 @@ type MockServer struct {
 	RetrieveFunc         func(context.Context, *proto.EntityRequest) (*proto.EntityResponse, error)
 	FindFunc             func(context.Context, *proto.FindRequest) (*proto.FindResponse, error)
 	ListFunc             func(context.Context, *proto.ListRequest) (*proto.ListResponse, error)
+	GroupCountFunc       func(context.Context, *proto.GroupCountRequest) (*proto.GroupCountResponse, error)
 	LogFunc              func(context.Context, *proto.LogRequest) (*proto.LogResponse, error)
 	LogsFunc             func(context.Context, *proto.LogsRequest) (*proto.LogsResponse, error)
 	EventsFunc           func(context.Context, *proto.EventRequest) (*proto.EventsResponse, error)
@@ -73,6 +74,12 @@ func (m *MockServer) List(ctx context.Context, req *proto.ListRequest) (*proto.L
 		return m.UnimplementedKeystoneServer.List(ctx, req)
 	}
 	return m.ListFunc(ctx, req)
+}
+func (m *MockServer) GroupCount(ctx context.Context, req *proto.GroupCountRequest) (*proto.GroupCountResponse, error) {
+	if m.GroupCountFunc == nil {
+		return m.UnimplementedKeystoneServer.GroupCount(ctx, req)
+	}
+	return m.GroupCountFunc(ctx, req)
 }
 func (m *MockServer) Log(ctx context.Context, req *proto.LogRequest) (*proto.LogResponse, error) {
 	if m.LogsFunc == nil {
