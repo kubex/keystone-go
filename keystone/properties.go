@@ -47,6 +47,10 @@ func (a *Actor) GetDynamicProperties(ctx context.Context, entityID string, prope
 
 type PropertyValueList map[string]*proto.Value
 
+func (p PropertyValueList) Get(key string) *proto.Value {
+	return p[key]
+}
+
 func NewProperties(props map[string]interface{}) []*proto.EntityProperty {
 	properties := make([]*proto.EntityProperty, 0, len(props))
 	for key, value := range props {
