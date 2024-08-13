@@ -63,7 +63,15 @@ func (e *BaseChildEntity) SetKeystoneID(id string) {
 }
 
 func (e *BaseChildEntity) SetKeystoneParentID(id string) {
-	e._entityID = id
+	if strings.Contains(id, "-") {
+		e.SetKeystoneID(id)
+	} else {
+		e._parentID = id
+	}
+
+	if e._entityID == "" {
+		e._entityID = e._parentID
+	}
 }
 
 func (e *BaseChildEntity) SetKeystoneChildID(id string) {
