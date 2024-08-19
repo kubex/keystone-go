@@ -22,6 +22,7 @@ const (
 	Keystone_Define_FullMethodName           = "/kubex.keystone.Keystone/Define"
 	Keystone_Mutate_FullMethodName           = "/kubex.keystone.Keystone/Mutate"
 	Keystone_Log_FullMethodName              = "/kubex.keystone.Keystone/Log"
+	Keystone_ReportTimeSeries_FullMethodName = "/kubex.keystone.Keystone/ReportTimeSeries"
 	Keystone_Retrieve_FullMethodName         = "/kubex.keystone.Keystone/Retrieve"
 	Keystone_Find_FullMethodName             = "/kubex.keystone.Keystone/Find"
 	Keystone_List_FullMethodName             = "/kubex.keystone.Keystone/List"
@@ -41,6 +42,8 @@ type KeystoneClient interface {
 	// Store
 	Mutate(ctx context.Context, in *MutateRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	Log(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error)
+	// Reporting
+	ReportTimeSeries(ctx context.Context, in *ReportTimeSeriesRequest, opts ...grpc.CallOption) (*MutateResponse, error)
 	// Load
 	Retrieve(ctx context.Context, in *EntityRequest, opts ...grpc.CallOption) (*EntityResponse, error)
 	Find(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
@@ -82,6 +85,15 @@ func (c *keystoneClient) Mutate(ctx context.Context, in *MutateRequest, opts ...
 func (c *keystoneClient) Log(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error) {
 	out := new(LogResponse)
 	err := c.cc.Invoke(ctx, Keystone_Log_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keystoneClient) ReportTimeSeries(ctx context.Context, in *ReportTimeSeriesRequest, opts ...grpc.CallOption) (*MutateResponse, error) {
+	out := new(MutateResponse)
+	err := c.cc.Invoke(ctx, Keystone_ReportTimeSeries_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +181,8 @@ type KeystoneServer interface {
 	// Store
 	Mutate(context.Context, *MutateRequest) (*MutateResponse, error)
 	Log(context.Context, *LogRequest) (*LogResponse, error)
+	// Reporting
+	ReportTimeSeries(context.Context, *ReportTimeSeriesRequest) (*MutateResponse, error)
 	// Load
 	Retrieve(context.Context, *EntityRequest) (*EntityResponse, error)
 	Find(context.Context, *FindRequest) (*FindResponse, error)
@@ -194,6 +208,9 @@ func (UnimplementedKeystoneServer) Mutate(context.Context, *MutateRequest) (*Mut
 }
 func (UnimplementedKeystoneServer) Log(context.Context, *LogRequest) (*LogResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Log not implemented")
+}
+func (UnimplementedKeystoneServer) ReportTimeSeries(context.Context, *ReportTimeSeriesRequest) (*MutateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReportTimeSeries not implemented")
 }
 func (UnimplementedKeystoneServer) Retrieve(context.Context, *EntityRequest) (*EntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retrieve not implemented")
@@ -282,6 +299,24 @@ func _Keystone_Log_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KeystoneServer).Log(ctx, req.(*LogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keystone_ReportTimeSeries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReportTimeSeriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeystoneServer).ReportTimeSeries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keystone_ReportTimeSeries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeystoneServer).ReportTimeSeries(ctx, req.(*ReportTimeSeriesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -448,6 +483,10 @@ var Keystone_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Log",
 			Handler:    _Keystone_Log_Handler,
+		},
+		{
+			MethodName: "ReportTimeSeries",
+			Handler:    _Keystone_ReportTimeSeries_Handler,
 		},
 		{
 			MethodName: "Retrieve",

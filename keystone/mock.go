@@ -16,6 +16,7 @@ type MockServer struct {
 	proto.UnimplementedKeystoneServer
 	DefineFunc           func(context.Context, *proto.SchemaRequest) (*proto.Schema, error)
 	MutateFunc           func(context.Context, *proto.MutateRequest) (*proto.MutateResponse, error)
+	ReportTimeSeriesFunc func(context.Context, *proto.ReportTimeSeriesRequest) (*proto.MutateResponse, error)
 	RetrieveFunc         func(context.Context, *proto.EntityRequest) (*proto.EntityResponse, error)
 	FindFunc             func(context.Context, *proto.FindRequest) (*proto.FindResponse, error)
 	ListFunc             func(context.Context, *proto.ListRequest) (*proto.ListResponse, error)
@@ -56,6 +57,12 @@ func (m *MockServer) Mutate(ctx context.Context, req *proto.MutateRequest) (*pro
 		return m.UnimplementedKeystoneServer.Mutate(ctx, req)
 	}
 	return m.MutateFunc(ctx, req)
+}
+func (m *MockServer) ReportTimeSeries(ctx context.Context, req *proto.ReportTimeSeriesRequest) (*proto.MutateResponse, error) {
+	if m.ReportTimeSeriesFunc == nil {
+		return m.UnimplementedKeystoneServer.ReportTimeSeries(ctx, req)
+	}
+	return m.ReportTimeSeriesFunc(ctx, req)
 }
 func (m *MockServer) Retrieve(ctx context.Context, req *proto.EntityRequest) (*proto.EntityResponse, error) {
 	if m.RetrieveFunc == nil {

@@ -69,6 +69,13 @@ func (c *Connection) Mutate(ctx context.Context, in *proto.MutateRequest, opts .
 	return resp, err
 }
 
+func (c *Connection) ReportTimeSeries(ctx context.Context, in *proto.ReportTimeSeriesRequest, opts ...grpc.CallOption) (*proto.MutateResponse, error) {
+	tl := c.timeLogConfig.NewLog("ReportTimeSeries", zap.String("EntityId", in.GetEntityId()))
+	resp, err := c.client.ReportTimeSeries(ctx, in, opts...)
+	c.logger.TimedLog(tl)
+	return resp, err
+}
+
 func (c *Connection) Retrieve(ctx context.Context, in *proto.EntityRequest, opts ...grpc.CallOption) (*proto.EntityResponse, error) {
 	tl := c.timeLogConfig.NewLog("Retrieve", zap.String("EntityId", in.GetEntityId()))
 	resp, err := c.client.Retrieve(ctx, in, opts...)

@@ -3,12 +3,32 @@ package keystone
 import (
 	"github.com/kubex/keystone-go/proto"
 	"strings"
+	"time"
 )
 
 func RemoteEntity(entityID string) *BaseEntity {
 	return &BaseEntity{
 		_entityID: entityID,
 	}
+}
+
+type TimeSeriesEntity struct {
+	_timeSeriesInputTime time.Time
+}
+
+func (e *TimeSeriesEntity) SetTimeSeriesInputTime(t time.Time) {
+	e._timeSeriesInputTime = t
+}
+
+func (e *TimeSeriesEntity) GetTimeSeriesInputTime() time.Time {
+	if e._timeSeriesInputTime.IsZero() {
+		e._timeSeriesInputTime = time.Now()
+	}
+	return e._timeSeriesInputTime
+}
+
+type TSEntity interface {
+	GetTimeSeriesInputTime() time.Time
 }
 
 type BaseEntity struct {

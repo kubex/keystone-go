@@ -71,6 +71,10 @@ func typeToSchema(input interface{}) schemaDef {
 		returnSchema.Options = append(returnSchema.Options, def.Options...)
 	}
 
+	if _, isTimeSeries := input.(TSEntity); isTimeSeries {
+		returnSchema.KsType = proto.Schema_TimeSeries
+	}
+
 	returnSchema.Properties = getProperties(t, "")
 
 	return retDef
@@ -246,6 +250,10 @@ func getFieldOptions(f reflect.StructField, prefix string) fieldOptions {
 			opt.reverseLookup = true
 		case "verify":
 			opt.verifyOnly = true
+		case "metric":
+			opt.metric = true
+		case "metricFilter":
+			opt.metricFilter = true
 
 		case "pii", "personal", "gdpr":
 			opt.personalData = true
@@ -271,6 +279,9 @@ type fieldOptions struct {
 	reverseLookup bool
 	verifyOnly    bool
 
+	metric       bool
+	metricFilter bool
+
 	// Data classification
 	personalData  bool
 	userInputData bool
@@ -293,6 +304,8 @@ func (fOpt fieldOptions) applyTo(protoField *proto.Property) {
 	appendOption(protoField, proto.Property_Required, fOpt.required)
 	appendOption(protoField, proto.Property_ReverseLookup, fOpt.reverseLookup)
 	appendOption(protoField, proto.Property_Searchable, fOpt.searchable)
+	appendOption(protoField, proto.Property_Metric, fOpt.metric)
+	appendOption(protoField, proto.Property_MetricFilter, fOpt.metricFilter)
 }
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
