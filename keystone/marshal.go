@@ -3,6 +3,7 @@ package keystone
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/kubex/keystone-go/proto"
@@ -124,7 +125,10 @@ func entityPropertyFromField(fieldValue reflect.Value, fieldType reflect.Type, f
 	case reflect.Uint8:
 		prop.Value.Raw = fieldValue.Bytes()
 		return prop, len(prop.Value.GetRaw()) > 0
-	case reflect.Float32, reflect.Float64:
+	case reflect.Float32:
+		prop.Value.Float, _ = strconv.ParseFloat(fmt.Sprintf("%f", float32(fieldValue.Float())), 64)
+		return prop, prop.Value.Float == 0
+	case reflect.Float64:
 		prop.Value.Float = fieldValue.Float()
 		return prop, prop.Value.Float == 0
 	case reflect.Map:
