@@ -36,17 +36,18 @@ func (a *Actor) ReportTimeSeries(ctx context.Context, src interface{}) error {
 		return errors.New("you must pass a TimeSeriesEntity as the source")
 	}
 
-	/*if entityWithLabels, ok := src.(EntityLabelProvider); ok {
+	if entityWithLabels, ok := src.(EntityLabelProvider); ok {
 		mutation.Labels = entityWithLabels.GetKeystoneLabels()
 	}
 
-	if entityWithSensor, ok := src.(EntitySensorProvider); ok {
-		mutation.Measurements = entityWithSensor.GetKeystoneSensorMeasurements()
-	}
+	/*
+		if entityWithSensor, ok := src.(EntitySensorProvider); ok {
+			mutation.Measurements = entityWithSensor.GetKeystoneSensorMeasurements()
+		}
 
-	if entityWithRelationships, ok := src.(EntityRelationshipProvider); ok {
-		mutation.Relationships = entityWithRelationships.GetKeystoneRelationships()
-	}*/
+		if entityWithRelationships, ok := src.(EntityRelationshipProvider); ok {
+			mutation.Relationships = entityWithRelationships.GetKeystoneRelationships()
+		}*/
 
 	mutation.Properties = a.getChangedProperties(nil, &proto.EntityResponse{Properties: mutation.Properties})
 
