@@ -592,6 +592,64 @@ func (MutateRequest_MutateOption) EnumDescriptor() ([]byte, []int) {
 	return file_keystone_proto_rawDescGZIP(), []int{26, 0}
 }
 
+type PropertyAggregation_AggregationType int32
+
+const (
+	PropertyAggregation_None    PropertyAggregation_AggregationType = 0
+	PropertyAggregation_Sum     PropertyAggregation_AggregationType = 1
+	PropertyAggregation_Average PropertyAggregation_AggregationType = 2
+	PropertyAggregation_Count   PropertyAggregation_AggregationType = 3
+	PropertyAggregation_Min     PropertyAggregation_AggregationType = 4
+	PropertyAggregation_Max     PropertyAggregation_AggregationType = 5
+)
+
+// Enum value maps for PropertyAggregation_AggregationType.
+var (
+	PropertyAggregation_AggregationType_name = map[int32]string{
+		0: "None",
+		1: "Sum",
+		2: "Average",
+		3: "Count",
+		4: "Min",
+		5: "Max",
+	}
+	PropertyAggregation_AggregationType_value = map[string]int32{
+		"None":    0,
+		"Sum":     1,
+		"Average": 2,
+		"Count":   3,
+		"Min":     4,
+		"Max":     5,
+	}
+)
+
+func (x PropertyAggregation_AggregationType) Enum() *PropertyAggregation_AggregationType {
+	p := new(PropertyAggregation_AggregationType)
+	*p = x
+	return p
+}
+
+func (x PropertyAggregation_AggregationType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PropertyAggregation_AggregationType) Descriptor() protoreflect.EnumDescriptor {
+	return file_keystone_proto_enumTypes[9].Descriptor()
+}
+
+func (PropertyAggregation_AggregationType) Type() protoreflect.EnumType {
+	return &file_keystone_proto_enumTypes[9]
+}
+
+func (x PropertyAggregation_AggregationType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PropertyAggregation_AggregationType.Descriptor instead.
+func (PropertyAggregation_AggregationType) EnumDescriptor() ([]byte, []int) {
+	return file_keystone_proto_rawDescGZIP(), []int{57, 0}
+}
+
 type ExtendedResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1910,7 +1968,7 @@ type EntitySensorMeasurement struct {
 
 	Sensor string                 `protobuf:"bytes,1,opt,name=sensor,proto3" json:"sensor,omitempty"`
 	At     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at,proto3" json:"at,omitempty"`
-	Value  float32                `protobuf:"fixed32,3,opt,name=value,proto3" json:"value,omitempty"`
+	Value  float64                `protobuf:"fixed64,3,opt,name=value,proto3" json:"value,omitempty"`
 	Data   map[string]string      `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -1960,7 +2018,7 @@ func (x *EntitySensorMeasurement) GetAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *EntitySensorMeasurement) GetValue() float32 {
+func (x *EntitySensorMeasurement) GetValue() float64 {
 	if x != nil {
 		return x.Value
 	}
@@ -4866,6 +4924,227 @@ func (x *DailyEntityResponse) GetLastId() string {
 	return ""
 }
 
+type ChartTimeSeriesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Authorization   *Authorization         `protobuf:"bytes,1,opt,name=authorization,proto3" json:"authorization,omitempty"`
+	Schema          *Key                   `protobuf:"bytes,2,opt,name=schema,proto3" json:"schema,omitempty"`
+	From            *Date                  `protobuf:"bytes,3,opt,name=from,proto3" json:"from,omitempty"`
+	Until           *Date                  `protobuf:"bytes,4,opt,name=until,proto3" json:"until,omitempty"`
+	Interval        string                 `protobuf:"bytes,5,opt,name=interval,proto3" json:"interval,omitempty"`
+	Timezone        string                 `protobuf:"bytes,6,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	SeriesProperty  string                 `protobuf:"bytes,7,opt,name=series_property,json=seriesProperty,proto3" json:"series_property,omitempty"`
+	Aggregations    []*PropertyAggregation `protobuf:"bytes,8,rep,name=aggregations,proto3" json:"aggregations,omitempty"`
+	PropertyFilters []*PropertyFilter      `protobuf:"bytes,9,rep,name=property_filters,json=propertyFilters,proto3" json:"property_filters,omitempty"`
+}
+
+func (x *ChartTimeSeriesRequest) Reset() {
+	*x = ChartTimeSeriesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_keystone_proto_msgTypes[56]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChartTimeSeriesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChartTimeSeriesRequest) ProtoMessage() {}
+
+func (x *ChartTimeSeriesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_keystone_proto_msgTypes[56]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChartTimeSeriesRequest.ProtoReflect.Descriptor instead.
+func (*ChartTimeSeriesRequest) Descriptor() ([]byte, []int) {
+	return file_keystone_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *ChartTimeSeriesRequest) GetAuthorization() *Authorization {
+	if x != nil {
+		return x.Authorization
+	}
+	return nil
+}
+
+func (x *ChartTimeSeriesRequest) GetSchema() *Key {
+	if x != nil {
+		return x.Schema
+	}
+	return nil
+}
+
+func (x *ChartTimeSeriesRequest) GetFrom() *Date {
+	if x != nil {
+		return x.From
+	}
+	return nil
+}
+
+func (x *ChartTimeSeriesRequest) GetUntil() *Date {
+	if x != nil {
+		return x.Until
+	}
+	return nil
+}
+
+func (x *ChartTimeSeriesRequest) GetInterval() string {
+	if x != nil {
+		return x.Interval
+	}
+	return ""
+}
+
+func (x *ChartTimeSeriesRequest) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+func (x *ChartTimeSeriesRequest) GetSeriesProperty() string {
+	if x != nil {
+		return x.SeriesProperty
+	}
+	return ""
+}
+
+func (x *ChartTimeSeriesRequest) GetAggregations() []*PropertyAggregation {
+	if x != nil {
+		return x.Aggregations
+	}
+	return nil
+}
+
+func (x *ChartTimeSeriesRequest) GetPropertyFilters() []*PropertyFilter {
+	if x != nil {
+		return x.PropertyFilters
+	}
+	return nil
+}
+
+type PropertyAggregation struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Property string                              `protobuf:"bytes,1,opt,name=property,proto3" json:"property,omitempty"`
+	Type     PropertyAggregation_AggregationType `protobuf:"varint,2,opt,name=type,proto3,enum=kubex.keystone.PropertyAggregation_AggregationType" json:"type,omitempty"`
+	Alias    string                              `protobuf:"bytes,3,opt,name=alias,proto3" json:"alias,omitempty"`
+}
+
+func (x *PropertyAggregation) Reset() {
+	*x = PropertyAggregation{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_keystone_proto_msgTypes[57]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PropertyAggregation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PropertyAggregation) ProtoMessage() {}
+
+func (x *PropertyAggregation) ProtoReflect() protoreflect.Message {
+	mi := &file_keystone_proto_msgTypes[57]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PropertyAggregation.ProtoReflect.Descriptor instead.
+func (*PropertyAggregation) Descriptor() ([]byte, []int) {
+	return file_keystone_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *PropertyAggregation) GetProperty() string {
+	if x != nil {
+		return x.Property
+	}
+	return ""
+}
+
+func (x *PropertyAggregation) GetType() PropertyAggregation_AggregationType {
+	if x != nil {
+		return x.Type
+	}
+	return PropertyAggregation_None
+}
+
+func (x *PropertyAggregation) GetAlias() string {
+	if x != nil {
+		return x.Alias
+	}
+	return ""
+}
+
+type ChartTimeSeriesResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Series map[string]*ChartTimeSeriesResponse_ChartSeries `protobuf:"bytes,1,rep,name=series,proto3" json:"series,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (x *ChartTimeSeriesResponse) Reset() {
+	*x = ChartTimeSeriesResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_keystone_proto_msgTypes[58]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChartTimeSeriesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChartTimeSeriesResponse) ProtoMessage() {}
+
+func (x *ChartTimeSeriesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_keystone_proto_msgTypes[58]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChartTimeSeriesResponse.ProtoReflect.Descriptor instead.
+func (*ChartTimeSeriesResponse) Descriptor() ([]byte, []int) {
+	return file_keystone_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *ChartTimeSeriesResponse) GetSeries() map[string]*ChartTimeSeriesResponse_ChartSeries {
+	if x != nil {
+		return x.Series
+	}
+	return nil
+}
+
 type GroupCountResponse_Result struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4879,7 +5158,7 @@ type GroupCountResponse_Result struct {
 func (x *GroupCountResponse_Result) Reset() {
 	*x = GroupCountResponse_Result{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_keystone_proto_msgTypes[62]
+		mi := &file_keystone_proto_msgTypes[65]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4892,7 +5171,7 @@ func (x *GroupCountResponse_Result) String() string {
 func (*GroupCountResponse_Result) ProtoMessage() {}
 
 func (x *GroupCountResponse_Result) ProtoReflect() protoreflect.Message {
-	mi := &file_keystone_proto_msgTypes[62]
+	mi := &file_keystone_proto_msgTypes[65]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4927,6 +5206,69 @@ func (x *GroupCountResponse_Result) GetCount() int32 {
 		return x.Count
 	}
 	return 0
+}
+
+type ChartTimeSeriesResponse_ChartSeries struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Bucket *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	Series string                 `protobuf:"bytes,2,opt,name=series,proto3" json:"series,omitempty"`
+	Values map[string]float64     `protobuf:"bytes,3,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"fixed64,2,opt,name=value,proto3"`
+}
+
+func (x *ChartTimeSeriesResponse_ChartSeries) Reset() {
+	*x = ChartTimeSeriesResponse_ChartSeries{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_keystone_proto_msgTypes[70]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChartTimeSeriesResponse_ChartSeries) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChartTimeSeriesResponse_ChartSeries) ProtoMessage() {}
+
+func (x *ChartTimeSeriesResponse_ChartSeries) ProtoReflect() protoreflect.Message {
+	mi := &file_keystone_proto_msgTypes[70]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChartTimeSeriesResponse_ChartSeries.ProtoReflect.Descriptor instead.
+func (*ChartTimeSeriesResponse_ChartSeries) Descriptor() ([]byte, []int) {
+	return file_keystone_proto_rawDescGZIP(), []int{58, 1}
+}
+
+func (x *ChartTimeSeriesResponse_ChartSeries) GetBucket() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Bucket
+	}
+	return nil
+}
+
+func (x *ChartTimeSeriesResponse_ChartSeries) GetSeries() string {
+	if x != nil {
+		return x.Series
+	}
+	return ""
+}
+
+func (x *ChartTimeSeriesResponse_ChartSeries) GetValues() map[string]float64 {
+	if x != nil {
+		return x.Values
+	}
+	return nil
 }
 
 var File_keystone_proto protoreflect.FileDescriptor
@@ -5205,7 +5547,7 @@ var file_keystone_proto_rawDesc = []byte{
 	0x0a, 0x02, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
 	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x02, 0x61, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
-	0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
 	0x12, 0x45, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x31,
 	0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e,
 	0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x53, 0x65, 0x6e, 0x73, 0x6f, 0x72, 0x4d, 0x65, 0x61, 0x73,
@@ -5794,94 +6136,173 @@ var file_keystone_proto_rawDesc = []byte{
 	0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c,
 	0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a,
-	0x02, 0x38, 0x01, 0x2a, 0x5b, 0x0a, 0x0b, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x53, 0x74, 0x61,
-	0x74, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x10, 0x00, 0x12,
-	0x0a, 0x0a, 0x06, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x4f,
-	0x66, 0x66, 0x6c, 0x69, 0x6e, 0x65, 0x10, 0x02, 0x12, 0x0b, 0x0a, 0x07, 0x43, 0x6f, 0x72, 0x72,
-	0x75, 0x70, 0x74, 0x10, 0x03, 0x12, 0x0c, 0x0a, 0x08, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65,
-	0x64, 0x10, 0x04, 0x12, 0x0b, 0x0a, 0x07, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x64, 0x10, 0x05,
-	0x2a, 0x6f, 0x0a, 0x08, 0x4c, 0x6f, 0x67, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x12, 0x09, 0x0a, 0x05,
-	0x44, 0x65, 0x62, 0x75, 0x67, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x49, 0x6e, 0x66, 0x6f, 0x10,
-	0x01, 0x12, 0x0a, 0x0a, 0x06, 0x4e, 0x6f, 0x74, 0x69, 0x63, 0x65, 0x10, 0x02, 0x12, 0x08, 0x0a,
-	0x04, 0x57, 0x61, 0x72, 0x6e, 0x10, 0x03, 0x12, 0x09, 0x0a, 0x05, 0x45, 0x72, 0x72, 0x6f, 0x72,
-	0x10, 0x04, 0x12, 0x0c, 0x0a, 0x08, 0x43, 0x72, 0x69, 0x74, 0x69, 0x63, 0x61, 0x6c, 0x10, 0x05,
-	0x12, 0x09, 0x0a, 0x05, 0x41, 0x6c, 0x65, 0x72, 0x74, 0x10, 0x06, 0x12, 0x09, 0x0a, 0x05, 0x46,
-	0x61, 0x74, 0x61, 0x6c, 0x10, 0x07, 0x12, 0x09, 0x0a, 0x05, 0x41, 0x75, 0x64, 0x69, 0x74, 0x10,
-	0x08, 0x2a, 0xcc, 0x01, 0x0a, 0x08, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x09,
-	0x0a, 0x05, 0x45, 0x71, 0x75, 0x61, 0x6c, 0x10, 0x00, 0x12, 0x0c, 0x0a, 0x08, 0x4e, 0x6f, 0x74,
-	0x45, 0x71, 0x75, 0x61, 0x6c, 0x10, 0x01, 0x12, 0x0f, 0x0a, 0x0b, 0x47, 0x72, 0x65, 0x61, 0x74,
-	0x65, 0x72, 0x54, 0x68, 0x61, 0x6e, 0x10, 0x02, 0x12, 0x16, 0x0a, 0x12, 0x47, 0x72, 0x65, 0x61,
-	0x74, 0x65, 0x72, 0x54, 0x68, 0x61, 0x6e, 0x4f, 0x72, 0x45, 0x71, 0x75, 0x61, 0x6c, 0x10, 0x03,
-	0x12, 0x0c, 0x0a, 0x08, 0x4c, 0x65, 0x73, 0x73, 0x54, 0x68, 0x61, 0x6e, 0x10, 0x04, 0x12, 0x13,
-	0x0a, 0x0f, 0x4c, 0x65, 0x73, 0x73, 0x54, 0x68, 0x61, 0x6e, 0x4f, 0x72, 0x45, 0x71, 0x75, 0x61,
-	0x6c, 0x10, 0x05, 0x12, 0x0c, 0x0a, 0x08, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x73, 0x10,
-	0x06, 0x12, 0x0f, 0x0a, 0x0b, 0x4e, 0x6f, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x73,
-	0x10, 0x07, 0x12, 0x0e, 0x0a, 0x0a, 0x53, 0x74, 0x61, 0x72, 0x74, 0x73, 0x57, 0x69, 0x74, 0x68,
-	0x10, 0x08, 0x12, 0x0c, 0x0a, 0x08, 0x45, 0x6e, 0x64, 0x73, 0x57, 0x69, 0x74, 0x68, 0x10, 0x09,
-	0x12, 0x06, 0x0a, 0x02, 0x49, 0x6e, 0x10, 0x0a, 0x12, 0x09, 0x0a, 0x05, 0x4e, 0x6f, 0x74, 0x49,
-	0x6e, 0x10, 0x0b, 0x12, 0x0b, 0x0a, 0x07, 0x42, 0x65, 0x74, 0x77, 0x65, 0x65, 0x6e, 0x10, 0x0c,
-	0x32, 0xbb, 0x07, 0x0a, 0x08, 0x4b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x12, 0x41, 0x0a,
-	0x06, 0x44, 0x65, 0x66, 0x69, 0x6e, 0x65, 0x12, 0x1d, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e,
-	0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b,
-	0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x22, 0x00,
-	0x12, 0x49, 0x0a, 0x06, 0x4d, 0x75, 0x74, 0x61, 0x74, 0x65, 0x12, 0x1d, 0x2e, 0x6b, 0x75, 0x62,
-	0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4d, 0x75, 0x74, 0x61,
-	0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6b, 0x75, 0x62, 0x65,
-	0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4d, 0x75, 0x74, 0x61, 0x74,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x40, 0x0a, 0x03, 0x4c,
-	0x6f, 0x67, 0x12, 0x1a, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74,
-	0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b,
+	0x02, 0x38, 0x01, 0x22, 0xd5, 0x03, 0x0a, 0x16, 0x43, 0x68, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d,
+	0x65, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x43,
+	0x0a, 0x0d, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65,
+	0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x41, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x7a, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0d, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x7a, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x12, 0x2b, 0x0a, 0x06, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73,
+	0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4b, 0x65, 0x79, 0x52, 0x06, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61,
+	0x12, 0x28, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14,
 	0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e,
-	0x4c, 0x6f, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5d, 0x0a,
-	0x10, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x69, 0x65,
-	0x73, 0x12, 0x27, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f,
-	0x6e, 0x65, 0x2e, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65, 0x72,
-	0x69, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6b, 0x75, 0x62,
-	0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4d, 0x75, 0x74, 0x61,
-	0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4b, 0x0a, 0x08,
-	0x52, 0x65, 0x74, 0x72, 0x69, 0x65, 0x76, 0x65, 0x12, 0x1d, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78,
-	0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e,
-	0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x04, 0x46, 0x69, 0x6e,
-	0x64, 0x12, 0x1b, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f,
-	0x6e, 0x65, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c,
+	0x44, 0x61, 0x74, 0x65, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x2a, 0x0a, 0x05, 0x75, 0x6e,
+	0x74, 0x69, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6b, 0x75, 0x62, 0x65,
+	0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x44, 0x61, 0x74, 0x65, 0x52,
+	0x05, 0x75, 0x6e, 0x74, 0x69, 0x6c, 0x12, 0x1a, 0x0a, 0x08, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76,
+	0x61, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76,
+	0x61, 0x6c, 0x12, 0x1a, 0x0a, 0x08, 0x74, 0x69, 0x6d, 0x65, 0x7a, 0x6f, 0x6e, 0x65, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x74, 0x69, 0x6d, 0x65, 0x7a, 0x6f, 0x6e, 0x65, 0x12, 0x27,
+	0x0a, 0x0f, 0x73, 0x65, 0x72, 0x69, 0x65, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x73, 0x65, 0x72, 0x69, 0x65, 0x73, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x12, 0x47, 0x0a, 0x0c, 0x61, 0x67, 0x67, 0x72, 0x65,
+	0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x23, 0x2e,
+	0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x52, 0x0c, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x12, 0x49, 0x0a, 0x10, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5f, 0x66, 0x69, 0x6c,
+	0x74, 0x65, 0x72, 0x73, 0x18, 0x09, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x6b, 0x75, 0x62,
+	0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x50, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x52, 0x0f, 0x70, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x22, 0xe0, 0x01, 0x0a, 0x13,
+	0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x12,
+	0x47, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x33, 0x2e,
+	0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x2e, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79,
+	0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x61, 0x6c, 0x69, 0x61,
+	0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x22, 0x4e,
+	0x0a, 0x0f, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70,
+	0x65, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x6f, 0x6e, 0x65, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x53,
+	0x75, 0x6d, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x41, 0x76, 0x65, 0x72, 0x61, 0x67, 0x65, 0x10,
+	0x02, 0x12, 0x09, 0x0a, 0x05, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x10, 0x03, 0x12, 0x07, 0x0a, 0x03,
+	0x4d, 0x69, 0x6e, 0x10, 0x04, 0x12, 0x07, 0x0a, 0x03, 0x4d, 0x61, 0x78, 0x10, 0x05, 0x22, 0xc6,
+	0x03, 0x0a, 0x17, 0x43, 0x68, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x69,
+	0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4b, 0x0a, 0x06, 0x73, 0x65,
+	0x72, 0x69, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x33, 0x2e, 0x6b, 0x75, 0x62,
+	0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x43, 0x68, 0x61, 0x72,
+	0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x2e, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52,
+	0x06, 0x73, 0x65, 0x72, 0x69, 0x65, 0x73, 0x1a, 0x6e, 0x0a, 0x0b, 0x53, 0x65, 0x72, 0x69, 0x65,
+	0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x49, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x33, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e,
+	0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x43, 0x68, 0x61, 0x72, 0x74, 0x54, 0x69,
+	0x6d, 0x65, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x2e, 0x43, 0x68, 0x61, 0x72, 0x74, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x52, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x1a, 0xed, 0x01, 0x0a, 0x0b, 0x43, 0x68, 0x61, 0x72,
+	0x74, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x12, 0x32, 0x0a, 0x06, 0x62, 0x75, 0x63, 0x6b, 0x65,
+	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x52, 0x06, 0x62, 0x75, 0x63, 0x6b, 0x65, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x73,
+	0x65, 0x72, 0x69, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x65, 0x72,
+	0x69, 0x65, 0x73, 0x12, 0x57, 0x0a, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x03, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x3f, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73,
+	0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x43, 0x68, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65,
+	0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x43, 0x68, 0x61,
+	0x72, 0x74, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x45,
+	0x6e, 0x74, 0x72, 0x79, 0x52, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x1a, 0x39, 0x0a, 0x0b,
+	0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
+	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x2a, 0x5b, 0x0a, 0x0b, 0x45, 0x6e, 0x74, 0x69, 0x74,
+	0x79, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x10, 0x01, 0x12,
+	0x0b, 0x0a, 0x07, 0x4f, 0x66, 0x66, 0x6c, 0x69, 0x6e, 0x65, 0x10, 0x02, 0x12, 0x0b, 0x0a, 0x07,
+	0x43, 0x6f, 0x72, 0x72, 0x75, 0x70, 0x74, 0x10, 0x03, 0x12, 0x0c, 0x0a, 0x08, 0x41, 0x72, 0x63,
+	0x68, 0x69, 0x76, 0x65, 0x64, 0x10, 0x04, 0x12, 0x0b, 0x0a, 0x07, 0x52, 0x65, 0x6d, 0x6f, 0x76,
+	0x65, 0x64, 0x10, 0x05, 0x2a, 0x6f, 0x0a, 0x08, 0x4c, 0x6f, 0x67, 0x4c, 0x65, 0x76, 0x65, 0x6c,
+	0x12, 0x09, 0x0a, 0x05, 0x44, 0x65, 0x62, 0x75, 0x67, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x49,
+	0x6e, 0x66, 0x6f, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x4e, 0x6f, 0x74, 0x69, 0x63, 0x65, 0x10,
+	0x02, 0x12, 0x08, 0x0a, 0x04, 0x57, 0x61, 0x72, 0x6e, 0x10, 0x03, 0x12, 0x09, 0x0a, 0x05, 0x45,
+	0x72, 0x72, 0x6f, 0x72, 0x10, 0x04, 0x12, 0x0c, 0x0a, 0x08, 0x43, 0x72, 0x69, 0x74, 0x69, 0x63,
+	0x61, 0x6c, 0x10, 0x05, 0x12, 0x09, 0x0a, 0x05, 0x41, 0x6c, 0x65, 0x72, 0x74, 0x10, 0x06, 0x12,
+	0x09, 0x0a, 0x05, 0x46, 0x61, 0x74, 0x61, 0x6c, 0x10, 0x07, 0x12, 0x09, 0x0a, 0x05, 0x41, 0x75,
+	0x64, 0x69, 0x74, 0x10, 0x08, 0x2a, 0xcc, 0x01, 0x0a, 0x08, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x12, 0x09, 0x0a, 0x05, 0x45, 0x71, 0x75, 0x61, 0x6c, 0x10, 0x00, 0x12, 0x0c, 0x0a,
+	0x08, 0x4e, 0x6f, 0x74, 0x45, 0x71, 0x75, 0x61, 0x6c, 0x10, 0x01, 0x12, 0x0f, 0x0a, 0x0b, 0x47,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x72, 0x54, 0x68, 0x61, 0x6e, 0x10, 0x02, 0x12, 0x16, 0x0a, 0x12,
+	0x47, 0x72, 0x65, 0x61, 0x74, 0x65, 0x72, 0x54, 0x68, 0x61, 0x6e, 0x4f, 0x72, 0x45, 0x71, 0x75,
+	0x61, 0x6c, 0x10, 0x03, 0x12, 0x0c, 0x0a, 0x08, 0x4c, 0x65, 0x73, 0x73, 0x54, 0x68, 0x61, 0x6e,
+	0x10, 0x04, 0x12, 0x13, 0x0a, 0x0f, 0x4c, 0x65, 0x73, 0x73, 0x54, 0x68, 0x61, 0x6e, 0x4f, 0x72,
+	0x45, 0x71, 0x75, 0x61, 0x6c, 0x10, 0x05, 0x12, 0x0c, 0x0a, 0x08, 0x43, 0x6f, 0x6e, 0x74, 0x61,
+	0x69, 0x6e, 0x73, 0x10, 0x06, 0x12, 0x0f, 0x0a, 0x0b, 0x4e, 0x6f, 0x74, 0x43, 0x6f, 0x6e, 0x74,
+	0x61, 0x69, 0x6e, 0x73, 0x10, 0x07, 0x12, 0x0e, 0x0a, 0x0a, 0x53, 0x74, 0x61, 0x72, 0x74, 0x73,
+	0x57, 0x69, 0x74, 0x68, 0x10, 0x08, 0x12, 0x0c, 0x0a, 0x08, 0x45, 0x6e, 0x64, 0x73, 0x57, 0x69,
+	0x74, 0x68, 0x10, 0x09, 0x12, 0x06, 0x0a, 0x02, 0x49, 0x6e, 0x10, 0x0a, 0x12, 0x09, 0x0a, 0x05,
+	0x4e, 0x6f, 0x74, 0x49, 0x6e, 0x10, 0x0b, 0x12, 0x0b, 0x0a, 0x07, 0x42, 0x65, 0x74, 0x77, 0x65,
+	0x65, 0x6e, 0x10, 0x0c, 0x32, 0xa1, 0x08, 0x0a, 0x08, 0x4b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e,
+	0x65, 0x12, 0x41, 0x0a, 0x06, 0x44, 0x65, 0x66, 0x69, 0x6e, 0x65, 0x12, 0x1d, 0x2e, 0x6b, 0x75,
+	0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68,
+	0x65, 0x6d, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6b, 0x75, 0x62,
+	0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68, 0x65,
+	0x6d, 0x61, 0x22, 0x00, 0x12, 0x49, 0x0a, 0x06, 0x4d, 0x75, 0x74, 0x61, 0x74, 0x65, 0x12, 0x1d,
 	0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e,
-	0x46, 0x69, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43,
-	0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x1b, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b,
-	0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73,
-	0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x12, 0x55, 0x0a, 0x0a, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x43, 0x6f, 0x75, 0x6e,
-	0x74, 0x12, 0x21, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f,
-	0x6e, 0x65, 0x2e, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79,
-	0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x43, 0x6f, 0x75, 0x6e, 0x74,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x04, 0x4c, 0x6f,
-	0x67, 0x73, 0x12, 0x1b, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74,
-	0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x1c, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65,
-	0x2e, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
-	0x48, 0x0a, 0x06, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x1c, 0x2e, 0x6b, 0x75, 0x62, 0x65,
-	0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e,
-	0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5a, 0x0a, 0x0d, 0x44, 0x61, 0x69,
-	0x6c, 0x79, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x69, 0x65, 0x73, 0x12, 0x22, 0x2e, 0x6b, 0x75, 0x62,
-	0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x44, 0x61, 0x69, 0x6c,
-	0x79, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x23,
+	0x4d, 0x75, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e,
+	0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4d,
+	0x75, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x40, 0x0a, 0x03, 0x4c, 0x6f, 0x67, 0x12, 0x1a, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b,
+	0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74,
+	0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x12, 0x5d, 0x0a, 0x10, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53,
+	0x65, 0x72, 0x69, 0x65, 0x73, 0x12, 0x27, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65,
+	0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x54, 0x69, 0x6d,
+	0x65, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e,
 	0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e,
-	0x44, 0x61, 0x69, 0x6c, 0x79, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x67, 0x0a, 0x10, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x53,
-	0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x12, 0x27, 0x2e, 0x6b, 0x75, 0x62, 0x65,
-	0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d,
-	0x61, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x28, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74,
-	0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73,
-	0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x16,
-	0x5a, 0x14, 0x2e, 0x2e, 0x2f, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2d, 0x67, 0x6f,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x4d, 0x75, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x64, 0x0a, 0x0f, 0x43, 0x68, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65, 0x72,
+	0x69, 0x65, 0x73, 0x12, 0x26, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73,
+	0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x43, 0x68, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65,
+	0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x6b, 0x75,
+	0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x43, 0x68, 0x61,
+	0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x69, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4b, 0x0a, 0x08, 0x52, 0x65, 0x74, 0x72, 0x69, 0x65,
+	0x76, 0x65, 0x12, 0x1d, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74,
+	0x6f, 0x6e, 0x65, 0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1e, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f,
+	0x6e, 0x65, 0x2e, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x04, 0x46, 0x69, 0x6e, 0x64, 0x12, 0x1b, 0x2e, 0x6b, 0x75,
+	0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x46, 0x69, 0x6e,
+	0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78,
+	0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x46, 0x69, 0x6e, 0x64, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74,
+	0x12, 0x1b, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e,
+	0x65, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e,
+	0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x55, 0x0a,
+	0x0a, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x21, 0x2e, 0x6b, 0x75,
+	0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x47, 0x72, 0x6f,
+	0x75, 0x70, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22,
+	0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e,
+	0x47, 0x72, 0x6f, 0x75, 0x70, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x04, 0x4c, 0x6f, 0x67, 0x73, 0x12, 0x1b, 0x2e, 0x6b,
+	0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x6f,
+	0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6b, 0x75, 0x62, 0x65,
+	0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x48, 0x0a, 0x06, 0x45, 0x76, 0x65,
+	0x6e, 0x74, 0x73, 0x12, 0x1c, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73,
+	0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1e, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f,
+	0x6e, 0x65, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x12, 0x5a, 0x0a, 0x0d, 0x44, 0x61, 0x69, 0x6c, 0x79, 0x45, 0x6e, 0x74, 0x69,
+	0x74, 0x69, 0x65, 0x73, 0x12, 0x22, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79,
+	0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x44, 0x61, 0x69, 0x6c, 0x79, 0x45, 0x6e, 0x74, 0x69, 0x74,
+	0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x23, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78,
+	0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x44, 0x61, 0x69, 0x6c, 0x79, 0x45,
+	0x6e, 0x74, 0x69, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x67, 0x0a, 0x10, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74,
+	0x69, 0x63, 0x73, 0x12, 0x27, 0x2e, 0x6b, 0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73,
+	0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x53, 0x74, 0x61, 0x74, 0x69,
+	0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x6b,
+	0x75, 0x62, 0x65, 0x78, 0x2e, 0x6b, 0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2e, 0x53, 0x63,
+	0x68, 0x65, 0x6d, 0x61, 0x53, 0x74, 0x61, 0x74, 0x69, 0x73, 0x74, 0x69, 0x63, 0x73, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x16, 0x5a, 0x14, 0x2e, 0x2e, 0x2f, 0x6b,
+	0x65, 0x79, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x2d, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -5896,256 +6317,276 @@ func file_keystone_proto_rawDescGZIP() []byte {
 	return file_keystone_proto_rawDescData
 }
 
-var file_keystone_proto_enumTypes = make([]protoimpl.EnumInfo, 9)
-var file_keystone_proto_msgTypes = make([]protoimpl.MessageInfo, 66)
+var file_keystone_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
+var file_keystone_proto_msgTypes = make([]protoimpl.MessageInfo, 72)
 var file_keystone_proto_goTypes = []interface{}{
-	(EntityState)(0),                  // 0: kubex.keystone.EntityState
-	(LogLevel)(0),                     // 1: kubex.keystone.LogLevel
-	(Operator)(0),                     // 2: kubex.keystone.Operator
-	(Schema_Option)(0),                // 3: kubex.keystone.Schema.Option
-	(Schema_Type)(0),                  // 4: kubex.keystone.Schema.Type
-	(Property_Type)(0),                // 5: kubex.keystone.Property.Type
-	(Property_ExtendedType)(0),        // 6: kubex.keystone.Property.ExtendedType
-	(Property_Option)(0),              // 7: kubex.keystone.Property.Option
-	(MutateRequest_MutateOption)(0),   // 8: kubex.keystone.MutateRequest.MutateOption
-	(*ExtendedResponse)(nil),          // 9: kubex.keystone.ExtendedResponse
-	(*VendorApp)(nil),                 // 10: kubex.keystone.VendorApp
-	(*Authorization)(nil),             // 11: kubex.keystone.Authorization
-	(*GenericResponse)(nil),           // 12: kubex.keystone.GenericResponse
-	(*Schema)(nil),                    // 13: kubex.keystone.Schema
-	(*Property)(nil),                  // 14: kubex.keystone.Property
-	(*Key)(nil),                       // 15: kubex.keystone.Key
-	(*Value)(nil),                     // 16: kubex.keystone.Value
-	(*RepeatedValue)(nil),             // 17: kubex.keystone.RepeatedValue
-	(*Entity)(nil),                    // 18: kubex.keystone.Entity
-	(*EntityProperty)(nil),            // 19: kubex.keystone.EntityProperty
-	(*EntityChild)(nil),               // 20: kubex.keystone.EntityChild
-	(*EntityDatum)(nil),               // 21: kubex.keystone.EntityDatum
-	(*EntityLog)(nil),                 // 22: kubex.keystone.EntityLog
-	(*EntityEvent)(nil),               // 23: kubex.keystone.EntityEvent
-	(*EntityRelationship)(nil),        // 24: kubex.keystone.EntityRelationship
-	(*EntityLabel)(nil),               // 25: kubex.keystone.EntityLabel
-	(*EntitySensorMeasurement)(nil),   // 26: kubex.keystone.EntitySensorMeasurement
-	(*User)(nil),                      // 27: kubex.keystone.User
-	(*Mutation)(nil),                  // 28: kubex.keystone.Mutation
-	(*LogRequest)(nil),                // 29: kubex.keystone.LogRequest
-	(*LogResponse)(nil),               // 30: kubex.keystone.LogResponse
-	(*Window)(nil),                    // 31: kubex.keystone.Window
-	(*PropertyFilter)(nil),            // 32: kubex.keystone.PropertyFilter
-	(*PropertySort)(nil),              // 33: kubex.keystone.PropertySort
-	(*SchemaRequest)(nil),             // 34: kubex.keystone.SchemaRequest
-	(*MutateRequest)(nil),             // 35: kubex.keystone.MutateRequest
-	(*ReportTimeSeriesRequest)(nil),   // 36: kubex.keystone.ReportTimeSeriesRequest
-	(*EntityView)(nil),                // 37: kubex.keystone.EntityView
-	(*TypeCount)(nil),                 // 38: kubex.keystone.TypeCount
-	(*ChildSummary)(nil),              // 39: kubex.keystone.ChildSummary
-	(*EntityRequest)(nil),             // 40: kubex.keystone.EntityRequest
-	(*EntityResponse)(nil),            // 41: kubex.keystone.EntityResponse
-	(*EntityLock)(nil),                // 42: kubex.keystone.EntityLock
-	(*MutateResponse)(nil),            // 43: kubex.keystone.MutateResponse
-	(*IDLookup)(nil),                  // 44: kubex.keystone.IDLookup
-	(*PropertyRequest)(nil),           // 45: kubex.keystone.PropertyRequest
-	(*ChildRequest)(nil),              // 46: kubex.keystone.ChildRequest
-	(*LogsRequest)(nil),               // 47: kubex.keystone.LogsRequest
-	(*LogsResponse)(nil),              // 48: kubex.keystone.LogsResponse
-	(*EventRequest)(nil),              // 49: kubex.keystone.EventRequest
-	(*EventsResponse)(nil),            // 50: kubex.keystone.EventsResponse
-	(*RelationOf)(nil),                // 51: kubex.keystone.RelationOf
-	(*FindRequest)(nil),               // 52: kubex.keystone.FindRequest
-	(*FindResponse)(nil),              // 53: kubex.keystone.FindResponse
-	(*PageRequest)(nil),               // 54: kubex.keystone.PageRequest
-	(*ListRequest)(nil),               // 55: kubex.keystone.ListRequest
-	(*ListResponse)(nil),              // 56: kubex.keystone.ListResponse
-	(*GroupCountRequest)(nil),         // 57: kubex.keystone.GroupCountRequest
-	(*GroupCountResponse)(nil),        // 58: kubex.keystone.GroupCountResponse
-	(*EntitiesResponse)(nil),          // 59: kubex.keystone.EntitiesResponse
-	(*Date)(nil),                      // 60: kubex.keystone.Date
-	(*SchemaStatisticsRequest)(nil),   // 61: kubex.keystone.SchemaStatisticsRequest
-	(*SchemaStatisticsResponse)(nil),  // 62: kubex.keystone.SchemaStatisticsResponse
-	(*DailyEntityRequest)(nil),        // 63: kubex.keystone.DailyEntityRequest
-	(*DailyEntityResponse)(nil),       // 64: kubex.keystone.DailyEntityResponse
-	nil,                               // 65: kubex.keystone.RepeatedValue.KeyValueEntry
-	nil,                               // 66: kubex.keystone.EntityChild.DataEntry
-	nil,                               // 67: kubex.keystone.EntityLog.DataEntry
-	nil,                               // 68: kubex.keystone.EntityEvent.DataEntry
-	nil,                               // 69: kubex.keystone.EntityRelationship.DataEntry
-	nil,                               // 70: kubex.keystone.EntitySensorMeasurement.DataEntry
-	(*GroupCountResponse_Result)(nil), // 71: kubex.keystone.GroupCountResponse.Result
-	nil,                               // 72: kubex.keystone.GroupCountResponse.Result.PropertiesEntry
-	nil,                               // 73: kubex.keystone.SchemaStatisticsResponse.DailyCountEntry
-	nil,                               // 74: kubex.keystone.DailyEntityResponse.EntitiesEntry
-	(*timestamppb.Timestamp)(nil),     // 75: google.protobuf.Timestamp
+	(EntityState)(0),                         // 0: kubex.keystone.EntityState
+	(LogLevel)(0),                            // 1: kubex.keystone.LogLevel
+	(Operator)(0),                            // 2: kubex.keystone.Operator
+	(Schema_Option)(0),                       // 3: kubex.keystone.Schema.Option
+	(Schema_Type)(0),                         // 4: kubex.keystone.Schema.Type
+	(Property_Type)(0),                       // 5: kubex.keystone.Property.Type
+	(Property_ExtendedType)(0),               // 6: kubex.keystone.Property.ExtendedType
+	(Property_Option)(0),                     // 7: kubex.keystone.Property.Option
+	(MutateRequest_MutateOption)(0),          // 8: kubex.keystone.MutateRequest.MutateOption
+	(PropertyAggregation_AggregationType)(0), // 9: kubex.keystone.PropertyAggregation.AggregationType
+	(*ExtendedResponse)(nil),                 // 10: kubex.keystone.ExtendedResponse
+	(*VendorApp)(nil),                        // 11: kubex.keystone.VendorApp
+	(*Authorization)(nil),                    // 12: kubex.keystone.Authorization
+	(*GenericResponse)(nil),                  // 13: kubex.keystone.GenericResponse
+	(*Schema)(nil),                           // 14: kubex.keystone.Schema
+	(*Property)(nil),                         // 15: kubex.keystone.Property
+	(*Key)(nil),                              // 16: kubex.keystone.Key
+	(*Value)(nil),                            // 17: kubex.keystone.Value
+	(*RepeatedValue)(nil),                    // 18: kubex.keystone.RepeatedValue
+	(*Entity)(nil),                           // 19: kubex.keystone.Entity
+	(*EntityProperty)(nil),                   // 20: kubex.keystone.EntityProperty
+	(*EntityChild)(nil),                      // 21: kubex.keystone.EntityChild
+	(*EntityDatum)(nil),                      // 22: kubex.keystone.EntityDatum
+	(*EntityLog)(nil),                        // 23: kubex.keystone.EntityLog
+	(*EntityEvent)(nil),                      // 24: kubex.keystone.EntityEvent
+	(*EntityRelationship)(nil),               // 25: kubex.keystone.EntityRelationship
+	(*EntityLabel)(nil),                      // 26: kubex.keystone.EntityLabel
+	(*EntitySensorMeasurement)(nil),          // 27: kubex.keystone.EntitySensorMeasurement
+	(*User)(nil),                             // 28: kubex.keystone.User
+	(*Mutation)(nil),                         // 29: kubex.keystone.Mutation
+	(*LogRequest)(nil),                       // 30: kubex.keystone.LogRequest
+	(*LogResponse)(nil),                      // 31: kubex.keystone.LogResponse
+	(*Window)(nil),                           // 32: kubex.keystone.Window
+	(*PropertyFilter)(nil),                   // 33: kubex.keystone.PropertyFilter
+	(*PropertySort)(nil),                     // 34: kubex.keystone.PropertySort
+	(*SchemaRequest)(nil),                    // 35: kubex.keystone.SchemaRequest
+	(*MutateRequest)(nil),                    // 36: kubex.keystone.MutateRequest
+	(*ReportTimeSeriesRequest)(nil),          // 37: kubex.keystone.ReportTimeSeriesRequest
+	(*EntityView)(nil),                       // 38: kubex.keystone.EntityView
+	(*TypeCount)(nil),                        // 39: kubex.keystone.TypeCount
+	(*ChildSummary)(nil),                     // 40: kubex.keystone.ChildSummary
+	(*EntityRequest)(nil),                    // 41: kubex.keystone.EntityRequest
+	(*EntityResponse)(nil),                   // 42: kubex.keystone.EntityResponse
+	(*EntityLock)(nil),                       // 43: kubex.keystone.EntityLock
+	(*MutateResponse)(nil),                   // 44: kubex.keystone.MutateResponse
+	(*IDLookup)(nil),                         // 45: kubex.keystone.IDLookup
+	(*PropertyRequest)(nil),                  // 46: kubex.keystone.PropertyRequest
+	(*ChildRequest)(nil),                     // 47: kubex.keystone.ChildRequest
+	(*LogsRequest)(nil),                      // 48: kubex.keystone.LogsRequest
+	(*LogsResponse)(nil),                     // 49: kubex.keystone.LogsResponse
+	(*EventRequest)(nil),                     // 50: kubex.keystone.EventRequest
+	(*EventsResponse)(nil),                   // 51: kubex.keystone.EventsResponse
+	(*RelationOf)(nil),                       // 52: kubex.keystone.RelationOf
+	(*FindRequest)(nil),                      // 53: kubex.keystone.FindRequest
+	(*FindResponse)(nil),                     // 54: kubex.keystone.FindResponse
+	(*PageRequest)(nil),                      // 55: kubex.keystone.PageRequest
+	(*ListRequest)(nil),                      // 56: kubex.keystone.ListRequest
+	(*ListResponse)(nil),                     // 57: kubex.keystone.ListResponse
+	(*GroupCountRequest)(nil),                // 58: kubex.keystone.GroupCountRequest
+	(*GroupCountResponse)(nil),               // 59: kubex.keystone.GroupCountResponse
+	(*EntitiesResponse)(nil),                 // 60: kubex.keystone.EntitiesResponse
+	(*Date)(nil),                             // 61: kubex.keystone.Date
+	(*SchemaStatisticsRequest)(nil),          // 62: kubex.keystone.SchemaStatisticsRequest
+	(*SchemaStatisticsResponse)(nil),         // 63: kubex.keystone.SchemaStatisticsResponse
+	(*DailyEntityRequest)(nil),               // 64: kubex.keystone.DailyEntityRequest
+	(*DailyEntityResponse)(nil),              // 65: kubex.keystone.DailyEntityResponse
+	(*ChartTimeSeriesRequest)(nil),           // 66: kubex.keystone.ChartTimeSeriesRequest
+	(*PropertyAggregation)(nil),              // 67: kubex.keystone.PropertyAggregation
+	(*ChartTimeSeriesResponse)(nil),          // 68: kubex.keystone.ChartTimeSeriesResponse
+	nil,                                      // 69: kubex.keystone.RepeatedValue.KeyValueEntry
+	nil,                                      // 70: kubex.keystone.EntityChild.DataEntry
+	nil,                                      // 71: kubex.keystone.EntityLog.DataEntry
+	nil,                                      // 72: kubex.keystone.EntityEvent.DataEntry
+	nil,                                      // 73: kubex.keystone.EntityRelationship.DataEntry
+	nil,                                      // 74: kubex.keystone.EntitySensorMeasurement.DataEntry
+	(*GroupCountResponse_Result)(nil),        // 75: kubex.keystone.GroupCountResponse.Result
+	nil,                                      // 76: kubex.keystone.GroupCountResponse.Result.PropertiesEntry
+	nil,                                      // 77: kubex.keystone.SchemaStatisticsResponse.DailyCountEntry
+	nil,                                      // 78: kubex.keystone.DailyEntityResponse.EntitiesEntry
+	nil,                                      // 79: kubex.keystone.ChartTimeSeriesResponse.SeriesEntry
+	(*ChartTimeSeriesResponse_ChartSeries)(nil), // 80: kubex.keystone.ChartTimeSeriesResponse.ChartSeries
+	nil,                           // 81: kubex.keystone.ChartTimeSeriesResponse.ChartSeries.ValuesEntry
+	(*timestamppb.Timestamp)(nil), // 82: google.protobuf.Timestamp
 }
 var file_keystone_proto_depIdxs = []int32{
-	10,  // 0: kubex.keystone.Authorization.source:type_name -> kubex.keystone.VendorApp
-	27,  // 1: kubex.keystone.Authorization.user:type_name -> kubex.keystone.User
-	10,  // 2: kubex.keystone.Schema.source:type_name -> kubex.keystone.VendorApp
-	75,  // 3: kubex.keystone.Schema.created:type_name -> google.protobuf.Timestamp
-	14,  // 4: kubex.keystone.Schema.properties:type_name -> kubex.keystone.Property
+	11,  // 0: kubex.keystone.Authorization.source:type_name -> kubex.keystone.VendorApp
+	28,  // 1: kubex.keystone.Authorization.user:type_name -> kubex.keystone.User
+	11,  // 2: kubex.keystone.Schema.source:type_name -> kubex.keystone.VendorApp
+	82,  // 3: kubex.keystone.Schema.created:type_name -> google.protobuf.Timestamp
+	15,  // 4: kubex.keystone.Schema.properties:type_name -> kubex.keystone.Property
 	3,   // 5: kubex.keystone.Schema.options:type_name -> kubex.keystone.Schema.Option
 	4,   // 6: kubex.keystone.Schema.ks_type:type_name -> kubex.keystone.Schema.Type
 	5,   // 7: kubex.keystone.Property.data_type:type_name -> kubex.keystone.Property.Type
 	6,   // 8: kubex.keystone.Property.extended_type:type_name -> kubex.keystone.Property.ExtendedType
 	7,   // 9: kubex.keystone.Property.options:type_name -> kubex.keystone.Property.Option
-	10,  // 10: kubex.keystone.Key.source:type_name -> kubex.keystone.VendorApp
-	75,  // 11: kubex.keystone.Value.time:type_name -> google.protobuf.Timestamp
-	17,  // 12: kubex.keystone.Value.array:type_name -> kubex.keystone.RepeatedValue
-	17,  // 13: kubex.keystone.Value.array_append:type_name -> kubex.keystone.RepeatedValue
-	17,  // 14: kubex.keystone.Value.array_reduce:type_name -> kubex.keystone.RepeatedValue
-	65,  // 15: kubex.keystone.RepeatedValue.key_value:type_name -> kubex.keystone.RepeatedValue.KeyValueEntry
-	75,  // 16: kubex.keystone.Entity.created:type_name -> google.protobuf.Timestamp
-	75,  // 17: kubex.keystone.Entity.state_change:type_name -> google.protobuf.Timestamp
+	11,  // 10: kubex.keystone.Key.source:type_name -> kubex.keystone.VendorApp
+	82,  // 11: kubex.keystone.Value.time:type_name -> google.protobuf.Timestamp
+	18,  // 12: kubex.keystone.Value.array:type_name -> kubex.keystone.RepeatedValue
+	18,  // 13: kubex.keystone.Value.array_append:type_name -> kubex.keystone.RepeatedValue
+	18,  // 14: kubex.keystone.Value.array_reduce:type_name -> kubex.keystone.RepeatedValue
+	69,  // 15: kubex.keystone.RepeatedValue.key_value:type_name -> kubex.keystone.RepeatedValue.KeyValueEntry
+	82,  // 16: kubex.keystone.Entity.created:type_name -> google.protobuf.Timestamp
+	82,  // 17: kubex.keystone.Entity.state_change:type_name -> google.protobuf.Timestamp
 	0,   // 18: kubex.keystone.Entity.state:type_name -> kubex.keystone.EntityState
-	75,  // 19: kubex.keystone.Entity.lastUpdate:type_name -> google.protobuf.Timestamp
-	16,  // 20: kubex.keystone.EntityProperty.value:type_name -> kubex.keystone.Value
-	10,  // 21: kubex.keystone.EntityProperty.source:type_name -> kubex.keystone.VendorApp
-	15,  // 22: kubex.keystone.EntityChild.type:type_name -> kubex.keystone.Key
-	66,  // 23: kubex.keystone.EntityChild.data:type_name -> kubex.keystone.EntityChild.DataEntry
-	10,  // 24: kubex.keystone.EntityDatum.source:type_name -> kubex.keystone.VendorApp
+	82,  // 19: kubex.keystone.Entity.lastUpdate:type_name -> google.protobuf.Timestamp
+	17,  // 20: kubex.keystone.EntityProperty.value:type_name -> kubex.keystone.Value
+	11,  // 21: kubex.keystone.EntityProperty.source:type_name -> kubex.keystone.VendorApp
+	16,  // 22: kubex.keystone.EntityChild.type:type_name -> kubex.keystone.Key
+	70,  // 23: kubex.keystone.EntityChild.data:type_name -> kubex.keystone.EntityChild.DataEntry
+	11,  // 24: kubex.keystone.EntityDatum.source:type_name -> kubex.keystone.VendorApp
 	1,   // 25: kubex.keystone.EntityLog.level:type_name -> kubex.keystone.LogLevel
-	75,  // 26: kubex.keystone.EntityLog.time:type_name -> google.protobuf.Timestamp
-	67,  // 27: kubex.keystone.EntityLog.data:type_name -> kubex.keystone.EntityLog.DataEntry
-	27,  // 28: kubex.keystone.EntityLog.audit_user:type_name -> kubex.keystone.User
-	15,  // 29: kubex.keystone.EntityEvent.type:type_name -> kubex.keystone.Key
-	75,  // 30: kubex.keystone.EntityEvent.time:type_name -> google.protobuf.Timestamp
-	68,  // 31: kubex.keystone.EntityEvent.data:type_name -> kubex.keystone.EntityEvent.DataEntry
-	15,  // 32: kubex.keystone.EntityRelationship.relationship:type_name -> kubex.keystone.Key
-	75,  // 33: kubex.keystone.EntityRelationship.since:type_name -> google.protobuf.Timestamp
-	69,  // 34: kubex.keystone.EntityRelationship.data:type_name -> kubex.keystone.EntityRelationship.DataEntry
-	75,  // 35: kubex.keystone.EntitySensorMeasurement.at:type_name -> google.protobuf.Timestamp
-	70,  // 36: kubex.keystone.EntitySensorMeasurement.data:type_name -> kubex.keystone.EntitySensorMeasurement.DataEntry
-	10,  // 37: kubex.keystone.User.source:type_name -> kubex.keystone.VendorApp
-	27,  // 38: kubex.keystone.User.parent:type_name -> kubex.keystone.User
-	27,  // 39: kubex.keystone.Mutation.mutator:type_name -> kubex.keystone.User
-	75,  // 40: kubex.keystone.Mutation.timestamp:type_name -> google.protobuf.Timestamp
+	82,  // 26: kubex.keystone.EntityLog.time:type_name -> google.protobuf.Timestamp
+	71,  // 27: kubex.keystone.EntityLog.data:type_name -> kubex.keystone.EntityLog.DataEntry
+	28,  // 28: kubex.keystone.EntityLog.audit_user:type_name -> kubex.keystone.User
+	16,  // 29: kubex.keystone.EntityEvent.type:type_name -> kubex.keystone.Key
+	82,  // 30: kubex.keystone.EntityEvent.time:type_name -> google.protobuf.Timestamp
+	72,  // 31: kubex.keystone.EntityEvent.data:type_name -> kubex.keystone.EntityEvent.DataEntry
+	16,  // 32: kubex.keystone.EntityRelationship.relationship:type_name -> kubex.keystone.Key
+	82,  // 33: kubex.keystone.EntityRelationship.since:type_name -> google.protobuf.Timestamp
+	73,  // 34: kubex.keystone.EntityRelationship.data:type_name -> kubex.keystone.EntityRelationship.DataEntry
+	82,  // 35: kubex.keystone.EntitySensorMeasurement.at:type_name -> google.protobuf.Timestamp
+	74,  // 36: kubex.keystone.EntitySensorMeasurement.data:type_name -> kubex.keystone.EntitySensorMeasurement.DataEntry
+	11,  // 37: kubex.keystone.User.source:type_name -> kubex.keystone.VendorApp
+	28,  // 38: kubex.keystone.User.parent:type_name -> kubex.keystone.User
+	28,  // 39: kubex.keystone.Mutation.mutator:type_name -> kubex.keystone.User
+	82,  // 40: kubex.keystone.Mutation.timestamp:type_name -> google.protobuf.Timestamp
 	0,   // 41: kubex.keystone.Mutation.state:type_name -> kubex.keystone.EntityState
-	19,  // 42: kubex.keystone.Mutation.properties:type_name -> kubex.keystone.EntityProperty
-	19,  // 43: kubex.keystone.Mutation.dynamic_properties:type_name -> kubex.keystone.EntityProperty
-	22,  // 44: kubex.keystone.Mutation.logs:type_name -> kubex.keystone.EntityLog
-	23,  // 45: kubex.keystone.Mutation.events:type_name -> kubex.keystone.EntityEvent
-	20,  // 46: kubex.keystone.Mutation.children:type_name -> kubex.keystone.EntityChild
-	20,  // 47: kubex.keystone.Mutation.remove_children:type_name -> kubex.keystone.EntityChild
-	24,  // 48: kubex.keystone.Mutation.relationships:type_name -> kubex.keystone.EntityRelationship
-	24,  // 49: kubex.keystone.Mutation.remove_relationships:type_name -> kubex.keystone.EntityRelationship
-	25,  // 50: kubex.keystone.Mutation.labels:type_name -> kubex.keystone.EntityLabel
-	25,  // 51: kubex.keystone.Mutation.remove_labels:type_name -> kubex.keystone.EntityLabel
-	26,  // 52: kubex.keystone.Mutation.measurements:type_name -> kubex.keystone.EntitySensorMeasurement
-	11,  // 53: kubex.keystone.LogRequest.authorization:type_name -> kubex.keystone.Authorization
-	22,  // 54: kubex.keystone.LogRequest.logs:type_name -> kubex.keystone.EntityLog
-	9,   // 55: kubex.keystone.LogResponse.extended:type_name -> kubex.keystone.ExtendedResponse
-	75,  // 56: kubex.keystone.Window.since:type_name -> google.protobuf.Timestamp
-	75,  // 57: kubex.keystone.Window.until:type_name -> google.protobuf.Timestamp
+	20,  // 42: kubex.keystone.Mutation.properties:type_name -> kubex.keystone.EntityProperty
+	20,  // 43: kubex.keystone.Mutation.dynamic_properties:type_name -> kubex.keystone.EntityProperty
+	23,  // 44: kubex.keystone.Mutation.logs:type_name -> kubex.keystone.EntityLog
+	24,  // 45: kubex.keystone.Mutation.events:type_name -> kubex.keystone.EntityEvent
+	21,  // 46: kubex.keystone.Mutation.children:type_name -> kubex.keystone.EntityChild
+	21,  // 47: kubex.keystone.Mutation.remove_children:type_name -> kubex.keystone.EntityChild
+	25,  // 48: kubex.keystone.Mutation.relationships:type_name -> kubex.keystone.EntityRelationship
+	25,  // 49: kubex.keystone.Mutation.remove_relationships:type_name -> kubex.keystone.EntityRelationship
+	26,  // 50: kubex.keystone.Mutation.labels:type_name -> kubex.keystone.EntityLabel
+	26,  // 51: kubex.keystone.Mutation.remove_labels:type_name -> kubex.keystone.EntityLabel
+	27,  // 52: kubex.keystone.Mutation.measurements:type_name -> kubex.keystone.EntitySensorMeasurement
+	12,  // 53: kubex.keystone.LogRequest.authorization:type_name -> kubex.keystone.Authorization
+	23,  // 54: kubex.keystone.LogRequest.logs:type_name -> kubex.keystone.EntityLog
+	10,  // 55: kubex.keystone.LogResponse.extended:type_name -> kubex.keystone.ExtendedResponse
+	82,  // 56: kubex.keystone.Window.since:type_name -> google.protobuf.Timestamp
+	82,  // 57: kubex.keystone.Window.until:type_name -> google.protobuf.Timestamp
 	2,   // 58: kubex.keystone.PropertyFilter.operator:type_name -> kubex.keystone.Operator
-	16,  // 59: kubex.keystone.PropertyFilter.values:type_name -> kubex.keystone.Value
-	11,  // 60: kubex.keystone.SchemaRequest.authorization:type_name -> kubex.keystone.Authorization
-	13,  // 61: kubex.keystone.SchemaRequest.schema:type_name -> kubex.keystone.Schema
-	37,  // 62: kubex.keystone.SchemaRequest.views:type_name -> kubex.keystone.EntityView
-	11,  // 63: kubex.keystone.MutateRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 64: kubex.keystone.MutateRequest.schema:type_name -> kubex.keystone.Key
-	28,  // 65: kubex.keystone.MutateRequest.mutation:type_name -> kubex.keystone.Mutation
+	17,  // 59: kubex.keystone.PropertyFilter.values:type_name -> kubex.keystone.Value
+	12,  // 60: kubex.keystone.SchemaRequest.authorization:type_name -> kubex.keystone.Authorization
+	14,  // 61: kubex.keystone.SchemaRequest.schema:type_name -> kubex.keystone.Schema
+	38,  // 62: kubex.keystone.SchemaRequest.views:type_name -> kubex.keystone.EntityView
+	12,  // 63: kubex.keystone.MutateRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 64: kubex.keystone.MutateRequest.schema:type_name -> kubex.keystone.Key
+	29,  // 65: kubex.keystone.MutateRequest.mutation:type_name -> kubex.keystone.Mutation
 	8,   // 66: kubex.keystone.MutateRequest.options:type_name -> kubex.keystone.MutateRequest.MutateOption
-	11,  // 67: kubex.keystone.ReportTimeSeriesRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 68: kubex.keystone.ReportTimeSeriesRequest.schema:type_name -> kubex.keystone.Key
-	28,  // 69: kubex.keystone.ReportTimeSeriesRequest.mutation:type_name -> kubex.keystone.Mutation
-	75,  // 70: kubex.keystone.ReportTimeSeriesRequest.timestamp:type_name -> google.protobuf.Timestamp
-	45,  // 71: kubex.keystone.EntityView.properties:type_name -> kubex.keystone.PropertyRequest
-	46,  // 72: kubex.keystone.EntityView.children:type_name -> kubex.keystone.ChildRequest
-	15,  // 73: kubex.keystone.EntityView.relationship_by_type:type_name -> kubex.keystone.Key
-	15,  // 74: kubex.keystone.EntityView.descendant_count_type:type_name -> kubex.keystone.Key
-	15,  // 75: kubex.keystone.EntityView.relationship_count_type:type_name -> kubex.keystone.Key
-	15,  // 76: kubex.keystone.TypeCount.type:type_name -> kubex.keystone.Key
-	15,  // 77: kubex.keystone.ChildSummary.type:type_name -> kubex.keystone.Key
-	11,  // 78: kubex.keystone.EntityRequest.authorization:type_name -> kubex.keystone.Authorization
-	44,  // 79: kubex.keystone.EntityRequest.unique_id:type_name -> kubex.keystone.IDLookup
-	37,  // 80: kubex.keystone.EntityRequest.view:type_name -> kubex.keystone.EntityView
-	15,  // 81: kubex.keystone.EntityRequest.schema:type_name -> kubex.keystone.Key
-	18,  // 82: kubex.keystone.EntityResponse.entity:type_name -> kubex.keystone.Entity
-	19,  // 83: kubex.keystone.EntityResponse.properties:type_name -> kubex.keystone.EntityProperty
-	20,  // 84: kubex.keystone.EntityResponse.children:type_name -> kubex.keystone.EntityChild
-	21,  // 85: kubex.keystone.EntityResponse.datum:type_name -> kubex.keystone.EntityDatum
-	24,  // 86: kubex.keystone.EntityResponse.relationships:type_name -> kubex.keystone.EntityRelationship
-	25,  // 87: kubex.keystone.EntityResponse.labels:type_name -> kubex.keystone.EntityLabel
-	38,  // 88: kubex.keystone.EntityResponse.relationship_counts:type_name -> kubex.keystone.TypeCount
-	38,  // 89: kubex.keystone.EntityResponse.descendant_counts:type_name -> kubex.keystone.TypeCount
-	39,  // 90: kubex.keystone.EntityResponse.child_summary:type_name -> kubex.keystone.ChildSummary
-	19,  // 91: kubex.keystone.EntityResponse.dynamic_properties:type_name -> kubex.keystone.EntityProperty
-	42,  // 92: kubex.keystone.EntityResponse.lock:type_name -> kubex.keystone.EntityLock
-	9,   // 93: kubex.keystone.EntityResponse.extended:type_name -> kubex.keystone.ExtendedResponse
-	75,  // 94: kubex.keystone.EntityLock.locked_until:type_name -> google.protobuf.Timestamp
-	9,   // 95: kubex.keystone.MutateResponse.extended:type_name -> kubex.keystone.ExtendedResponse
-	10,  // 96: kubex.keystone.PropertyRequest.source:type_name -> kubex.keystone.VendorApp
-	15,  // 97: kubex.keystone.ChildRequest.type:type_name -> kubex.keystone.Key
-	11,  // 98: kubex.keystone.LogsRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 99: kubex.keystone.LogsRequest.type:type_name -> kubex.keystone.Key
+	12,  // 67: kubex.keystone.ReportTimeSeriesRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 68: kubex.keystone.ReportTimeSeriesRequest.schema:type_name -> kubex.keystone.Key
+	29,  // 69: kubex.keystone.ReportTimeSeriesRequest.mutation:type_name -> kubex.keystone.Mutation
+	82,  // 70: kubex.keystone.ReportTimeSeriesRequest.timestamp:type_name -> google.protobuf.Timestamp
+	46,  // 71: kubex.keystone.EntityView.properties:type_name -> kubex.keystone.PropertyRequest
+	47,  // 72: kubex.keystone.EntityView.children:type_name -> kubex.keystone.ChildRequest
+	16,  // 73: kubex.keystone.EntityView.relationship_by_type:type_name -> kubex.keystone.Key
+	16,  // 74: kubex.keystone.EntityView.descendant_count_type:type_name -> kubex.keystone.Key
+	16,  // 75: kubex.keystone.EntityView.relationship_count_type:type_name -> kubex.keystone.Key
+	16,  // 76: kubex.keystone.TypeCount.type:type_name -> kubex.keystone.Key
+	16,  // 77: kubex.keystone.ChildSummary.type:type_name -> kubex.keystone.Key
+	12,  // 78: kubex.keystone.EntityRequest.authorization:type_name -> kubex.keystone.Authorization
+	45,  // 79: kubex.keystone.EntityRequest.unique_id:type_name -> kubex.keystone.IDLookup
+	38,  // 80: kubex.keystone.EntityRequest.view:type_name -> kubex.keystone.EntityView
+	16,  // 81: kubex.keystone.EntityRequest.schema:type_name -> kubex.keystone.Key
+	19,  // 82: kubex.keystone.EntityResponse.entity:type_name -> kubex.keystone.Entity
+	20,  // 83: kubex.keystone.EntityResponse.properties:type_name -> kubex.keystone.EntityProperty
+	21,  // 84: kubex.keystone.EntityResponse.children:type_name -> kubex.keystone.EntityChild
+	22,  // 85: kubex.keystone.EntityResponse.datum:type_name -> kubex.keystone.EntityDatum
+	25,  // 86: kubex.keystone.EntityResponse.relationships:type_name -> kubex.keystone.EntityRelationship
+	26,  // 87: kubex.keystone.EntityResponse.labels:type_name -> kubex.keystone.EntityLabel
+	39,  // 88: kubex.keystone.EntityResponse.relationship_counts:type_name -> kubex.keystone.TypeCount
+	39,  // 89: kubex.keystone.EntityResponse.descendant_counts:type_name -> kubex.keystone.TypeCount
+	40,  // 90: kubex.keystone.EntityResponse.child_summary:type_name -> kubex.keystone.ChildSummary
+	20,  // 91: kubex.keystone.EntityResponse.dynamic_properties:type_name -> kubex.keystone.EntityProperty
+	43,  // 92: kubex.keystone.EntityResponse.lock:type_name -> kubex.keystone.EntityLock
+	10,  // 93: kubex.keystone.EntityResponse.extended:type_name -> kubex.keystone.ExtendedResponse
+	82,  // 94: kubex.keystone.EntityLock.locked_until:type_name -> google.protobuf.Timestamp
+	10,  // 95: kubex.keystone.MutateResponse.extended:type_name -> kubex.keystone.ExtendedResponse
+	11,  // 96: kubex.keystone.PropertyRequest.source:type_name -> kubex.keystone.VendorApp
+	16,  // 97: kubex.keystone.ChildRequest.type:type_name -> kubex.keystone.Key
+	12,  // 98: kubex.keystone.LogsRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 99: kubex.keystone.LogsRequest.type:type_name -> kubex.keystone.Key
 	1,   // 100: kubex.keystone.LogsRequest.levels:type_name -> kubex.keystone.LogLevel
 	1,   // 101: kubex.keystone.LogsRequest.min_level:type_name -> kubex.keystone.LogLevel
-	31,  // 102: kubex.keystone.LogsRequest.window:type_name -> kubex.keystone.Window
-	22,  // 103: kubex.keystone.LogsResponse.logs:type_name -> kubex.keystone.EntityLog
-	11,  // 104: kubex.keystone.EventRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 105: kubex.keystone.EventRequest.event_by_type:type_name -> kubex.keystone.Key
-	31,  // 106: kubex.keystone.EventRequest.events_in_window:type_name -> kubex.keystone.Window
-	23,  // 107: kubex.keystone.EventsResponse.events:type_name -> kubex.keystone.EntityEvent
-	15,  // 108: kubex.keystone.RelationOf.relationship:type_name -> kubex.keystone.Key
-	11,  // 109: kubex.keystone.FindRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 110: kubex.keystone.FindRequest.schema:type_name -> kubex.keystone.Key
-	37,  // 111: kubex.keystone.FindRequest.view:type_name -> kubex.keystone.EntityView
-	51,  // 112: kubex.keystone.FindRequest.relation_of:type_name -> kubex.keystone.RelationOf
-	32,  // 113: kubex.keystone.FindRequest.property_filters:type_name -> kubex.keystone.PropertyFilter
-	25,  // 114: kubex.keystone.FindRequest.label_filters:type_name -> kubex.keystone.EntityLabel
-	41,  // 115: kubex.keystone.FindResponse.entities:type_name -> kubex.keystone.EntityResponse
-	9,   // 116: kubex.keystone.FindResponse.extended:type_name -> kubex.keystone.ExtendedResponse
-	11,  // 117: kubex.keystone.ListRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 118: kubex.keystone.ListRequest.schema:type_name -> kubex.keystone.Key
-	32,  // 119: kubex.keystone.ListRequest.filters:type_name -> kubex.keystone.PropertyFilter
-	33,  // 120: kubex.keystone.ListRequest.sort:type_name -> kubex.keystone.PropertySort
-	54,  // 121: kubex.keystone.ListRequest.page:type_name -> kubex.keystone.PageRequest
-	41,  // 122: kubex.keystone.ListResponse.entities:type_name -> kubex.keystone.EntityResponse
-	9,   // 123: kubex.keystone.ListResponse.extended:type_name -> kubex.keystone.ExtendedResponse
-	11,  // 124: kubex.keystone.GroupCountRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 125: kubex.keystone.GroupCountRequest.schema:type_name -> kubex.keystone.Key
-	32,  // 126: kubex.keystone.GroupCountRequest.filters:type_name -> kubex.keystone.PropertyFilter
-	54,  // 127: kubex.keystone.GroupCountRequest.page:type_name -> kubex.keystone.PageRequest
-	71,  // 128: kubex.keystone.GroupCountResponse.results:type_name -> kubex.keystone.GroupCountResponse.Result
-	41,  // 129: kubex.keystone.EntitiesResponse.entities:type_name -> kubex.keystone.EntityResponse
-	11,  // 130: kubex.keystone.SchemaStatisticsRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 131: kubex.keystone.SchemaStatisticsRequest.schema:type_name -> kubex.keystone.Key
-	60,  // 132: kubex.keystone.SchemaStatisticsRequest.created_from:type_name -> kubex.keystone.Date
-	60,  // 133: kubex.keystone.SchemaStatisticsRequest.created_until:type_name -> kubex.keystone.Date
-	73,  // 134: kubex.keystone.SchemaStatisticsResponse.daily_count:type_name -> kubex.keystone.SchemaStatisticsResponse.DailyCountEntry
-	11,  // 135: kubex.keystone.DailyEntityRequest.authorization:type_name -> kubex.keystone.Authorization
-	15,  // 136: kubex.keystone.DailyEntityRequest.schema:type_name -> kubex.keystone.Key
-	60,  // 137: kubex.keystone.DailyEntityRequest.date:type_name -> kubex.keystone.Date
-	74,  // 138: kubex.keystone.DailyEntityResponse.entities:type_name -> kubex.keystone.DailyEntityResponse.EntitiesEntry
-	72,  // 139: kubex.keystone.GroupCountResponse.Result.properties:type_name -> kubex.keystone.GroupCountResponse.Result.PropertiesEntry
-	34,  // 140: kubex.keystone.Keystone.Define:input_type -> kubex.keystone.SchemaRequest
-	35,  // 141: kubex.keystone.Keystone.Mutate:input_type -> kubex.keystone.MutateRequest
-	29,  // 142: kubex.keystone.Keystone.Log:input_type -> kubex.keystone.LogRequest
-	36,  // 143: kubex.keystone.Keystone.ReportTimeSeries:input_type -> kubex.keystone.ReportTimeSeriesRequest
-	40,  // 144: kubex.keystone.Keystone.Retrieve:input_type -> kubex.keystone.EntityRequest
-	52,  // 145: kubex.keystone.Keystone.Find:input_type -> kubex.keystone.FindRequest
-	55,  // 146: kubex.keystone.Keystone.List:input_type -> kubex.keystone.ListRequest
-	57,  // 147: kubex.keystone.Keystone.GroupCount:input_type -> kubex.keystone.GroupCountRequest
-	47,  // 148: kubex.keystone.Keystone.Logs:input_type -> kubex.keystone.LogsRequest
-	49,  // 149: kubex.keystone.Keystone.Events:input_type -> kubex.keystone.EventRequest
-	63,  // 150: kubex.keystone.Keystone.DailyEntities:input_type -> kubex.keystone.DailyEntityRequest
-	61,  // 151: kubex.keystone.Keystone.SchemaStatistics:input_type -> kubex.keystone.SchemaStatisticsRequest
-	13,  // 152: kubex.keystone.Keystone.Define:output_type -> kubex.keystone.Schema
-	43,  // 153: kubex.keystone.Keystone.Mutate:output_type -> kubex.keystone.MutateResponse
-	30,  // 154: kubex.keystone.Keystone.Log:output_type -> kubex.keystone.LogResponse
-	43,  // 155: kubex.keystone.Keystone.ReportTimeSeries:output_type -> kubex.keystone.MutateResponse
-	41,  // 156: kubex.keystone.Keystone.Retrieve:output_type -> kubex.keystone.EntityResponse
-	53,  // 157: kubex.keystone.Keystone.Find:output_type -> kubex.keystone.FindResponse
-	56,  // 158: kubex.keystone.Keystone.List:output_type -> kubex.keystone.ListResponse
-	58,  // 159: kubex.keystone.Keystone.GroupCount:output_type -> kubex.keystone.GroupCountResponse
-	48,  // 160: kubex.keystone.Keystone.Logs:output_type -> kubex.keystone.LogsResponse
-	50,  // 161: kubex.keystone.Keystone.Events:output_type -> kubex.keystone.EventsResponse
-	64,  // 162: kubex.keystone.Keystone.DailyEntities:output_type -> kubex.keystone.DailyEntityResponse
-	62,  // 163: kubex.keystone.Keystone.SchemaStatistics:output_type -> kubex.keystone.SchemaStatisticsResponse
-	152, // [152:164] is the sub-list for method output_type
-	140, // [140:152] is the sub-list for method input_type
-	140, // [140:140] is the sub-list for extension type_name
-	140, // [140:140] is the sub-list for extension extendee
-	0,   // [0:140] is the sub-list for field type_name
+	32,  // 102: kubex.keystone.LogsRequest.window:type_name -> kubex.keystone.Window
+	23,  // 103: kubex.keystone.LogsResponse.logs:type_name -> kubex.keystone.EntityLog
+	12,  // 104: kubex.keystone.EventRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 105: kubex.keystone.EventRequest.event_by_type:type_name -> kubex.keystone.Key
+	32,  // 106: kubex.keystone.EventRequest.events_in_window:type_name -> kubex.keystone.Window
+	24,  // 107: kubex.keystone.EventsResponse.events:type_name -> kubex.keystone.EntityEvent
+	16,  // 108: kubex.keystone.RelationOf.relationship:type_name -> kubex.keystone.Key
+	12,  // 109: kubex.keystone.FindRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 110: kubex.keystone.FindRequest.schema:type_name -> kubex.keystone.Key
+	38,  // 111: kubex.keystone.FindRequest.view:type_name -> kubex.keystone.EntityView
+	52,  // 112: kubex.keystone.FindRequest.relation_of:type_name -> kubex.keystone.RelationOf
+	33,  // 113: kubex.keystone.FindRequest.property_filters:type_name -> kubex.keystone.PropertyFilter
+	26,  // 114: kubex.keystone.FindRequest.label_filters:type_name -> kubex.keystone.EntityLabel
+	42,  // 115: kubex.keystone.FindResponse.entities:type_name -> kubex.keystone.EntityResponse
+	10,  // 116: kubex.keystone.FindResponse.extended:type_name -> kubex.keystone.ExtendedResponse
+	12,  // 117: kubex.keystone.ListRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 118: kubex.keystone.ListRequest.schema:type_name -> kubex.keystone.Key
+	33,  // 119: kubex.keystone.ListRequest.filters:type_name -> kubex.keystone.PropertyFilter
+	34,  // 120: kubex.keystone.ListRequest.sort:type_name -> kubex.keystone.PropertySort
+	55,  // 121: kubex.keystone.ListRequest.page:type_name -> kubex.keystone.PageRequest
+	42,  // 122: kubex.keystone.ListResponse.entities:type_name -> kubex.keystone.EntityResponse
+	10,  // 123: kubex.keystone.ListResponse.extended:type_name -> kubex.keystone.ExtendedResponse
+	12,  // 124: kubex.keystone.GroupCountRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 125: kubex.keystone.GroupCountRequest.schema:type_name -> kubex.keystone.Key
+	33,  // 126: kubex.keystone.GroupCountRequest.filters:type_name -> kubex.keystone.PropertyFilter
+	55,  // 127: kubex.keystone.GroupCountRequest.page:type_name -> kubex.keystone.PageRequest
+	75,  // 128: kubex.keystone.GroupCountResponse.results:type_name -> kubex.keystone.GroupCountResponse.Result
+	42,  // 129: kubex.keystone.EntitiesResponse.entities:type_name -> kubex.keystone.EntityResponse
+	12,  // 130: kubex.keystone.SchemaStatisticsRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 131: kubex.keystone.SchemaStatisticsRequest.schema:type_name -> kubex.keystone.Key
+	61,  // 132: kubex.keystone.SchemaStatisticsRequest.created_from:type_name -> kubex.keystone.Date
+	61,  // 133: kubex.keystone.SchemaStatisticsRequest.created_until:type_name -> kubex.keystone.Date
+	77,  // 134: kubex.keystone.SchemaStatisticsResponse.daily_count:type_name -> kubex.keystone.SchemaStatisticsResponse.DailyCountEntry
+	12,  // 135: kubex.keystone.DailyEntityRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 136: kubex.keystone.DailyEntityRequest.schema:type_name -> kubex.keystone.Key
+	61,  // 137: kubex.keystone.DailyEntityRequest.date:type_name -> kubex.keystone.Date
+	78,  // 138: kubex.keystone.DailyEntityResponse.entities:type_name -> kubex.keystone.DailyEntityResponse.EntitiesEntry
+	12,  // 139: kubex.keystone.ChartTimeSeriesRequest.authorization:type_name -> kubex.keystone.Authorization
+	16,  // 140: kubex.keystone.ChartTimeSeriesRequest.schema:type_name -> kubex.keystone.Key
+	61,  // 141: kubex.keystone.ChartTimeSeriesRequest.from:type_name -> kubex.keystone.Date
+	61,  // 142: kubex.keystone.ChartTimeSeriesRequest.until:type_name -> kubex.keystone.Date
+	67,  // 143: kubex.keystone.ChartTimeSeriesRequest.aggregations:type_name -> kubex.keystone.PropertyAggregation
+	33,  // 144: kubex.keystone.ChartTimeSeriesRequest.property_filters:type_name -> kubex.keystone.PropertyFilter
+	9,   // 145: kubex.keystone.PropertyAggregation.type:type_name -> kubex.keystone.PropertyAggregation.AggregationType
+	79,  // 146: kubex.keystone.ChartTimeSeriesResponse.series:type_name -> kubex.keystone.ChartTimeSeriesResponse.SeriesEntry
+	76,  // 147: kubex.keystone.GroupCountResponse.Result.properties:type_name -> kubex.keystone.GroupCountResponse.Result.PropertiesEntry
+	80,  // 148: kubex.keystone.ChartTimeSeriesResponse.SeriesEntry.value:type_name -> kubex.keystone.ChartTimeSeriesResponse.ChartSeries
+	82,  // 149: kubex.keystone.ChartTimeSeriesResponse.ChartSeries.bucket:type_name -> google.protobuf.Timestamp
+	81,  // 150: kubex.keystone.ChartTimeSeriesResponse.ChartSeries.values:type_name -> kubex.keystone.ChartTimeSeriesResponse.ChartSeries.ValuesEntry
+	35,  // 151: kubex.keystone.Keystone.Define:input_type -> kubex.keystone.SchemaRequest
+	36,  // 152: kubex.keystone.Keystone.Mutate:input_type -> kubex.keystone.MutateRequest
+	30,  // 153: kubex.keystone.Keystone.Log:input_type -> kubex.keystone.LogRequest
+	37,  // 154: kubex.keystone.Keystone.ReportTimeSeries:input_type -> kubex.keystone.ReportTimeSeriesRequest
+	66,  // 155: kubex.keystone.Keystone.ChartTimeSeries:input_type -> kubex.keystone.ChartTimeSeriesRequest
+	41,  // 156: kubex.keystone.Keystone.Retrieve:input_type -> kubex.keystone.EntityRequest
+	53,  // 157: kubex.keystone.Keystone.Find:input_type -> kubex.keystone.FindRequest
+	56,  // 158: kubex.keystone.Keystone.List:input_type -> kubex.keystone.ListRequest
+	58,  // 159: kubex.keystone.Keystone.GroupCount:input_type -> kubex.keystone.GroupCountRequest
+	48,  // 160: kubex.keystone.Keystone.Logs:input_type -> kubex.keystone.LogsRequest
+	50,  // 161: kubex.keystone.Keystone.Events:input_type -> kubex.keystone.EventRequest
+	64,  // 162: kubex.keystone.Keystone.DailyEntities:input_type -> kubex.keystone.DailyEntityRequest
+	62,  // 163: kubex.keystone.Keystone.SchemaStatistics:input_type -> kubex.keystone.SchemaStatisticsRequest
+	14,  // 164: kubex.keystone.Keystone.Define:output_type -> kubex.keystone.Schema
+	44,  // 165: kubex.keystone.Keystone.Mutate:output_type -> kubex.keystone.MutateResponse
+	31,  // 166: kubex.keystone.Keystone.Log:output_type -> kubex.keystone.LogResponse
+	44,  // 167: kubex.keystone.Keystone.ReportTimeSeries:output_type -> kubex.keystone.MutateResponse
+	68,  // 168: kubex.keystone.Keystone.ChartTimeSeries:output_type -> kubex.keystone.ChartTimeSeriesResponse
+	42,  // 169: kubex.keystone.Keystone.Retrieve:output_type -> kubex.keystone.EntityResponse
+	54,  // 170: kubex.keystone.Keystone.Find:output_type -> kubex.keystone.FindResponse
+	57,  // 171: kubex.keystone.Keystone.List:output_type -> kubex.keystone.ListResponse
+	59,  // 172: kubex.keystone.Keystone.GroupCount:output_type -> kubex.keystone.GroupCountResponse
+	49,  // 173: kubex.keystone.Keystone.Logs:output_type -> kubex.keystone.LogsResponse
+	51,  // 174: kubex.keystone.Keystone.Events:output_type -> kubex.keystone.EventsResponse
+	65,  // 175: kubex.keystone.Keystone.DailyEntities:output_type -> kubex.keystone.DailyEntityResponse
+	63,  // 176: kubex.keystone.Keystone.SchemaStatistics:output_type -> kubex.keystone.SchemaStatisticsResponse
+	164, // [164:177] is the sub-list for method output_type
+	151, // [151:164] is the sub-list for method input_type
+	151, // [151:151] is the sub-list for extension type_name
+	151, // [151:151] is the sub-list for extension extendee
+	0,   // [0:151] is the sub-list for field type_name
 }
 
 func init() { file_keystone_proto_init() }
@@ -6826,8 +7267,56 @@ func file_keystone_proto_init() {
 				return nil
 			}
 		}
-		file_keystone_proto_msgTypes[62].Exporter = func(v interface{}, i int) interface{} {
+		file_keystone_proto_msgTypes[56].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChartTimeSeriesRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_keystone_proto_msgTypes[57].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PropertyAggregation); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_keystone_proto_msgTypes[58].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChartTimeSeriesResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_keystone_proto_msgTypes[65].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GroupCountResponse_Result); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_keystone_proto_msgTypes[70].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChartTimeSeriesResponse_ChartSeries); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6844,8 +7333,8 @@ func file_keystone_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_keystone_proto_rawDesc,
-			NumEnums:      9,
-			NumMessages:   66,
+			NumEnums:      10,
+			NumMessages:   72,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
