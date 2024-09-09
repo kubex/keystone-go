@@ -28,7 +28,7 @@ func (e *EntitySensors) GetKeystoneSensorMeasurements() []*proto.EntitySensorMea
 }
 
 // AddKeystoneSensorMeasurement adds a Sensor measurement
-func (e *EntitySensors) AddKeystoneSensorMeasurement(sensor string, value float32) {
+func (e *EntitySensors) AddKeystoneSensorMeasurement(sensor string, value float64) {
 	e.ksEntitySensorsMeasurements = append(e.ksEntitySensorsMeasurements, &proto.EntitySensorMeasurement{
 		Sensor: sensor,
 		Value:  value,
@@ -37,7 +37,7 @@ func (e *EntitySensors) AddKeystoneSensorMeasurement(sensor string, value float3
 }
 
 // AddKeystoneSensorMeasurementWithData adds a Sensor measurement
-func (e *EntitySensors) AddKeystoneSensorMeasurementWithData(sensor string, value float32, data map[string]string) {
+func (e *EntitySensors) AddKeystoneSensorMeasurementWithData(sensor string, value float64, data map[string]string) {
 	e.ksEntitySensorsMeasurements = append(e.ksEntitySensorsMeasurements, &proto.EntitySensorMeasurement{
 		Sensor: sensor,
 		Value:  value,
